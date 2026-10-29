@@ -1,0 +1,98 @@
+  <aside id="sp-pane" class="sp-pane" data-closed aria-labelledby="sp-title">
+    <header class="sp-head">
+      <div class="sp-heading">
+        <h2 id="sp-title" tabindex="-1">Help &amp; support</h2>
+        <p>Ask a question, or tell the support team.</p>
+      </div>
+      <button type="button" class="sp-close" id="sp-close" aria-label="Close side pane"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </header>
+
+    <div class="sp-tabs" role="tablist" aria-label="Help and support">
+      <button type="button" role="tab" id="sp-tab-ask" aria-controls="sp-ask" aria-selected="true"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Ask</button>
+      <button type="button" role="tab" id="sp-tab-ticket" aria-controls="sp-ticket" aria-selected="false" tabindex="-1"><i class="ti ti-ticket" aria-hidden="true"></i>Support ticket</button>
+    </div>
+
+    <section id="sp-ask" class="sp-panel sp-chat" role="tabpanel" aria-labelledby="sp-tab-ask">
+      <div class="sp-messages" id="sp-messages" aria-live="polite"></div>
+      <form class="sp-composer" id="sp-composer">
+        <label class="sp-sr-only" for="sp-question">Ask a question</label>
+        <textarea id="sp-question" rows="1" placeholder="Ask about UnionSuite or iMIS…" autocomplete="off"></textarea>
+        <button type="submit" class="sp-send" aria-label="Send question" disabled><i class="ti ti-send" aria-hidden="true"></i></button>
+      </form>
+      <p class="sp-disclaimer">Answers come from the UnionSuite guide. Check them before you change a member's record.</p>
+    </section>
+
+    <section id="sp-ticket" class="sp-panel sp-ticket" role="tabpanel" aria-labelledby="sp-tab-ticket" hidden>
+      <form id="sp-ticket-form" class="sp-form" novalidate>
+        <div class="sp-form-body">
+          <p class="sp-handoff" id="sp-handoff" hidden><i class="ti ti-sparkles" aria-hidden="true"></i>Your chat is attached, so you won't need to explain it again.</p>
+
+          <div class="sp-field">
+            <label for="sp-type">What do you need help with?</label>
+            <select id="sp-type">
+              <option value="broken">Something isn't working</option>
+              <option value="howto">How do I…?</option>
+              <option value="data">Change or fix data</option>
+              <option value="access">Access or permissions</option>
+              <option value="idea">Suggest an improvement</option>
+            </select>
+          </div>
+
+          <div class="sp-field">
+            <label for="sp-subject">Subject</label>
+            <input id="sp-subject" type="text" maxlength="120" placeholder="A short summary" aria-describedby="sp-subject-error">
+            <p class="sp-error" id="sp-subject-error" hidden>Add a short summary.</p>
+          </div>
+
+          <div class="sp-field">
+            <label for="sp-details">What happened?</label>
+            <textarea id="sp-details" rows="5" placeholder="What were you doing, what did you expect, and what happened instead?" aria-describedby="sp-details-error"></textarea>
+            <p class="sp-error" id="sp-details-error" hidden>Tell us a little about what happened.</p>
+          </div>
+
+          <fieldset class="sp-field">
+            <legend>How much is this affecting your work?</legend>
+            <div class="sp-impact">
+              <label><input type="radio" name="sp-impact" value="low" checked><span>Not much</span></label>
+              <label><input type="radio" name="sp-impact" value="slow"><span>Slowing me down</span></label>
+              <label><input type="radio" name="sp-impact" value="blocked"><span>I can't work</span></label>
+            </div>
+            <p class="sp-hint" id="sp-impact-hint">It joins the normal queue.</p>
+          </fieldset>
+
+          <fieldset class="sp-field">
+            <legend>Sent with your ticket</legend>
+            <ul class="sp-context">
+              <li id="sp-context-chat" hidden>
+                <label><input type="checkbox" id="sp-include-chat" checked><i class="ti ti-message-chatbot" aria-hidden="true"></i><span><strong>Help chat</strong><small id="sp-chat-count">Your conversation</small></span></label>
+              </li>
+              <li>
+                <label><input type="checkbox" checked><i class="ti ti-file-text" aria-hidden="true"></i><span><strong>This page</strong><small>Staff home · /Staff/Home.aspx</small></span></label>
+              </li>
+              <li>
+                <label><input type="checkbox" checked><i class="ti ti-info-circle" aria-hidden="true"></i><span><strong>Browser and screen</strong><small id="sp-browser">Your browser</small></span></label>
+              </li>
+            </ul>
+            <ul class="sp-files" id="sp-files"></ul>
+            <button type="button" class="sp-attach" id="sp-attach"><i class="ti ti-paperclip" aria-hidden="true"></i>Add a screenshot or file</button>
+          </fieldset>
+        </div>
+        <footer class="sp-form-footer">
+          <span>Replies go to your iMIS email.</span>
+          <button type="submit" class="sp-primary" id="sp-submit"><span class="us-button-spinner" aria-hidden="true" hidden></span><i class="ti ti-send" aria-hidden="true"></i>Send to support</button>
+        </footer>
+      </form>
+
+      <div class="sp-sent" id="sp-sent" hidden>
+        <div class="sp-sent-icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+        <h3 id="sp-sent-title" tabindex="-1">Ticket <span id="sp-ticket-number">SUP-2048</span> sent</h3>
+        <p>The support team usually replies within one business day. We'll email you, and you can follow it here.</p>
+        <h4>Your tickets</h4>
+        <ul class="sp-tickets" id="sp-tickets"></ul>
+        <div class="sp-sent-actions">
+          <button type="button" class="sp-secondary" id="sp-another"><i class="ti ti-plus" aria-hidden="true"></i>Raise another ticket</button>
+          <button type="button" class="sp-link" id="sp-back-to-ask">Back to Ask</button>
+        </div>
+      </div>
+    </section>
+  </aside>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Taskbar side pane — UnionSuite</title>
+  <style>/* WORKSHOP_STYLES */
+/* PAGE_STYLES */</style>
+</head>
+<body class="workshop">
+  <main class="workshop-page">
+    <header class="workshop-intro">
+      <div><p class="eyebrow">UNIONSUITE / DESIGN WORKSHOP 02</p><h1>Help, one click away.</h1>
+        <p class="intro-copy">A side pane from the right of the taskbar, with a help assistant and a support ticket form. It runs on the theme’s own header, taskbar, bookmarks and Recents.</p></div>
+      <span class="trial-badge">Work in progress</span>
+    </header>
+    <section class="workshop-controls" aria-label="Preview settings">
+      <div class="layout-control"><span class="control-label">When the pane opens</span><div class="segmented" role="group" aria-label="Pane behaviour">
+        <button type="button" data-pane-mode="overlay" aria-pressed="true">Overlay <span>Covers the page</span></button>
+        <button type="button" data-pane-mode="push" aria-pressed="false">Push <span>Page narrows</span></button>
+      </div></div>
+      <label>Preview width<select id="preview-width"><option value="fluid">Fit window</option><option value="1440">Wide · 1440px</option><option value="1180">Desktop · 1180px</option><option value="900">Laptop · 900px</option><option value="420">Narrow · 420px</option></select></label>
+      <label>Appearance<select id="preview-scheme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    </section>
+    <section class="comparison-section" aria-labelledby="proposal-title">
+      <div class="comparison-heading"><div><span class="section-letter accent-letter">01</span><h2 id="proposal-title">Help &amp; support pane</h2><span class="trial-label">Draft</span></div><button type="button" id="reset-demo">Reset demo</button></div>
+      <p class="layout-description">Select the side pane toggle at the far right of the taskbar. Ask a question, or switch to Support ticket. When an answer doesn't solve it, Raise a ticket carries the chat across so you don't explain it twice.</p>
+      <div class="try-controls" aria-label="Try the pane"><span>Try it</span><button type="button" data-pane-try="open">Open the pane</button><button type="button" data-pane-try="ask">Ask a question</button><button type="button" data-pane-try="handoff">Chat to ticket</button><button type="button" data-pane-try="ticket">Blank ticket</button></div>
+      <div class="preview-scroll"><div class="preview-width"><iframe id="proposal" title="Taskbar with the help and support side pane" srcdoc="PROPOSAL_DOCUMENT"></iframe></div></div>
+    </section>
+    <section class="workshop-notes" aria-label="Design considerations">
+      <article><span class="note-number">1</span><h3>One place to get unstuck</h3><p>The pane opens beside the work, not over it in a popup, so you can follow the steps while you do them. It stays open until you close it.</p></article>
+      <article><span class="note-number">2</span><h3>Ask first, then escalate</h3><p>The assistant answers from the usage guide and shows where the answer came from. When it can't help, the ticket starts with the chat attached.</p></article>
+      <article><span class="note-number">3</span><h3>Context comes with you</h3><p>The ticket includes the page and browser automatically, each one can be unticked, and you can add a screenshot. Replies go to your iMIS email.</p></article>
+    </section>
+    <footer class="workshop-footer"><p>Fictional data · Answers are canned · Nothing is sent · Changes last for this preview session</p><p>Open decisions are listed in prototypes/wip/taskbar-side-pane/README.md.</p></footer>
+  </main>
+  <script>/* WORKSHOP_CONTROLS */</script>
+</body>
+</html>

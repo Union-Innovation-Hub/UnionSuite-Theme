@@ -113,6 +113,18 @@ has the exact order, lifecycle, palette ownership and native coverage limits.
 Verify authenticated search, real query permissions, record navigation and partial
 updates on iMIS after deployment. Offline guide fixtures use fictional responses.
 
+## Side pane
+
+`UnionSuiteSidePane.js` adds a side pane toggle at the far right of the taskbar
+(after the bookmarks star) on pages that have a side pane tab, and opens a pane
+from the right, below the header. Features add tabs with
+`UnionSuiteSidePane.register({id, label, icon, pages, render})`. The first tab,
+Case help on the manage case page, is a chat placeholder. The loader loads the
+script on the case page only; widen its gate in `index.js` when tabs for other
+pages arrive. Styles are US-SIDE-PANE in `zUnionSuite.css`, with dark details
+in `zzDarkMode.css`. Test: `node tools/test-side-pane.cjs`. Guide:
+[side pane section](../../UnionSuite-Guides/Usage-Guide.html#side-pane).
+
 Taskbar management shortcuts: Manage IQAs, Manage Content, Manage Themes and About iMIS appear between Biscuit and Quick Search. They are labelled same-tab anchors with shared theme outline icons. They hide at <=768px. Deploy updated UnionSuiteTaskbar.js and zUnionSuite.css; destination permissions remain native.
 
 Management shortcuts and Full search resolve against websiteRoot in the DOM __ClientContext JSON. Built-in paths are website-relative (including leading-slash paths); no UTNewTheme prefix is embedded. Absolute HTTP(S) fullSearchUrl overrides are preserved. Missing websiteRoot falls back to the current origin root; malformed roots retain the original path. API and record lookup URLs remain unchanged.

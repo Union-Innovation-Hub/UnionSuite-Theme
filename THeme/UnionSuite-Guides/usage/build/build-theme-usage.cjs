@@ -147,6 +147,7 @@ allSources.push('THeme/UnionSuite-Guides/usage/build/home-task-empty-example.cjs
 allSources.push('THeme/UnionSuite-Guides/usage/build/report-icon-example.cjs');
 allSources.push(...require('./panel-title-icons-example.cjs').sources);
 allSources.push(...require('./where-used-example.cjs').sources);
+allSources.push(...require('./side-pane-example.cjs').sources);
 allSources.push(...require('./iqa-finder-example.cjs').sources);
 allSources.push(...require('./popup-forms-example.cjs').sources);
 allSources.push('THeme/UnionSuite-Guides/usage/build/popup-action-example.cjs');
@@ -272,6 +273,8 @@ const inserts = {
  POPUP_FORMS_ADD_DEMO: iframe('popup-forms-add-demo','Task form: adding a task to an agreement',require('./popup-forms-example.cjs').documentHtml({nativePreviewCss,theme,branding:clientRoots,variant:'add'}),true),
  POPUP_FORMS_EDIT_DEMO: iframe('popup-forms-edit-demo','Task form: editing a case task',require('./popup-forms-example.cjs').documentHtml({nativePreviewCss,theme,branding:clientRoots,variant:'edit'}),true),
  IQA_FINDER_DEMO: iframe('iqa-finder-demo','IQA browser: search, favourites and recent',require('./iqa-finder-example.cjs').documentHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
+ SIDE_PANE_DEMO: iframe('side-pane-demo','Taskbar side pane: Case help on a case page',require('./side-pane-example.cjs').liveHtml({read,nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
+ SIDE_CHAT_DEMO: iframe('side-chat-demo','Side pane chat styles for the coming help chat',require('./side-pane-example.cjs').chatHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
  WHERE_USED_DEMO: iframe('where-used-demo','IQA designer: Show Usage drawer',require('./where-used-example.cjs').documentHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
  PANEL_TITLE_ICONS_DEMO: iframe('panel-title-icons-demo','Panel titles typed with an icon token',require('./panel-title-icons-example.cjs').documentHtml({nativePreviewCss,theme,themeJs,iconCss,branding:clientRoots}),true),
  POPUP_ACTION_DEMO: iframe('popup-action-demo','Native popup action example',popupActionExample.documentHtml({nativePreviewCss,theme,themeJs,branding:clientRoots}),true),

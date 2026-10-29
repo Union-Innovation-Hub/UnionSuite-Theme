@@ -44,7 +44,7 @@ The folder keeps its original spelling (`THeme`); hundreds of paths depend on it
 | `THeme/UnionSuite/zUnionSuite.js` | Shared behaviour: reports, banners, composers, actions, loaders |
 | `THeme/UnionSuite/zzDarkMode.css` | All dark-mode palette and overrides; loads last |
 | `THeme/UnionSuite/zzClientSpecific.css` | Client overrides in the shared package |
-| `THeme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
+| `THeme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
 | `THeme/UnionSuite/Forms/` | Theme-built popup forms (task form) |
 | `THeme/UnionSuite/Tabler/`, `Tabler.css`, `images/` | Bundled icon font and images |
 | `THeme/UnionSuite/*.skin`, `ThemeSettings.xml`, `index.js` | iMIS theme package files |

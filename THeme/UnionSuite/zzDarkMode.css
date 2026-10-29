@@ -683,6 +683,19 @@
     color: var(--text-strong);
   }
 
+  /* Taskbar side pane: the brand ramp stays light, so the toggle's on state,
+     the assistant avatar and the reader's chat bubbles use the dark
+     selection surface, as the bookmarks star does. */
+  :root[data-us-color-scheme="dark"] #injected-taskbar > .us-side-pane-toggle[aria-expanded="true"],
+  :root[data-us-color-scheme="dark"] .us-side-chat__avatar,
+  :root[data-us-color-scheme="dark"] .us-side-chat__message--user .us-side-chat__bubble {
+    background: var(--dm-selected);
+  }
+
+  :root[data-us-color-scheme="dark"] .us-side-chat__avatar {
+    color: var(--text-link);
+  }
+
   /* IQA finder: the taskbar quick search's dark hover, rules and icons. */
   :root[data-us-color-scheme="dark"] .us-iqa-finder {
     --us-finder-hover: var(--dm-accent-bg);

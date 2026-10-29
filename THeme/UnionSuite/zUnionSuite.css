@@ -14932,6 +14932,558 @@ a[data-us-comms-log-held] {
 .us-iqa-finder__list {
   margin: 0;
   padding: 0;
+/* US-SIDE-PANE:START — the taskbar's side pane (Scripts/UnionSuiteSidePane.js).
+   A toggle at the far right of the taskbar opens a pane from the right, below
+   the header, with tabs for the page being viewed. Like the Where-used
+   drawer it overlays the page and never moves it. The chat styles below are
+   for the help tabs; the first, Case help, is a placeholder until the chat
+   arrives. */
+
+/* The toggle matches the bookmarks star beside it: a 36px icon button with
+   the theme's heading icon toggle "on" state. The appearance switch is order
+   1 and the star 2, so the toggle closes the row. */
+#injected-taskbar > .us-side-pane-toggle {
+  order: 3;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background-color 150ms cubic-bezier(.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(.2, 0, 0, 1),
+    box-shadow 150ms cubic-bezier(.2, 0, 0, 1),
+    color 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+#injected-taskbar > .us-side-pane-toggle > .ti {
+  font-size: 18px;
+}
+
+#injected-taskbar > .us-side-pane-toggle:hover {
+  border-color: var(--border);
+  background: var(--bg-sunken);
+  color: var(--text-link);
+}
+
+#injected-taskbar > .us-side-pane-toggle[aria-expanded="true"],
+#injected-taskbar > .us-side-pane-toggle[aria-expanded="true"]:hover {
+  border-color: color-mix(in srgb, var(--text-link) 28%, transparent);
+  background: var(--brand-100);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / .14);
+  color: var(--text-link);
+}
+
+#injected-taskbar > .us-side-pane-toggle:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+/* The pane. --us-side-pane-top is the header's bottom edge, set by the
+   script; it reaches 0 as the header scrolls away. Below iMIS dialogs
+   (RadWindow starts at 3000) and the taskbar's own menus (10000 and up). */
+.us-side-pane {
+  --us-side-pane-width: 400px;
+  --us-side-pane-ease: cubic-bezier(.2, 0, 0, 1);
+  position: fixed;
+  top: var(--us-side-pane-top, 0px);
+  right: 0;
+  bottom: 0;
+  z-index: 2900;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(var(--us-side-pane-width), 100vw);
+  border-left: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-base);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-ui);
+  transform: translateX(0);
+  transition:
+    transform 220ms var(--us-side-pane-ease),
+    visibility 0s linear 0s;
+}
+
+.us-side-pane[data-closed] {
+  visibility: hidden;
+  transform: translateX(calc(100% + 24px));
+  transition:
+    transform 180ms var(--us-side-pane-ease),
+    visibility 0s linear 180ms;
+}
+
+.us-side-pane *,
+.us-side-pane *::before,
+.us-side-pane *::after {
+  box-sizing: border-box;
+}
+
+.us-side-pane [hidden] {
+  display: none !important;
+}
+
+.us-side-pane__head {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 16px 12px 12px 20px;
+}
+
+.us-side-pane__heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.us-side-pane__title {
+  margin: 0;
+  color: var(--text-strong);
+  font: 600 16px/1.3 var(--font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.us-side-pane__title:focus {
+  outline: none;
+}
+
+.us-side-pane__subtitle {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font: 13px/1.4 var(--font-ui);
+}
+
+.us-side-pane__close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+
+.us-side-pane__close:hover {
+  background: var(--bg-subtle);
+  color: var(--text-strong);
+}
+
+.us-side-pane button:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* Tabs: the compact segmented switcher used by Recents, across the pane.
+   Shown only when the page has more than one tab. */
+.us-side-pane__tabs {
+  display: grid;
+  flex: none;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 2px;
+  margin: 0 20px 12px;
+  padding: 3px;
+  border-radius: var(--radius);
+  background: var(--bg-sunken);
+}
+
+.us-side-pane__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font: 500 12px var(--font-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--us-side-pane-ease),
+    box-shadow 150ms var(--us-side-pane-ease),
+    color 150ms var(--us-side-pane-ease);
+}
+
+.us-side-pane__tab > .ti {
+  font-size: 16px;
+}
+
+.us-side-pane__tab[aria-selected="true"] {
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-strong);
+}
+
+.us-side-pane__panels {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid var(--border);
+}
+
+.us-side-pane__panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  animation: us-side-pane-fade 160ms var(--us-side-pane-ease);
+}
+
+@keyframes us-side-pane-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.us-side-pane__error {
+  margin: 20px;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+/* Chat, for help tabs. Assistant messages sit on the pane with a round
+   avatar; the reader's own questions are tinted bubbles on the right. */
+.us-side-chat {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.us-side-chat__messages {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 18px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.us-side-chat__message {
+  display: flex;
+  gap: 10px;
+  animation: us-side-pane-fade 180ms var(--us-side-pane-ease);
+}
+
+.us-side-chat__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand-50);
+  color: var(--brand-600);
+  font-size: 15px;
+}
+
+.us-side-chat__bubble {
+  min-width: 0;
+  color: var(--text-strong);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.us-side-chat__bubble p,
+.us-side-chat__bubble ol,
+.us-side-chat__bubble ul {
+  margin: 0 0 8px;
+}
+
+.us-side-chat__bubble :is(ol, ul) {
+  padding-left: 18px;
+}
+
+.us-side-chat__bubble > :last-child {
+  margin-bottom: 0;
+}
+
+.us-side-chat__message--user {
+  justify-content: flex-end;
+}
+
+.us-side-chat__message--user .us-side-chat__bubble {
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 12px 12px 4px 12px;
+  background: var(--brand-50);
+  white-space: pre-wrap;
+}
+
+/* Suggested questions, under the greeting. */
+.us-side-chat__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.us-side-chat__chip {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--text-link);
+  font: 500 12px var(--font-ui);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--us-side-pane-ease),
+    border-color 150ms var(--us-side-pane-ease);
+}
+
+.us-side-chat__chip:hover {
+  border-color: var(--text-link);
+  background: var(--bg-subtle);
+}
+
+/* Where an answer came from: a guide page. */
+.us-side-chat__source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  color: var(--text-link);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.us-side-chat__source > .ti {
+  flex: none;
+  font-size: 16px;
+}
+
+.us-side-chat__source > span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.us-side-chat__source small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Three dots while an answer is on its way. */
+.us-side-chat__typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 9px 0;
+}
+
+.us-side-chat__typing > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  animation: us-side-chat-typing 1s infinite ease-in-out;
+}
+
+.us-side-chat__typing > span:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.us-side-chat__typing > span:nth-child(3) {
+  animation-delay: .3s;
+}
+
+@keyframes us-side-chat-typing {
+  0%,
+  60%,
+  100% {
+    opacity: .35;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.us-side-chat__composer {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 0 16px;
+  padding: 6px 6px 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  transition:
+    border-color 150ms var(--us-side-pane-ease),
+    box-shadow 150ms var(--us-side-pane-ease);
+}
+
+.us-side-chat__composer:focus-within {
+  border-color: var(--field-focus-colour);
+  box-shadow: var(--field-focus-glow);
+}
+
+.us-side-chat__composer[aria-disabled="true"] {
+  border-color: var(--border);
+  background: var(--bg-subtle);
+}
+
+/* Named for screen readers; the placeholder shows the purpose. */
+.us-side-chat__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Orion styles every textarea as a form field; this one sits inside the
+   composer's own border. */
+.us-side-chat__input {
+  flex: 1 1 auto;
+  width: auto;
+  min-height: 30px;
+  max-height: 120px;
+  margin: 0;
+  padding: 5px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-strong);
+  font: 13px/1.5 var(--font-ui);
+  resize: none;
+}
+
+.us-side-chat__input:focus,
+.us-side-chat__input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.us-side-chat__input:disabled {
+  background: transparent;
+  cursor: default;
+}
+
+.us-side-chat__send {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--brand-600);
+  color: var(--text-inverse);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--us-side-pane-ease),
+    opacity 150ms var(--us-side-pane-ease);
+}
+
+.us-side-chat__send:hover:not(:disabled) {
+  background: var(--brand-700);
+}
+
+.us-side-chat__send:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.us-side-chat__note {
+  flex: none;
+  margin: 6px 20px 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+/* Touch-sized controls follow the window width (AGENTS.md). */
+@media (max-width: 950px) {
+  #injected-taskbar > .us-side-pane-toggle,
+  .us-side-pane__close,
+  .us-side-chat__send {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .us-side-pane__tab {
+    min-height: 40px;
+  }
+}
+
+/* On a phone the pane takes the whole width. */
+@media (max-width: 480px) {
+  .us-side-pane {
+    --us-side-pane-width: 100vw;
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #injected-taskbar > .us-side-pane-toggle,
+  .us-side-pane,
+  .us-side-pane[data-closed],
+  .us-side-pane__tab,
+  .us-side-pane__panel,
+  .us-side-chat__message,
+  .us-side-chat__composer {
+    animation: none;
+    transition: none;
+  }
+
+  .us-side-chat__typing > span {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .us-side-pane {
+    border-left-color: CanvasText;
+  }
+
+  #injected-taskbar > .us-side-pane-toggle[aria-expanded="true"],
+  .us-side-pane__tab[aria-selected="true"] {
+    border: 2px solid Highlight;
+  }
+}
+/* US-SIDE-PANE:END */
+
   list-style: none;
 }
 

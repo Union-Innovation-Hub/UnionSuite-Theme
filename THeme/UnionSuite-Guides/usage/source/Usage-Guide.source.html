@@ -87,7 +87,7 @@
     </tbody></table></div>
     <ol class="steps">
       <li><strong>Load the styles in order.</strong> Native Orion → <code>zUnionSuite.css</code> → <code>UnionSuite-Client/Branding.css</code> → <code>UnionSuite-Client/Override.css</code> → <code>zzDarkMode.css</code>. Dark mode must be last. Keep native icon, font and control assets. Uploading a separate theme/client ZIP does not itself establish stylesheet order.</li>
-      <li><strong>Load the theme JavaScript through the loader.</strong> One header include, <code>index.js</code>, loads <code>zUnionSuite.js</code>, <code>Scripts/ActionDefinitions.js</code>, the taskbar and its bookmarks, and the page-specific scripts (sign-in page, IQA and Business Object designers) in dependency order. Deploy it once; later releases ship in the theme folder alone, with the loader's <code>RELEASE</code> bumped so browsers fetch the new files. Confirmed on the dev tenant, 3 October 2026. The client <code>Actions.js</code> is not loaded by the loader yet; until it is, client registrations wait for <code>UnionSuiteLoader.ready</code>. See <a href="#unified-action-route">action installation and migration</a>. Merely placing a JS file in the theme folder does not load it.</li>
+      <li><strong>Load the theme JavaScript through the loader.</strong> One header include, <code>index.js</code>, loads <code>zUnionSuite.js</code>, <code>Scripts/ActionDefinitions.js</code>, the taskbar and its bookmarks, and the page-specific scripts (sign-in page, IQA and Business Object designers, the case page's <a href="#side-pane">side pane</a>) in dependency order. Deploy it once; later releases ship in the theme folder alone, with the loader's <code>RELEASE</code> bumped so browsers fetch the new files. Confirmed on the dev tenant, 3 October 2026. The client <code>Actions.js</code> is not loaded by the loader yet; until it is, client registrations wait for <code>UnionSuiteLoader.ready</code>. See <a href="#unified-action-route">action installation and migration</a>. Merely placing a JS file in the theme folder does not load it.</li>
       <li><strong>Install the approved taskbar and Biscuit.</strong> The theme archive includes <code>Scripts/UnionSuiteTaskbar.js</code> and its shared drawing/animation CSS. Load the client <code>Config.js</code> first, then the taskbar script once with <code>defer</code>. Keep <code>pipGreeting: true</code> to enable Biscuit. The <a href="#taskbar-pip-install">taskbar include</a> uses the existing header; no mascot HTML or preview controls need copying.</li>
       <li><strong>Use the same include for banners.</strong> The updated <code>zUnionSuite.js</code> contains sticky/collapse and Actions behaviour. Keep the visible banner HTML in its own content iPart. No separate banner script iPart is needed.</li>
       <li><strong>Apply the component classes.</strong> Use the <a href="#classes">class reference</a> below. Check the rendered page outside Easy Edit, including a real partial refresh.</li>
@@ -2188,6 +2188,51 @@ UnionSuiteCcoSwitch.enable();  // switch in place again</code></pre></div>
 <p>Write every IQA path in a theme script as one whole string, for example <code>'$/_i4u_/Core/Admin/Taskbar/Recent IQAs - User'</code>, never assembled from parts. The index finds the theme's IQAs by scanning its scripts, and <code>node tools/check-usage-sources.cjs</code> fails on an assembled path. A new script added to <code>index.js</code> is scanned automatically.</p>
 <h3>Lifecycle, access and limits</h3>
 <p>The drawer is a labelled dialog that does not trap focus: Escape or × closes it and returns focus to the button, and the summary line is a polite status. Opening and closing slide over 220 ms and 180 ms; reduced motion makes them instant. Dark mode uses <code>zzDarkMode.css</code>. Tokens: <code>--bg-surface</code>, <code>--bg-subtle</code>, <code>--border</code>, <code>--text-strong</code>, <code>--text-muted</code>, <code>--brand-50</code>/<code>--brand-900</code> for counts, <code>--danger</code> for warnings and <code>--us-dialog-shadow</code>. Script API: <code>UnionSuiteWhereUsed.open()</code>, <code>.close()</code>, <code>.rebuild()</code>, <code>.readStored()</code> and the pure <code>.lookup(index, target)</code>. Tests: <code>node --test tools/test-where-used.cjs</code>. Research and decisions: <code>prototypes/wip/iqa-where-used/</code>.</p>
+</section>
+
+<section id="side-pane" class="section">
+<h2>Taskbar side pane</h2>
+<p><strong>Implemented in the theme; live verification on the dev tenant is pending.</strong> A side pane toggle at the far right of the taskbar opens a pane from the right, below the header, with tabs for the page being viewed. Each tab says which pages it belongs on, and the toggle appears only on a page with at least one tab. The first tab is <strong>Case help</strong> on the manage case page: a placeholder for a help chat, which arrives with the case documentation. No author classes or page markup are needed.</p>
+{{SIDE_PANE_DEMO}}
+<h3>What the reader sees</h3>
+<ul>
+  <li><strong>The toggle</strong> is an icon-only button (Tabler <code>layout-sidebar-right</code>) after the bookmarks star, named "Side pane" for screen readers, with a tooltip saying Show or Hide side pane. While the pane is open it takes the theme's heading icon toggle "on" state, the same as the star.</li>
+  <li><strong>The pane</strong> is 400px wide and starts at the header's bottom edge, so the taskbar, the bookmarks bar and the toggle stay in view; as the header scrolls away the pane rises to the top. Like the IQA designer's <a href="#iqa-where-used">Show Usage drawer</a> it overlays the page and never moves it, and it is non-modal: the page stays usable while it is open.</li>
+  <li><strong>The title</strong> names the open tab, with an optional line under it. With two or more tabs, a segmented tab strip (the Recents switcher's style) sits under the title; with one, the strip is hidden.</li>
+  <li><strong>Case help</strong> shows the chat's layout with a note that case help is on its way. The question box and Send button are disabled until the chat arrives.</li>
+</ul>
+<h3>Chat styles for help tabs</h3>
+<p>These are the styles the help chat will use: an assistant message with suggested questions, the reader's question, an answer with the guide page it came from, and the dots shown while an answer is on its way. Only the greeting and the disabled box are in use today; the sample answer below is not real guidance.</p>
+{{SIDE_CHAT_DEMO}}
+<table><thead><tr><th>Class</th><th>Element</th></tr></thead><tbody>
+  <tr><td><code>us-side-chat</code></td><td>The chat, filling a tab's panel: messages, composer, note.</td></tr>
+  <tr><td><code>us-side-chat__messages</code></td><td>The scrolling message list, <code>role="log"</code>.</td></tr>
+  <tr><td><code>us-side-chat__message</code> with <code>--assistant</code> or <code>--user</code></td><td>One message. Assistant messages start with <code>us-side-chat__avatar</code>; the reader's are tinted bubbles on the right.</td></tr>
+  <tr><td><code>us-side-chat__bubble</code></td><td>The message text: paragraphs and lists.</td></tr>
+  <tr><td><code>us-side-chat__suggestions</code>, <code>us-side-chat__chip</code></td><td>Suggested questions under the greeting.</td></tr>
+  <tr><td><code>us-side-chat__source</code></td><td>The guide page an answer came from: an icon, a title with a <code>small</code> line, and an external-link icon.</td></tr>
+  <tr><td><code>us-side-chat__typing</code></td><td>Three <code>span</code> dots while an answer is on its way.</td></tr>
+  <tr><td><code>us-side-chat__composer</code></td><td>The question box: a visually hidden <code>us-side-chat__label</code>, <code>us-side-chat__input</code> and <code>us-side-chat__send</code>. <code>aria-disabled="true"</code> on the composer shows it unavailable.</td></tr>
+  <tr><td><code>us-side-chat__note</code></td><td>The line under the box.</td></tr>
+</tbody></table>
+<h3>Adding a tab</h3>
+<p>Planned tabs register the same way: an admin support ticket (to the UnionSuite team), a standard support ticket (to the client's system administrator), an assistant that sees the page's context, and a preview. A tab's <code>render</code> runs once, the first time it is shown, with the tab's panel. Page names are listed in <code>PAGES</code> in the script, and <code>window.UnionSuiteSidePane.pages</code> lists them; today that is <code>case</code>. A tab can give its own <code>when</code> test instead of <code>pages</code>.</p>
+<div class="snippet"><div class="snippet-bar"><span>Registering a tab — from a theme script, after the side pane script</span><button type="button" data-copy="side-pane-register">Copy JavaScript</button></div><pre><code id="side-pane-register">UnionSuiteSidePane.register({
+  id: 'case-support',          // unique
+  label: 'Support',            // tab name and pane title
+  icon: 'lifebuoy',            // Tabler icon name
+  description: 'Ask the system administrator for help.',  // optional
+  pages: ['case'],             // or when: () =&gt; true
+  order: 20,                   // optional, lower first; Case help is 10
+  render(panel, {close}) {
+    // Build the tab's content in panel. close() closes the pane.
+  }
+});</code></pre></div>
+<p>The pane is added to the end of the page's body, outside iMIS's page form, so fields in a tab never post the page. <code>UnionSuiteSidePane.open(id)</code> opens the pane on a tab and <code>close()</code> closes it; <code>open(id, {focus: false})</code> leaves focus where it is, for previews only.</p>
+<h3>Installation</h3>
+<p>Upload <code>Scripts/UnionSuiteSidePane.js</code>, <code>index.js</code>, <code>zUnionSuite.css</code> and <code>zzDarkMode.css</code>. The loader loads the script only on the manage case page: the <code>/Cases_ManageCase</code> path, or a page whose CSS class includes <code>us-case-page</code> (the case access check's test). Widen that gate in <code>index.js</code> when a tab for other pages arrives. The script needs the taskbar (<a href="#taskbar-pip">UnionSuiteTaskbar.js</a>); it waits for it, and puts the toggle back whenever the taskbar is replaced. It does not need the bookmarks script.</p>
+<h3>Lifecycle, access and limits</h3>
+<p>The pane is a labelled dialog that does not trap focus. Opening it moves focus to its title; Escape inside the pane or × closes it and returns focus to the toggle. The tabs follow the tab pattern: arrow keys, Home and End move between them. Opening slides over 220 ms and closing over 180 ms, and a newly shown tab fades in over 160 ms; reduced motion makes them instant. At 950px and below the toggle, × and Send are 44px; at 480px and below the pane takes the full width. The pane sits at z-index 2900: above the page, below iMIS dialogs and the taskbar's own menus. Dark mode uses <code>zzDarkMode.css</code> for the toggle's on state, the avatar and the reader's bubbles. Tokens: <code>--bg-surface</code>, <code>--bg-subtle</code>, <code>--bg-sunken</code>, <code>--border</code>, <code>--border-strong</code>, <code>--text-strong</code>, <code>--text-muted</code>, <code>--text-link</code>, <code>--brand-50</code>, <code>--brand-100</code>, <code>--brand-600</code>, <code>--field-focus-colour</code>, <code>--shadow-lg</code>. The pane's open state is not remembered between pages. Whether the pane should push the page aside instead of covering it is still open.</p>
 </section>
 
 <section id="dialog-chrome" class="section">

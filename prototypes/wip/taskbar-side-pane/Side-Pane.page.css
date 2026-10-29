@@ -1,0 +1,128 @@
+/* Mockup page layout only: the header frame around the native markup and a
+   placeholder page. The header's controls use the native and theme CSS. */
+
+html {
+  height: auto;
+}
+
+body.sp-frame {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-base);
+  font: 14px/1.5 var(--font-ui);
+}
+
+.sp-frame .wrapper {
+  min-height: 0;
+  padding-bottom: 0;
+}
+
+.sp-frame .wrapper #hd {
+  position: relative;
+  z-index: 3;
+  min-height: 0;
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-frame .navbar-header {
+  float: none;
+  min-height: 44px;
+  padding: 0;
+}
+
+.sp-frame .navbar-header .navbar-right {
+  float: none !important;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 0;
+  max-width: 100%;
+}
+
+.sp-frame .navbar-right > .NavigationUnorderedList {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sp-frame .account-toggle-wrapper.open > .dropdown-menu {
+  display: block;
+}
+
+.sp-page {
+  padding: 28px 30px;
+}
+
+.sp-page-overline {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: .13em;
+}
+
+.sp-page h1 {
+  margin: 0 0 22px;
+  color: var(--text-strong);
+  font: 600 25px/1.3 var(--font-ui);
+  letter-spacing: -.5px;
+  text-transform: none;
+}
+
+.sp-page-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.sp-page-cards section {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.sp-page-cards span,
+.sp-page-cards small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.sp-page-cards strong {
+  display: block;
+  margin: 6px 0 2px;
+  color: var(--text-strong);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.sp-page-status {
+  margin: 22px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.sp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.sp-pane [hidden] {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  .sp-frame .wrapper #hd {
+    padding: 12px;
+  }
+
+  .sp-page {
+    padding: 20px 14px;
+  }
+}

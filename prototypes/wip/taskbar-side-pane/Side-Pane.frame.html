@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-us-color-scheme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Taskbar side pane</title>
+  <style>/* THEME_STYLES */
+/* PAGE_STYLES */</style>
+  <script>window.UnionSuiteAppearanceConfig = {storageKey: 'union-suite:side-pane:appearance'};
+/* APPEARANCE_SCRIPT */</script>
+</head>
+<body class="sp-frame">
+  <div class="wrapper SVG-enabled">
+    <!-- The native iMIS header, as in the guide's utility navigation example.
+         The theme's taskbar and bookmarks scripts mount into it. -->
+    <header class="header navbar" id="hd">
+      <div class="navbar-header nav-auxiliary" id="masterTopBarAuxiliary">
+        <div class="navbar-left"><a class="logo" href="#home" aria-label="Client home (offline sample logo)">Client home</a></div>
+        <div class="navbar-right" role="navigation" aria-label="utility">
+          <div class="searchfieldplus-dropdown"><div class="RecentHistoryList"><div class="RecentHistoryItem"><a href="/Party.aspx?ID=104038">Tony Stark (104038)</a></div><div class="RecentHistoryItem"><a href="/Party.aspx?ID=104019">Alex Morgan (104019)</a></div></div></div>
+          <ul class="NavigationUnorderedList"><li class="NavigationListItem nav-aux-button nav-aux-cart"><a class="NavigationLink" href="#cart"><span class="nav-text">Cart</span><span data-cartlink="y" class="cartEmpty"><span class="cartSprite"></span></span></a></li></ul>
+          <a title="Easy edit is off. Click to turn it on." class="ste-toggle off" href="#easy-edit">Enable easy edit</a>
+          <ul class="account-menu obo-off">
+            <li class="obo-toggle-wrapper"><a id="sp-demo-obo" title="Select on behalf of" class="obo-toggle off" href="#obo">Select on behalf of</a></li>
+            <li class="dropdown account-toggle-wrapper">
+              <a href="#account" class="dropdown-toggle account-toggle" role="button" aria-expanded="false"><div class="profile-picture-wrapper"><img class="picture-primary" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Crect width='34' height='34' fill='gray'/%3E%3C/svg%3E"></div><span class="nav-text">James Driscoll</span><span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#profile">My profile</a></li>
+                <li><a href="#sign-out">Sign out</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  </div>
+  <input type="hidden" id="__ClientContext">
+  <input type="hidden" id="__RequestVerificationToken" value="offline-mockup">
+
+  <main class="sp-page">
+    <p class="sp-page-overline">STAFF / HOME</p>
+    <h1>Good morning, James.</h1>
+    <div class="sp-page-cards">
+      <section><span>Applications to review</span><strong>12</strong><small>4 assigned to you</small></section>
+      <section><span>Follow-ups today</span><strong>8</strong><small>Next one at 10:30 am</small></section>
+      <section><span>Open cases</span><strong>5</strong><small>2 waiting on you</small></section>
+    </div>
+    <p id="demo-taskbar-status" class="sp-page-status" role="status">Everything here is fictional. Try Quick Search with "Morgan", Go to…, the star, and the side pane toggle.</p>
+  </main>
+
+/* PANE_MARKUP */
+  <script>/* FIXTURE_SCRIPT */</script>
+  <script>/* THEME_SCRIPTS */</script>
+  <script>/* TASKBAR_SCRIPT */</script>
+  <script>/* BOOKMARKS_SCRIPT */</script>
+  <script>/* PANE_SCRIPT */</script>
+</body>
+</html>
