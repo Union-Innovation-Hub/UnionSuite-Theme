@@ -1,6 +1,6 @@
 // Regression: Read more -> Show less at the top -> scroll must condense.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8');
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8');
 const closeBody=source.split('descriptionClosed: function (surface) {')[1].split('    // Read-only diagnostics')[0].replace(/},\s*$/,'');
 const decision=source.slice(source.indexOf('    var compact = state.compact;'),source.indexOf('\n\n    if (pin) {',source.indexOf('    var compact = state.compact;')));
 const disclosure={},otherInput={},attributes={};let onBlur,scheduled=0,expanded=true;

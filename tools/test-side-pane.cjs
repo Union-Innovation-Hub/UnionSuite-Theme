@@ -3,8 +3,8 @@
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const { chromium } = require('../.tmp-iqa-integration/node_modules/playwright');
-const script = fs.readFileSync('THeme/UnionSuite/Scripts/UnionSuiteSidePane.js', 'utf8');
-const css = fs.readFileSync('THeme/UnionSuite/zUnionSuite.css', 'utf8').replace(/@import\s+[^;]+;/g, '');
+const script = fs.readFileSync('Theme/UnionSuite/Scripts/UnionSuiteSidePane.js', 'utf8');
+const css = fs.readFileSync('Theme/UnionSuite/zUnionSuite.css', 'utf8').replace(/@import\s+[^;]+;/g, '');
 
 // A header whose taskbar arrives after the script, as on a live page.
 async function fixture(browser, { casePage = true, reducedMotion = 'no-preference' } = {}) {

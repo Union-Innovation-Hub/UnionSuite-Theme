@@ -204,7 +204,7 @@ and forced colours.
   its interim row styles were removed. A chosen type in the feed shows a
   "View all …" link to that type's IQA page (`data-history` on the source).
 - When approved: move the templates and their field definitions into
-  `THeme/UnionSuite-Guides/usage/templates/List-Templates/`, the CSS into a
+  `Theme/UnionSuite-Guides/usage/templates/List-Templates/`, the CSS into a
   `US-RECORD-CARDS` section of `zUnionSuite.css` (dark values into
   `zzDarkMode.css`) and the script into `zUnionSuite.js`, then document them
   in the usage guide.

@@ -5,7 +5,7 @@
  * build-embed.js load it by default; `--plain` builds without it). Load AFTER
  * fd-styles.css. Nothing here changes layout, spacing rhythm or behaviour —
  * only colour, accent, shape and type. Values are taken verbatim from the
- * theme's ramps in CRM Layouts/THeme/UnionSuite/zUnionSuite.css.
+ * theme's ramps in CRM Layouts/Theme/UnionSuite/zUnionSuite.css.
  *
  * Two things are worth knowing if this is ever merged into fd-styles.css:
  *  1. Union Suite's accent (#ff9947) is a LIGHT orange — its own token says

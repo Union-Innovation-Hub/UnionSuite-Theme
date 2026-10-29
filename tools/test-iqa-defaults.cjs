@@ -1,6 +1,6 @@
 // Unit tests using lightweight element doubles; not browser/integration tests.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8'),nodes=[];
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8'),nodes=[];
 function element(tag='button'){
  const n={localName:tag,children:[],parent:null,id:'',attrs:{},listeners:{},textContent:'',classList:{contains:()=>false},
  setAttribute(k,v){this.attrs[k]=v;},appendChild(n){n.parent=this;this.children.push(n);},
@@ -20,7 +20,7 @@ const entry={wrapper,customActions:element('div'),key:'test',state:{query:'',ini
 ctx.saveState(entry);classes.add('us-filters-collapsed');assert.equal(ctx.getState(wrapper,{}).collapsed,true);
 entry.state={collapsed:true};ctx.saveState(entry);classes.delete('us-filters-collapsed');assert.equal(ctx.getState(wrapper,{}).collapsed,false,'Forced state preserves normal saved preference');
 entry.state={query:'',initialCollapsed:false,collapsed:true};ctx.saveState(entry);assert.equal(ctx.getState(wrapper,{}).collapsed,true);
-const css=fs.readFileSync('THeme/UnionSuite/zUnionSuite.css','utf8'),guard=':not(:where(.us-report-no-styling, .us-report-no-styling *))';
+const css=fs.readFileSync('Theme/UnionSuite/zUnionSuite.css','utf8'),guard=':not(:where(.us-report-no-styling, .us-report-no-styling *))';
 assert(css.includes('[data-gridid] .RadGrid'+guard));assert(css.includes(' > .panel > .panel-heading'+guard));
 assert(source.includes('wrapper.removeAttribute("data-us-iqa-native")'));
 console.log('Passed: forced/saved filter state and opt-out contracts.');

@@ -60,7 +60,7 @@ seeds, shared query controls, icon actions/tooltips and the bulletin action regi
 extra class div under ContentItemContainer, exactly as iMIS generates it.
 Fonts use local/system fallbacks. Client header/logo overrides are outside this
 content-only preview. No remote assets or runtime fetches are needed.
-The home and guide use `THeme/UnionSuite-Guides/usage/source/attention-example.js` to simulate
+The home and guide use `Theme/UnionSuite-Guides/usage/source/attention-example.js` to simulate
 folder and query responses. That fetch stub is never installed in production.
 The actual folder loader lives in the shared theme's US-ATTENTION block. Its
 direct-folder discovery uses DocumentSummary FindByPath/FindDocumentsInFolder,
@@ -178,7 +178,7 @@ list item**, scoped under `us-list` or `QueryTemplateSet`; it does not create a
 whole-list summary, calculate totals, supply a destination or fix the footer
 outside a scroll area. Those behaviours still need the page/query integration.
 
-The welcome header is implemented in `THeme/UnionSuite/zUnionSuite.css`.
+The welcome header is implemented in `Theme/UnionSuite/zUnionSuite.css`.
 Paste `Welcome-Content.html` into a Content HTML iPart; keep `home-welcome` on
 its header and `home-welcome-date` on the optional date span. No extra iPart CSS
 class, prototype stylesheet or JavaScript is required. Keep the iPart title blank
@@ -207,4 +207,4 @@ Side-by-side Stats cards stretch to matching heights in each row; mobile cards u
 
 The page layout remains in home-stats.css and Stats-Content.html; home-stats.js and Stats/captured-data.json are offline-only fixtures. Do not install these fixture files on iMIS. There are no selectors, exports or clickable group drilldowns. Restrained accents, responsive cards and an accessible scrolling table remain. The new source templates are inside Stats/ and are also copyable from the standalone usage guide.
 
-Build using node tools/build-membership-stats.cjs, node tools/build-home-preview.cjs and node THeme/UnionSuite-Guides/usage/build/build-theme-usage.cjs. Validate with node tools/test-membership-stats.cjs and node tools/test-home-stats.cjs.
+Build using node tools/build-membership-stats.cjs, node tools/build-home-preview.cjs and node Theme/UnionSuite-Guides/usage/build/build-theme-usage.cjs. Validate with node tools/test-membership-stats.cjs and node tools/test-home-stats.cjs.

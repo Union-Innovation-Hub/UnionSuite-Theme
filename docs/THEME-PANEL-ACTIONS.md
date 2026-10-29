@@ -2,7 +2,7 @@
 
 The unified registry is implemented. Its current contract replaces the earlier business-action proposal in this file.
 
-- [Usage guide: full template, options, visuals and execution route](THeme/UnionSuite-Guides/Usage-Guide.html#unified-action-route)
+- [Usage guide: full template, options, visuals and execution route](Theme/UnionSuite-Guides/Usage-Guide.html#unified-action-route)
 - [Execution contract](../references/Unified-Action-Execution-Contract.md)
 - [Conversion checklist and exact old-to-new mappings](../references/Unified-Action-Conversion-Checklist.md)
 - [Current function inventory](../references/Theme-Button-Function-Inventory.md)

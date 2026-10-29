@@ -5,7 +5,7 @@ const dir = path.join(__dirname, '..');
 // The real cascade, in load order. themed.html gets all five; native.html
 // stops at 99-Orion so you can see what the theme is actually doing.
 const NATIVE = [
-  ['10-UltraWaveResponsive.css', 'THeme/UnionSuite/guides/usage/vendor/10-UltraWaveResponsive.css'],
+  ['10-UltraWaveResponsive.css', 'Theme/UnionSuite/guides/usage/vendor/10-UltraWaveResponsive.css'],
   ['UT_Staff.css',              'legacy/UTStaff.css'],
   ['Orion-99.css',              'legacy/Native CSS/Orion-99.css'],
 ];
@@ -19,7 +19,7 @@ for (const [dest, src] of [...NATIVE, ...THEME]) {
 }
 
 // Tabler lives in the deploy folder; mirror it so icons.html can smoke-test it.
-const T = path.join(dir, 'THeme', 'UnionSuite');
+const T = path.join(dir, 'Theme', 'UnionSuite');
 fs.mkdirSync(path.join(__dirname, 'Tabler', 'fonts'), { recursive: true });
 fs.copyFileSync(path.join(T, 'Tabler.css'), path.join(__dirname, 'Tabler.css'));
 fs.copyFileSync(path.join(T, 'Tabler', 'tabler-icons.min.css'), path.join(__dirname, 'Tabler', 'tabler-icons.min.css'));

@@ -1,7 +1,7 @@
 // Follow the real pointer path through a tooltip overlapping the preceding row.
 const assert = require('node:assert/strict');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
-const preview = require('../THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
+const preview = require('../Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
 const key = 'union-suite:preview:quick-search-history:100';
 
 (async () => {

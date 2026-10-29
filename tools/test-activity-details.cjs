@@ -39,8 +39,8 @@ const html=`<form><input type="hidden" id="__RequestVerificationToken" value="fi
     return {ok:true,status:200,json:async()=>({TotalCount:rows.length,HasNext:false,Items:{$values:rows}})};
    };
   },folder);
-  await page.addStyleTag({content:read('THeme/UnionSuite/zUnionSuite.css')});
-  await page.addScriptTag({content:read('THeme/UnionSuite/zUnionSuite.js')});
+  await page.addStyleTag({content:read('Theme/UnionSuite/zUnionSuite.css')});
+  await page.addScriptTag({content:read('Theme/UnionSuite/zUnionSuite.js')});
   const card=page.locator('[data-us-activity-id="interactions:I-2"]'),meeting=page.locator('[data-us-activity-id="meetings:M-1"]');
   await card.waitFor();
   const search=page.locator('.us-activity-feed input[type=search]');

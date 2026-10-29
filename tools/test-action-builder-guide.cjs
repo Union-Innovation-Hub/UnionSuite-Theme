@@ -1,6 +1,6 @@
-// Compatibility entry point. Maintained implementation: THeme/UnionSuite-Guides/usage/tests/test-action-builder-guide.cjs
+// Compatibility entry point. Maintained implementation: Theme/UnionSuite-Guides/usage/tests/test-action-builder-guide.cjs
 'use strict';
-const implementation = require.resolve("../THeme/UnionSuite-Guides/usage/tests/test-action-builder-guide.cjs");
+const implementation = require.resolve("../Theme/UnionSuite-Guides/usage/tests/test-action-builder-guide.cjs");
 if (require.main === module) {
   const result = require('node:child_process').spawnSync(process.execPath, [implementation, ...process.argv.slice(2)], {stdio: 'inherit'});
   if (result.error) throw result.error;

@@ -37,14 +37,14 @@ Run these commands from `Mascot`. Choose a shell whose matching source has not c
 These prototypes remain independent design examples. Biscuit is now the production
 taskbar mascot, replacing Pip. The approved drawing is 30% larger than the original
 preview; the floppy ears are attached to his head and follow its turns and curious
-tilt. Maintained production CSS is in `THeme/UnionSuite/zUnionSuite.css`, dark
+tilt. Maintained production CSS is in `Theme/UnionSuite/zUnionSuite.css`, dark
 colours in `zzDarkMode.css`, and markup/timing/storage in `Scripts/UnionSuiteTaskbar.js`.
 The legacy pip-prefixed configuration, storage and CSS hooks remain compatible.
 
 The [taskbar preview](../references/Taskbar-Preview.html) and
 [Biscuit review preview](../references/Taskbar-Biscuit-Preview.html) both use those
-shared production assets. Build with `node THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs` and
+shared production assets. Build with `node Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs` and
 `node tools/build-taskbar-biscuit.cjs` from the project root. Replay, appearance
 and scratch/tilt controls remain preview-only. See the
-[installation guide](../THeme/UnionSuite-Guides/Usage-Guide.html#taskbar-pip).
+[installation guide](../Theme/UnionSuite-Guides/Usage-Guide.html#taskbar-pip).
 Editing a standalone mascot prototype does not change the production taskbar.

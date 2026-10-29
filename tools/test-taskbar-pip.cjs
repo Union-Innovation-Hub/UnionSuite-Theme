@@ -1,8 +1,8 @@
 // Browser regression checks for daily greeting, storage and the real taskbar lifecycle.
 const fs = require('node:fs'), assert = require('node:assert/strict');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
-const script = fs.readFileSync('THeme/UnionSuite/Scripts/UnionSuiteTaskbar.js','utf8');
-const css = ['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css','THeme/UnionSuite/zzDarkMode.css'].map(file=>fs.readFileSync(file,'utf8')).join('\n').replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
+const script = fs.readFileSync('Theme/UnionSuite/Scripts/UnionSuiteTaskbar.js','utf8');
+const css = ['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css','Theme/UnionSuite/zzDarkMode.css'].map(file=>fs.readFileSync(file,'utf8')).join('\n').replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
 const key = 'union-suite:pip-greeting:100';
 const fixture = `<!doctype html><html><head><style>${css}\nbody{margin:24px}#hd{display:block;position:relative;padding-bottom:18px;border-bottom:1px solid #ccc}</style></head><body><header id="hd"><div class="searchfieldplus-dropdown"></div></header><input type="hidden" id="__ClientContext"><button id="outside">Page action</button><script>
 document.getElementById('__ClientContext').value=JSON.stringify(window.testContext || {loggedInPartyId:'100',selectedPartyId:'900',isAnonymous:false});

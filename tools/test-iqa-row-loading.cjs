@@ -4,7 +4,7 @@
 // PageRequestManager lifecycle and a partial update that replaces the grid.
 const assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const html=require('../THeme/UnionSuite-Guides/usage/build/iqa-expand-example.cjs').documentHtml();
+const html=require('../Theme/UnionSuite-Guides/usage/build/iqa-expand-example.cjs').documentHtml();
 (async()=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});
  try{

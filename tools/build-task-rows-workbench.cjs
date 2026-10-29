@@ -11,24 +11,24 @@ const script = text => text.replace(/<\/script/gi, '<\\/script');
 const specimens = require('../prototypes/approved/task-rows/task-specimens.cjs');
 
 // Both variants are supported templates now: the accepted row and the older one.
-const supportedDirectory = 'THeme/UnionSuite-Guides/usage/templates/List-Templates/';
+const supportedDirectory = 'Theme/UnionSuite-Guides/usage/templates/List-Templates/';
 const template = file => read(supportedDirectory + file).replace(/<!--[\s\S]*?-->\s*/g, '').trim();
 
 function themeStyles() {
-  const icons = read('THeme/UnionSuite/Tabler/tabler-icons.min.css').replace(
+  const icons = read('Theme/UnionSuite/Tabler/tabler-icons.min.css').replace(
     /@font-face\s*\{[^}]*\}/g,
     '@font-face{font-family:tabler-icons;src:url(data:font/woff2;base64,'
-      + fs.readFileSync(path.join(root, 'THeme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64')
+      + fs.readFileSync(path.join(root, 'Theme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64')
       + ') format("woff2");font-display:block}'
   );
   return [
     // Native base first: it sets html{font-size:62.5%}, so anything sized in rem
     // behaves here exactly as it does on a real iMIS page.
-    read('THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css'),
-    read('THeme/UnionSuite/99-Orion.css'),
-    read('THeme/UnionSuite/zUnionSuite.css'),
-    read('THeme/UnionSuite-Client/Branding.css'),
-    read('THeme/UnionSuite/zzDarkMode.css'),
+    read('Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css'),
+    read('Theme/UnionSuite/99-Orion.css'),
+    read('Theme/UnionSuite/zUnionSuite.css'),
+    read('Theme/UnionSuite-Client/Branding.css'),
+    read('Theme/UnionSuite/zzDarkMode.css'),
     icons
   ].join('\n');
 }
@@ -36,14 +36,14 @@ function themeStyles() {
 // The same composition the guide's list reference uses: everything up to the
 // banner behaviour, plus the action icons and task rows.
 function sharedScript() {
-  const source = read('THeme/UnionSuite/zUnionSuite.js');
+  const source = read('Theme/UnionSuite/zUnionSuite.js');
   return [
     source.split('/* US-BANNER-BEHAVIOUR:START */')[0],
     source.match(/\/\* US-ACTION-ICONS:START \*\/[\s\S]*?\/\* US-ACTION-ICONS:END \*\//)[0],
     source.match(/\/\* US-TASK-ROWS:START[\s\S]*?US-TASK-ROWS:END \*\//)[0],
     // The task title is the home.open-task action (a link); without the
     // site's definitions the theme draws it as an unconfigured button.
-    read('THeme/UnionSuite/Scripts/ActionDefinitions.js')
+    read('Theme/UnionSuite/Scripts/ActionDefinitions.js')
   ].join('\n');
 }
 

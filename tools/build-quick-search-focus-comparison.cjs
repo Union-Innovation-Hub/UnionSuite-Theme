@@ -1,5 +1,5 @@
 const fs=require('fs');
-const {frameDocument}=require('../THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
+const {frameDocument}=require('../Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
 const esc=s=>s.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
 function frame(approved){
  let doc=approved?frameDocument():fs.readFileSync('references/Quick-Search-Legacy.html','utf8');

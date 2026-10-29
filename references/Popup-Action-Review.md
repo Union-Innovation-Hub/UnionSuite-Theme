@@ -2,7 +2,7 @@
 
 ## Current implementation
 
-Use UnionSuiteActions.define with action.type=popup and action.refresh. The old configureAction/target=popup API below is retired. See [the callable template and options](../THeme/UnionSuite-Guides/Usage-Guide.html#popup-actions), [execution contract](Unified-Action-Execution-Contract.md), and [helper cleanup status](Helper-Cleanup-Status.md). Native origin-report and queued multi-IQA refresh are implemented; arbitrary Query Template fragment reload remains custom.
+Use UnionSuiteActions.define with action.type=popup and action.refresh. The old configureAction/target=popup API below is retired. See [the callable template and options](../Theme/UnionSuite-Guides/Usage-Guide.html#popup-actions), [execution contract](Unified-Action-Execution-Contract.md), and [helper cleanup status](Helper-Cleanup-Status.md). Native origin-report and queued multi-IQA refresh are implemented; arbitrary Query Template fragment reload remains custom.
 
 ## Archived review — superseded API examples
 

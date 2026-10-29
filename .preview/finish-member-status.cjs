@@ -11,7 +11,7 @@ w('prototypes/legacy/banner-status-final.css',`/* Preview layout only; member ap
 .status-final .us-banner__nav[hidden]{display:none}
 `);
 p='prototypes/legacy/banner-status-comparison.js';s=r(p).replace("colour.value=source;","document.querySelectorAll('.us-banner__surface--member').forEach(n=>n.setAttribute('data-us-status-colour',source));\n  window.UnionSuiteMemberStatus?.refresh();\n  colour.value=source;");w(p,s);
-p='THeme/UnionSuite/guides/usage/source/Usage-Guide.source.html';s=r(p);
+p='Theme/UnionSuite/guides/usage/source/Usage-Guide.source.html';s=r(p);
 const start=s.indexOf('<p class="note">Design trial:');const end=s.indexOf('</p>',start);
 if(start>=0)s=s.slice(0,start)+'<p class="note"><strong>Implemented:</strong> the <a href="../../references/Banner-Status-Final.html">member profile banner</a> uses a status rail, matching pill and glass Actions button. <a href="../../references/Banner-Status-Comparison.html">Earlier comparisons</a> remain available for reference.</p>'+s.slice(end+4);
 const docs=`
@@ -25,7 +25,7 @@ const docs=`
 <p>Load the shared CSS and JS once. Status styling works independently of sticky scrolling and refreshes after partial replacement or a changed colour attribute. <code>UnionSuiteMemberStatus.refresh()</code> is available for explicit refresh. Without JavaScript the neutral fallback remains. <code>us-report-no-styling</code> opts out. Component variables are <code>--member-status-colour</code> and <code>--member-status-inner-edge</code>; JS derives them per header, so configure the input attribute rather than overriding these outputs.</p>
 `;
 s=s.replace('{{CONTACT_DEMO}}',docs+'\n{{CONTACT_DEMO}}');w(p,s);
-p='THeme/UnionSuite/guides/usage/build/build-theme-usage.cjs';s=r(p).replace("staticBanner('Contact banner',snippets.contact[1])","staticBanner('Contact banner',snippets.contact[1].replaceAll('{#query.StatusColour}', '#23845B').replaceAll('{#query.StatusDescription}', 'Financial member'))");
+p='Theme/UnionSuite/guides/usage/build/build-theme-usage.cjs';s=r(p).replace("staticBanner('Contact banner',snippets.contact[1])","staticBanner('Contact banner',snippets.contact[1].replaceAll('{#query.StatusColour}', '#23845B').replaceAll('{#query.StatusDescription}', 'Financial member'))");
 s=s.replace('<body><div class="us-banner">${markup}</div></body>','<body><div class="ContentItemContainer"><div class="us-banner">${markup}</div></div></body>');
 // Action CSS is needed by the member example as well as the full demo.
 s=s.replace('${bannerCss}\\n${clientRoots}\\nbody','${bannerCss}\\n${actionCss}\\n${clientRoots}\\nbody');

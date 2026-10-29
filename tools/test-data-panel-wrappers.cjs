@@ -1,9 +1,9 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const theme=fs.readFileSync('THeme/UnionSuite/zUnionSuite.css','utf8');
-const foundation=(fs.readFileSync('THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','utf8')+'\n'+fs.readFileSync('THeme/UnionSuite/99-Orion.css','utf8')).replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
+const theme=fs.readFileSync('Theme/UnionSuite/zUnionSuite.css','utf8');
+const foundation=(fs.readFileSync('Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','utf8')+'\n'+fs.readFileSync('Theme/UnionSuite/99-Orion.css','utf8')).replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
 const organisation=fs.readFileSync('prototypes/legacy/Data-Panel-Native-organisation.html','utf8');
-const script=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8').split('/* US-DATA-PANELS:START')[1].split('/* US-DATA-PANELS:END */')[0].replace(/^[\s\S]*?\*\//,'');
+const script=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8').split('/* US-DATA-PANELS:START')[1].split('/* US-DATA-PANELS:END */')[0].replace(/^[\s\S]*?\*\//,'');
 const panel=`<div class="panel"><div class="panel-heading Distinguish"><h2 class="panel-title">Membership details</h2><div class="panel-heading-options"><button type="button" class="sysicon-edit" title="Edit information">Edit</button></div></div><div class="panel-body-container"><div class="panel-body"><div class="RadAjaxPanel"><div class="PanelEditorReadOnlyForm"><div class="ReadOnly PanelField Top"><div><span class="Label">Member type</span></div><br><div class="PanelFieldValue"><span>Sample member</span></div></div></div></div></div></div></div>`;
 (async()=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});

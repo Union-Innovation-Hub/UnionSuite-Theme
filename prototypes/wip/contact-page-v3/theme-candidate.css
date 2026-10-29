@@ -1,6 +1,6 @@
 /* ==========================================================================
    CONTACT PAGE v3 — THEME CANDIDATE (not installed)
-   Proposed changes to THeme/UnionSuite/zUnionSuite.css. Each block names the
+   Proposed changes to Theme/UnionSuite/zUnionSuite.css. Each block names the
    theme section it replaces or extends and uses the same selectors, so an
    approved block moves into that section unchanged. Loaded after the shared
    theme; the prototype toolbar can switch this file off to compare.
@@ -641,7 +641,7 @@
     width: 24px;
     height: 24px;
     background: var(--text-muted);
-    mask: url("../../../THeme/UnionSuite/images/NavbarSprite.svg#menu-collapse") center / 24px 24px no-repeat;
+    mask: url("../../../Theme/UnionSuite/images/NavbarSprite.svg#menu-collapse") center / 24px 24px no-repeat;
   }
 
   .us-cco-rail-toggle:hover > .us-cco-rail-toggle__icon {
@@ -649,7 +649,7 @@
   }
 
   [data-us-cco-rail="collapsed"] .us-cco-rail-toggle > .us-cco-rail-toggle__icon {
-    mask-image: url("../../../THeme/UnionSuite/images/NavbarSprite.svg#menu-expand");
+    mask-image: url("../../../Theme/UnionSuite/images/NavbarSprite.svg#menu-expand");
   }
 
   /* Halve the native 32px between the iPart above (usually the banner) and

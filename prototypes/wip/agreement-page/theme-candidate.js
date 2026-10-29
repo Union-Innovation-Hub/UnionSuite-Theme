@@ -1,5 +1,5 @@
 /* Agreement page — proposed theme JS (candidate, not installed).
-   Target: THeme/UnionSuite/zUnionSuite.js, after US-TASK-ROWS. Load after
+   Target: Theme/UnionSuite/zUnionSuite.js, after US-TASK-ROWS. Load after
    zUnionSuite.js and agreement-actions.candidate.js.
 
    The agreement IQAs are kept as they are (owner, 2 October 2026): templates

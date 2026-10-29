@@ -4,7 +4,7 @@ Status: work in progress, first mockup 29 October 2026.
 
 **First version built into the theme (29 October 2026):** the toggle, the pane
 with page tabs, and Case help as a chat placeholder on the manage case page
-(`THeme/UnionSuite/Scripts/UnionSuiteSidePane.js`, US-SIDE-PANE in
+(`Theme/UnionSuite/Scripts/UnionSuiteSidePane.js`, US-SIDE-PANE in
 `zUnionSuite.css`, the usage guide's `#side-pane`, `tools/test-side-pane.cjs`).
 The owner's decisions for it: the toggle shows only on pages that have a tab
 (the case page for now); support tickets wait, and will be two tabs, an admin

@@ -1,5 +1,5 @@
 const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
-const script = fs.readFileSync('THeme/UnionSuite/Scripts/UnionSuiteTaskbar.js','utf8');
+const script = fs.readFileSync('Theme/UnionSuite/Scripts/UnionSuiteTaskbar.js','utf8');
 const history = script.split('// US-TASKBAR-HISTORY:START')[1].split('// US-TASKBAR-HISTORY:END')[0];
 let now = 0;
 const storage = new Map();

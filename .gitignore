@@ -10,7 +10,7 @@ desktop.ini
 .DS_Store
 
 # Packaged theme archives (rebuilt from source)
-THeme/**/*.zip
+Theme/**/*.zip
 
 # Superseded research and disposable experiments (keep current/approved designs tracked)
 /archive/
@@ -19,9 +19,9 @@ THeme/**/*.zip
 /Custom CCO iPart/
 
 # Generated guides and component previews; rebuild from maintained sources
-/THeme/UnionSuite-Guides/Usage-Guide.html
-/THeme/UnionSuite-Guides/Theme-Config.html
-/THeme/UnionSuite-Guides/Theme-Config-*.html
+/Theme/UnionSuite-Guides/Usage-Guide.html
+/Theme/UnionSuite-Guides/Theme-Config.html
+/Theme/UnionSuite-Guides/Theme-Config-*.html
 /references/*.html
 !/references/index.html
 # Approved unimplemented designs remain directly reviewable after checkout

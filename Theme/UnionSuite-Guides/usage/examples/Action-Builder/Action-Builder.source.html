@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UnionSuite action builder</title>
+  <style>{{THEME_CSS}}</style>
+  <style>{{BUILDER_CSS}}</style>
+</head>
+<body class="action-builder">
+  <main class="builder-page">
+    <header class="builder-header">
+      <div><p class="builder-eyebrow">UNIONSUITE <span>ACTION BUILDER</span></p><h1>Build an action</h1><p>Choose what it does, where it appears, and what refreshes afterwards.</p></div>
+      <a href="../Theme/UnionSuite-Guides/Usage-Guide.html#action-builder">Builder in the usage guide ↗</a>
+    </header>
+    <div class="builder-start">
+      <label for="preset">Start with an example</label>
+      <select id="preset"><option value="job">Edit job</option><option value="popup">Custom popup</option><option value="function">Call your function</option><option value="navigate">Open a page</option></select>
+      <button type="button" id="load-preset" class="TextButton us-outline-button">Load example</button>
+      <p>Examples start a new definition. Nothing is installed or saved to iMIS.</p>
+    </div>
+    <div class="builder-layout">
+      <form id="builder-form" novalidate>
+        <section class="builder-card" aria-labelledby="action-heading">
+          <div class="builder-section-title"><span>01</span><div><h2 id="action-heading">What should it do?</h2><p>Give the action a name and choose its operation.</p></div></div>
+          <div class="builder-fields two">
+            <label>Area<input id="area" required placeholder="jobs" autocomplete="off"><small>Lowercase, e.g. home, cases, member.</small></label>
+            <label>Action name<input id="command" required placeholder="edit-example" autocomplete="off"><small>Use hyphens between words.</small></label>
+          </div>
+          <p class="builder-identity"><span>Action key</span> <code id="identity-key"></code></p>
+          <label>Operation<select id="operation"><option value="popup">Open a popup</option><option value="function">Call an existing function</option><option value="navigate">Navigate to a page</option></select></label>
+          <div data-for="popup navigate"><label>Destination URL<input id="destination" placeholder="/your-editor.aspx" spellcheck="false"><small>Use the actual editor/page URL. Context parameters are added below.</small></label></div>
+          <div data-for="function"><label>Function name<input id="helper" placeholder="MyActions.updateRecord" spellcheck="false"><small>The function must exist on window and return its promise for asynchronous work.</small></label><label>Pass to the function<select id="helper-args"><option value="env">Action environment (env)</option><option value="context">Resolved context only</option><option value="none">No arguments — legacy helper</option></select></label></div>
+          <div data-for="popup">
+            <label>Popup title<input id="popup-title"></label>
+            <div class="builder-fields two"><label>Width<input id="popup-width" placeholder="70%"><small>Pixels (800) or percentage (70%).</small></label><label>Height<input id="popup-height" placeholder="70%"></label></div>
+          </div>
+          <div data-for="navigate"><label>Open in<select id="target"><option value="_self">Current tab</option><option value="_blank">New tab</option></select></label></div>
+        </section>
+
+        <section class="builder-card" aria-labelledby="presentation-heading">
+          <div class="builder-section-title"><span>02</span><div><h2 id="presentation-heading">How should it look?</h2><p>The same definition can be reused in several places.</p></div></div>
+          <label>Label<input id="label" required></label>
+          <div class="builder-fields two"><label>Icon<select id="icon">{{ICON_OPTIONS}}</select></label><label>Tone<select id="tone"><option value="default">Theme default</option><option value="danger">Danger / destructive</option></select></label></div>
+          <div class="builder-fields two"><label>Placement<select id="placement"><option value="header">iPart panel heading</option><option value="default">Standalone button / link</option><option value="menu">Actions menu item</option><option value="row">Report row</option></select></label><label>Appearance here<select id="appearance"><option value="button">Labelled button</option><option value="icon">Icon only</option><option value="link">Text link</option><option value="menu-item">Menu item</option></select></label></div>
+          <p class="builder-help">Changing placement keeps its appearance choice. An icon-only action still has an accessible label.</p>
+          <div class="builder-appearance-preview">
+            <h3>Button preview</h3>
+            <iframe id="appearance-preview" title="Button appearance preview" sandbox="allow-scripts"></iframe>
+            <p class="builder-help">Updates as you choose a label, icon, tone or appearance. Use the live preview to try the action.</p>
+          </div>
+        </section>
+
+        <section class="builder-card" aria-labelledby="context-heading">
+          <div class="builder-section-title"><span>03</span><div><h2 id="context-heading">Which record?</h2><p>Define the data the action needs. Required missing values disable its control.</p></div></div>
+          <div id="context-fields"></div>
+          <button type="button" id="add-context" class="TextButton us-outline-button">+ Add a context field</button>
+          <p class="builder-help">Sample values drive this preview. Only literal sources are exported as fixed values. A row ordinal must be the stored record key.</p>
+        </section>
+
+        <section class="builder-card" aria-labelledby="refresh-heading">
+          <div class="builder-section-title"><span>04</span><div><h2 id="refresh-heading">What should refresh?</h2><p id="refresh-timing">After the popup closes, including Cancel or X.</p></div></div>
+          <div id="refresh-settings">
+            <label>Refresh behaviour<select id="refresh-mode"><option value="origin">The IQA containing the clicked button</option><option value="specific">Specific IQA report(s)</option><option value="both">Originating IQA + other report(s)</option><option value="custom">My own refresh function</option><option value="none">Nothing</option></select></label>
+            <div id="refresh-targets-wrap"><div id="refresh-targets"></div><button type="button" id="add-target" class="TextButton us-outline-button">+ Add an IQA target</button><p class="builder-help">Use the report's stable wrapper class, e.g. .JobsIQA. Targets are matched across the page. “Exactly one” reports an error if the selector matches several reports.</p></div>
+            <div id="refresh-custom-wrap"><label>Refresh function<input id="refresh-helper" placeholder="MyActions.refreshRelatedViews"><small>Receives env, including env.refresh. Return a promise; keep this callback limited to repeatable view updates.</small></label></div>
+          </div>
+          <p id="navigation-refresh-note" class="builder-help">Navigation uses a native link. The destination page loads normally; this definition has no follow-up refresh.</p>
+        </section>
+
+        <details class="builder-card builder-advanced">
+          <summary>Advanced settings <span>Confirmation, permissions and registration</span></summary>
+          <div class="builder-advanced-body">
+            <label data-for="popup function">Confirmation message (optional)<input id="confirmation" placeholder="Are you sure you want to continue?"></label>
+            <label>Permission key (optional)<input id="permission" placeholder="jobs.edit"><small>Requires your site's access resolver. Server permissions must also enforce access.</small></label>
+            <label>When permission is denied<select id="denied"><option value="disable">Disable the control</option><option value="hide">Hide the control</option></select></label>
+            <div class="builder-fields two"><label>Definition owner<input id="owner" placeholder="client.jobs"></label><label>Source identifier<input id="source" placeholder="Actions.js:jobs.edit-example"></label></div>
+            <label>Registration<select id="registration"><option value="define">Define a new action</option><option value="configure">Explicitly replace an existing action</option></select></label>
+            <label class="builder-check"><input type="checkbox" id="acknowledge"> I intend to replace the complete existing definition.</label>
+            <div class="builder-fields two"><label>Header order<input id="order" type="number" step="1"></label><label>Record lock fields<input id="record-key" placeholder="partyId, ordinal"><small>Comma-separated context names. Blank uses all context.</small></label></div>
+            <div data-for="popup"><label class="builder-check"><input type="checkbox" id="commit-close"> Native close-on-commit flag</label><label>Maximise popup below this width (optional)<input id="fullscreen-below" type="number" min="0" placeholder="768"></label></div>
+            <p class="builder-help">This first builder covers common settings. Custom eligibility checks, context resolvers and native popup callbacks can be added to the exported definition in JavaScript.</p>
+          </div>
+        </details>
+      </form>
+
+      <aside class="builder-result" aria-label="Preview and generated code" tabindex="0">
+        <section class="builder-card preview-card">
+          <div class="builder-preview-title"><div><p class="builder-eyebrow">LIVE PREVIEW</p><h2 id="preview-heading">Try your action</h2></div><span class="builder-pill">Simulation</span></div>
+          <p class="builder-help">Uses the shared control renderer. Popups, functions and refreshes are simulated.</p>
+          <div class="builder-simulation-controls"><label class="builder-check"><input type="checkbox" id="simulate-missing"> Missing required data</label><label class="builder-check"><input type="checkbox" id="simulate-denied"> Permission denied</label></div>
+          <iframe id="action-preview" title="Generated action preview" sandbox="allow-scripts"></iframe>
+          <p id="simulation-status" role="status">Choose settings, then try the control.</p>
+        </section>
+        <section class="builder-card output-card">
+          <div id="validation" role="status" aria-live="polite"></div>
+          <div class="builder-output-tabs" role="tablist" aria-label="Generated output"><button type="button" id="tab-js" role="tab" aria-selected="true" aria-controls="output-js" data-tab="js">JavaScript</button><button type="button" id="tab-html" role="tab" aria-selected="false" aria-controls="output-html" tabindex="-1" data-tab="html">HTML / class</button><button type="button" id="tab-setup" role="tab" aria-selected="false" aria-controls="output-setup" tabindex="-1" data-tab="setup">Setup</button></div>
+          <div id="output-js" role="tabpanel" aria-labelledby="tab-js"><div class="builder-code-toolbar"><span>Client Actions.js</span><button type="button" class="TextButton us-outline-button" data-copy="js">Copy JavaScript</button></div><pre><code id="code-js"></code></pre></div>
+          <div id="output-html" role="tabpanel" aria-labelledby="tab-html" hidden><div class="builder-code-toolbar"><span id="html-placement">Author markup</span><button type="button" class="TextButton us-outline-button" data-copy="html">Copy HTML / class</button></div><pre><code id="code-html"></code></pre><p id="html-note" class="builder-help"></p></div>
+          <div id="output-setup" role="tabpanel" aria-labelledby="tab-setup" hidden><ol id="setup-list"></ol></div>
+          <div class="builder-export"><button type="button" class="TextButton" id="download-js">Download registration</button><button type="button" class="TextButton us-outline-button" id="download-draft">Save builder draft</button><label class="builder-import TextButton us-outline-button">Load draft<input id="load-draft" type="file" accept=".json,application/json"></label></div>
+          <p id="copy-status" role="status"></p>
+          <p class="builder-help">A draft stores form settings and sample values in JSON. JavaScript export is a registration snippet, not a replacement for your whole Actions.js file. Collision checks cover the bundled definitions; check your deployed client registrations too.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <script id="builder-assets" type="application/json">{{ASSETS}}</script>
+  <script>{{CORE_JS}}</script>
+  <script>{{APP_JS}}</script>
+</body>
+</html>

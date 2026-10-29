@@ -31,10 +31,10 @@ const report=(id,{direct=false,classes='JobsIQA us-action-member-add-job',rows=r
    },true);
    window.fetch=async(url,options)=>{requests.push({url,method:options.method,token:options.headers.RequestVerificationToken});return {ok:true,status:204};};
   });
-  await page.addStyleTag({content:read('THeme/UnionSuite/zUnionSuite.css')});
+  await page.addStyleTag({content:read('Theme/UnionSuite/zUnionSuite.css')});
   console.log('Loading unified runtime');
-  await page.addScriptTag({content:read('THeme/UnionSuite/zUnionSuite.js')});
-  await page.addScriptTag({content:read('THeme/UnionSuite/Scripts/ActionDefinitions.js')});
+  await page.addScriptTag({content:read('Theme/UnionSuite/zUnionSuite.js')});
+  await page.addScriptTag({content:read('Theme/UnionSuite/Scripts/ActionDefinitions.js')});
   console.log('Checking generated controls');
   await page.waitForFunction(()=>document.querySelectorAll('[data-us-command-key="member.add-job"]').length===5);
   // Fifteen standard definitions, plus the agreement page set (3 October 2026).

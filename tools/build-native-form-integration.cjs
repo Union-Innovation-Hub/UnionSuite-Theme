@@ -1,8 +1,8 @@
 const fs=require('fs');
 const read=p=>fs.readFileSync(p,'utf8');
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-const css=(read('THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css')+'\n'+read('THeme/UnionSuite/99-Orion.css')+'\n'+read('THeme/UnionSuite/zUnionSuite.css')).replace(/@import[^;]+;/g,'').replace(/url\([^)]*\)/g,url=>url.includes('data:image/svg+xml')?url:'none');
-const nativeSource=read('THeme/UnionSuite/zUnionSuite.css');
+const css=(read('Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css')+'\n'+read('Theme/UnionSuite/99-Orion.css')+'\n'+read('Theme/UnionSuite/zUnionSuite.css')).replace(/@import[^;]+;/g,'').replace(/url\([^)]*\)/g,url=>url.includes('data:image/svg+xml')?url:'none');
+const nativeSource=read('Theme/UnionSuite/zUnionSuite.css');
 const trial=nativeSource.slice(nativeSource.indexOf('*/',nativeSource.indexOf('/* US-NATIVE-FORMS:START'))+2,nativeSource.indexOf('/* US-NATIVE-FORMS:END */'));
 const fallback=read('prototypes/legacy/Native-Form-Integration.css').split('\n').filter(l=>l.includes('.ruFileInput')||l.includes(':is(.ruFakeInput,.ruBrowse,.ruClear)')||l.includes('.ruFileWrap')||l.includes('.EmptyMasterContentPanel:has')||l.includes('upload-preview-status')).join('\n').replaceAll('[id$="_AppThemeEditControl_UploadPanel"]',':is([id$="_AppThemeEditControl_UploadPanel"],[id$="_ImporterControlPanel"] [id$="_FileUploadPanel"])');
 const items=['Theme-Upload','Edit-Address','Add-Contact','Panel-Editor','Import'];

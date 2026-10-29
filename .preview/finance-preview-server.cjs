@@ -11,7 +11,7 @@ http.createServer((req,res) => {
   let url;
   try { url=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname); } catch { res.writeHead(400);res.end();return; }
   if(url==='/') {res.writeHead(302,{Location:encodeURI(entry)});res.end();return;}
-  if(!allow.has(url) && !url.startsWith('/THeme/UnionSuite/') && !url.startsWith('/THeme/UnionSuite-Client/')) {res.writeHead(404);res.end('Not found');return;}
+  if(!allow.has(url) && !url.startsWith('/Theme/UnionSuite/') && !url.startsWith('/Theme/UnionSuite-Client/')) {res.writeHead(404);res.end('Not found');return;}
   const file=path.resolve(root,'.'+url);
   if(!file.startsWith(root+path.sep)) {res.writeHead(403);res.end();return;}
   fs.readFile(file,(err,data)=>{if(err){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(data);});

@@ -548,7 +548,7 @@ Placement discovery from the parent DVK is now implemented through the supplied 
 - [22 September handover and evidence](research/native-cco-handover/README.md): dated findings, full A/B report copies and ordered next steps for the Cases grid in B.
 - [Consolidated CCO findings](research/custom-iframe-ipart/research/Findings-and-Decisions.md): confirmed ContentItem lookup, native route discrepancy and preview route.
 - [Earlier retained-frame trial](research/custom-iframe-ipart/examples/CCO-Retained-Tabs-Trial.md): native-tab capture and iframe experiment. These new probes do not modify it.
-- [Shared Query Template refresh](../../../THeme/UnionSuite/zUnionSuite.js): known pagination and theme reinitialisation pattern.
+- [Shared Query Template refresh](../../../Theme/UnionSuite/zUnionSuite.js): known pagination and theme reinitialisation pattern.
 - [Telerik tab-selection event](https://www.telerik.com/products/aspnet-ajax/documentation/controls/tabstrip/client-side-programming/events/onclienttabselecting): a potential production interception point. These probes use capture interception, including already-selected links, without changing Telerik's server state.
 - [DOMParser behaviour](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString): parsed documents are separate from the active DOM; insertion still requires deliberate treatment of scripts/handlers.
 

@@ -1,6 +1,6 @@
-// Compatibility entry point. Maintained implementation: THeme/UnionSuite/guides/usage/build/build-banner-preview.cjs
+// Compatibility entry point. Maintained implementation: Theme/UnionSuite/guides/usage/build/build-banner-preview.cjs
 'use strict';
-const implementation = require.resolve("../THeme/UnionSuite/guides/usage/build/build-banner-preview.cjs");
+const implementation = require.resolve("../Theme/UnionSuite/guides/usage/build/build-banner-preview.cjs");
 if (require.main === module) {
   const result = require('node:child_process').spawnSync(process.execPath, [implementation, ...process.argv.slice(2)], {stdio: 'inherit'});
   if (result.error) throw result.error;

@@ -40,8 +40,8 @@ const html=`<form><input type="hidden" id="__RequestVerificationToken" value="fi
     if(event.target.closest('.us-record__more a')){window.clicks.push(event.defaultPrevented);event.preventDefault();}
    });
   },[folder,preview]);
-  await page.addStyleTag({content:read('THeme/UnionSuite/zUnionSuite.css')});
-  await page.addScriptTag({content:read('THeme/UnionSuite/zUnionSuite.js')});
+  await page.addStyleTag({content:read('Theme/UnionSuite/zUnionSuite.css')});
+  await page.addScriptTag({content:read('Theme/UnionSuite/zUnionSuite.js')});
 
   const open=async id=>{
    const card=page.locator(`[data-us-activity-id="${id}"]`);

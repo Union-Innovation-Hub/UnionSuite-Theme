@@ -8,16 +8,16 @@ Companion to [THEME-FINDINGS.md](THEME-FINDINGS.md),
 [IMIS-CMS-STRUCTURE.md](IMIS-CMS-STRUCTURE.md).
 
 Current adoption: Query Menu / IQA report presentation and utilities have moved
-into `THeme/UnionSuite/zUnionSuite.css` and `zUnionSuite.js`, activated by
-`us-report` on an iPart. See [setup and modifiers](../THeme/UnionSuite/README.md).
-The [banner component](../THeme/UnionSuite-Guides/usage/examples/Banner-README.md) now provides the reusable
+into `Theme/UnionSuite/zUnionSuite.css` and `zUnionSuite.js`, activated by
+`us-report` on an iPart. See [setup and modifiers](../Theme/UnionSuite/README.md).
+The [banner component](../Theme/UnionSuite-Guides/usage/examples/Banner-README.md) now provides the reusable
 `us-banner` component, including token-driven styling, native-gutter page layout,
 sticky/condensing modes and optional Actions/tabs markup. All banner CSS has moved
 into separate sections of `zUnionSuite.css`; the existing behaviour script remains
 separately included. This does not automatically migrate legacy banner markup or
 retire its old rules. The remaining
 component consolidation below is still outstanding. Current author recipes and
-templates are in the [Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html).
+templates are in the [Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html).
 
 ---
 
@@ -130,7 +130,7 @@ deleted from the content records.
 `.Agreements-wrapper`, `.Calls-wrapper`, `.Committees-wrapper`,
 `.Travel-wrapper`, `.Integrations-wrapper`
 
-Implemented in `THeme/UnionSuite/zUnionSuite.css`, block `US-STAFF-NAV-ICONS`
+Implemented in `Theme/UnionSuite/zUnionSuite.css`, block `US-STAFF-NAV-ICONS`
 (7 September 2026). Existing wrapper classes are retained, scoped to root staff
 navigation rows. Organising/Committees use `ti-users-group`, Calls uses
 `ti-phone-outgoing`, and the other five mappings retain their Tabler equivalents.

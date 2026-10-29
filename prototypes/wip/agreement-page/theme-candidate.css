@@ -1,5 +1,5 @@
 /* Agreement page — proposed theme CSS (candidate, not installed).
-   Each section names its target in THeme/UnionSuite/zUnionSuite.css and uses
+   Each section names its target in Theme/UnionSuite/zUnionSuite.css and uses
    theme tokens only, so an approved section moves across unchanged. All three
    are opt-in per Query Template Display iPart (class in the iPart CSS class
    field) and sit alongside us-query-template, us-query-search and

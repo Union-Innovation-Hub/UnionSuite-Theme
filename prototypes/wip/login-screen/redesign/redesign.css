@@ -1,5 +1,5 @@
 /* Hub sign-in redesign: three layout concepts over the existing triangle field.
-   Tokens mirror THeme/UnionSuite/zUnionSuite.css; the page opens standalone.
+   Tokens mirror Theme/UnionSuite/zUnionSuite.css; the page opens standalone.
    Concepts are selected by data-concept on .stage: card | split | open. */
 
 :root {

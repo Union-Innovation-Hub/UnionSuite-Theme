@@ -63,7 +63,7 @@ README. Tick an item off only once it is in the theme and has been checked.
       `AGENTS.md` requires for approved designs, and update the preview URL,
       the v1/v2 links and the paths in `build-standalone.cjs`.
 
-## `THeme/UnionSuite/zUnionSuite.css`
+## `Theme/UnionSuite/zUnionSuite.css`
 
 Each `theme-candidate.css` section names its target and uses the theme's own
 selectors, so it moves across unchanged.
@@ -147,17 +147,17 @@ selectors, so it moves across unchanged.
       locked-out states. In iMIS, change the iPart's CSS class from
       `HubCredentials` to `us-credentials us-credentials--hide-contact`.
 
-## `THeme/UnionSuite/99-Orion.css`
+## `Theme/UnionSuite/99-Orion.css`
 
 - [x] Item 11, buttons: section 11 → the base button rule and
       `.SmallButton`. Orion is project-owned; change it in place.
 
-## `THeme/UnionSuite/zzDarkMode.css`
+## `Theme/UnionSuite/zzDarkMode.css`
 
 - [x] Item 21, dark mode: section 21 → beside each component's dark
       overrides.
 
-## `THeme/UnionSuite/zUnionSuite.js`
+## `Theme/UnionSuite/zUnionSuite.js`
 
 - [x] Item 8: add `US-IQA-ROW-GROUPS`.
 - [x] Item 10: add `US-CCO-RAIL-COLLAPSE` (its owner selector is
@@ -329,7 +329,7 @@ selectors, so it moves across unchanged.
 
 ## Usage guide
 
-- [ ] Document in `THeme/UnionSuite-Guides/usage/`: `us-cco-cards`,
+- [ ] Document in `Theme/UnionSuite-Guides/usage/`: `us-cco-cards`,
       `us-cco-collapsible`, `us-cco-rail` (what it includes, and that a
       page-level rail CCO with nothing after it fills to the window bottom on
       short tabs, `US-CCO-RAIL-FILL`), the

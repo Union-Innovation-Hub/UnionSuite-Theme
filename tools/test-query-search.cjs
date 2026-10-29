@@ -2,8 +2,8 @@
 const fs = require('node:fs'), assert = require('node:assert/strict');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
 const read = file => fs.readFileSync(file, 'utf8');
-const css = ['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
-const script = read('THeme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
+const css = ['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
+const script = read('Theme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
 function items(cards = true) {
   return [['Sarah Mitchell','104582'],['Daniel Chen','103917'],['Emma Thompson','101293']].map(([name,id],i) =>
     `<section data-record="${i}"><div class="${cards ? 'card ' : ''}QueryTemplateItem"><div${cards ? ' class="card-body"' : ''}><h3>${name}</h3><p>${id}</p><span hidden>Secret</span><button type="button" onclick="window.rowClicks++">Open task</button></div></div></section>`).join('') +

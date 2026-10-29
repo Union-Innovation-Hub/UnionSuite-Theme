@@ -37,7 +37,7 @@ All new classes below are implemented by Scripts/ActionDefinitions.js. This work
 
 - [ ] Upload shared CSS/JS, new Scripts/ActionDefinitions.js and client Actions.js together, then include scripts once in order. Existing ZIP archives are not repackaged by this task.
 - [ ] Replace published legacy classes/attributes and remove inline/delegated handlers on converted controls. Keep structural menu classes and native filter/search/task-completion classes.
-- [ ] Update Jobs IQA SQL output to the row HTML in THeme/UnionSuite-Guides/usage/templates/Jobs-Row-Actions.html. Preserve the existing Delete eligibility rule; emit stored ordinal, not a changing row number; HTML-encode attribute values. Every field referenced in Query Template syntax must be selected.
+- [ ] Update Jobs IQA SQL output to the row HTML in Theme/UnionSuite-Guides/usage/templates/Jobs-Row-Actions.html. Preserve the existing Delete eligibility rule; emit stored ordinal, not a changing row number; HTML-encode attribute values. Every field referenced in Query Template syntax must be selected.
 - [ ] Review all custom registerAction/configureAction/UnionSuiteActions.register callers and replace them with full definitions. Explicit configure is a full override, not a merge.
 - [ ] Supply Home and Case task editor/assignee contracts. us-action-home-add-task and us-action-cases-add-task are hooks/examples, not working standard task creators. Keep the preview-only definitions out of production.
 - [ ] Adapt the six Case action examples in Client-Actions.example.js to verified functions. Required missing CaseID or helper dependencies disable controls.

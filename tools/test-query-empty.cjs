@@ -1,8 +1,8 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
-const example = require('../THeme/UnionSuite-Guides/usage/build/query-empty-example.cjs');
-const source = fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8').split('/* US-BANNER-BEHAVIOUR:START */')[0];
+const example = require('../Theme/UnionSuite-Guides/usage/build/query-empty-example.cjs');
+const source = fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8').split('/* US-BANNER-BEHAVIOUR:START */')[0];
 const wrap = (id, classes, content=example.panel(false)) => '<div class="ContentItemContainer"><div id="'+id+'" class="'+classes+'">'+content+'</div></div>';
 (async()=>{
   const browser=await chromium.launch({channel:'msedge',headless:true});

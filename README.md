@@ -10,7 +10,7 @@ a browser and can be shared as one offline HTML file. It is built outside the
 repo, to `C:\Dev\UHUB\Theme\Usage-Guide\Usage-Guide.html`.
 
 Maintained documentation, templates, examples and guide builders now live together
-in [guides/usage](THeme/UnionSuite-Guides/usage/README.md), the documentation source
+in [guides/usage](Theme/UnionSuite-Guides/usage/README.md), the documentation source
 of truth. Generated guides and comparison pages are built locally and ignored by
 Git. After checkout, run `node tools/build-theme-usage.cjs` to create the guide.
 The smaller index/topic-page publication format is planned separately.
@@ -24,14 +24,14 @@ palette and Recents design is retained in [approved/taskbar](prototypes/approved
 
 | Feature | Status | Maintained source |
 |---|---|---|
-| Five brand seeds, palette ramps, semantic tokens and live editor | Theme tokens; guide editor updates every preview, with hex input/reset/CSS download | `THeme/UnionSuite/zUnionSuite.css`; client overrides in `zzClientSpecific.css` |
+| Five brand seeds, palette ramps, semantic tokens and live editor | Theme tokens; guide editor updates every preview, with hex input/reset/CSS download | `Theme/UnionSuite/zUnionSuite.css`; client overrides in `zzClientSpecific.css` |
 | Existing native buttons (`TextButton`, `btn` and native variants) | Token colour mapping in shared theme; native layout and handlers retained | `zUnionSuite.css`; inventory and limits in `docs/THEME-BUTTONS.md` |
 | Action icons and compact row actions | Tabler children on native buttons; optional `us-icon-button` modifier and hover/focus tooltips | `zUnionSuite.css` and `zUnionSuite.js`; recipes in the usage guide |
-| Visual author handbook | Native-button recipes, action meanings, banner previews and dummy IQA; click-to-copy classes and exact placement | `THeme/UnionSuite-Guides/usage/`; generated as `THeme/UnionSuite-Guides/Usage-Guide.html` |
-| IQA Query Menu presentation, filter disclosure, native Export and expanded view | In shared theme; deployment must be verified on the target site | `THeme/UnionSuite/zUnionSuite.css` and `zUnionSuite.js` |
-| Static and current-record banner styling | In shared theme, with separate page-layout and component sections | `THeme/UnionSuite/zUnionSuite.css` |
-| Sticky/condensing banner behaviour and Actions disclosure | In shared theme JS | `THeme/UnionSuite/zUnionSuite.js`; generated legacy fallbacks in `UnionSuite-Guides/usage/examples/` |
-| Banner tabs row | Visual template available; switcher deferred for a later session. Direct zone switching first, CCO separately | `THeme/UnionSuite-Guides/usage/templates/Banner-Template.html`, `Banner-Tabs-Plan.md` and `TODO.md` |
+| Visual author handbook | Native-button recipes, action meanings, banner previews and dummy IQA; click-to-copy classes and exact placement | `Theme/UnionSuite-Guides/usage/`; generated as `Theme/UnionSuite-Guides/Usage-Guide.html` |
+| IQA Query Menu presentation, filter disclosure, native Export and expanded view | In shared theme; deployment must be verified on the target site | `Theme/UnionSuite/zUnionSuite.css` and `zUnionSuite.js` |
+| Static and current-record banner styling | In shared theme, with separate page-layout and component sections | `Theme/UnionSuite/zUnionSuite.css` |
+| Sticky/condensing banner behaviour and Actions disclosure | In shared theme JS | `Theme/UnionSuite/zUnionSuite.js`; generated legacy fallbacks in `UnionSuite-Guides/usage/examples/` |
+| Banner tabs row | Visual template available; switcher deferred for a later session. Direct zone switching first, CCO separately | `Theme/UnionSuite-Guides/usage/templates/Banner-Template.html`, `Banner-Tabs-Plan.md` and `TODO.md` |
 | Report action slot and button/text-link styling | In shared theme | `zUnionSuite.js` and `zUnionSuite.css` |
 | Named business-action registry and combined activity feed | Planned | `docs/THEME-PANEL-ACTIONS.md` and `docs/THEME-ACTIVITY-FEED.md` |
 
@@ -49,15 +49,15 @@ colour tokens, size/group utilities, specialised controls and known gaps.
 | Document | Audience and purpose |
 |---|---|
 | [Project TODO](TODO.md) | Deferred work, agreed scope and implementation checklist for the next session |
-| [Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html) | Content authors: visual examples, click-to-copy classes, exact placement, branding preview, templates, dummy IQA and troubleshooting |
-| [Theme README](THeme/UnionSuite/README.md) | Implementers: shared assets, deployment and report APIs |
-| [Guide maintenance](THeme/UnionSuite-Guides/usage/source/README.md) | Maintainers: source files, generation and verification |
+| [Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html) | Content authors: visual examples, click-to-copy classes, exact placement, branding preview, templates, dummy IQA and troubleshooting |
+| [Theme README](Theme/UnionSuite/README.md) | Implementers: shared assets, deployment and report APIs |
+| [Guide maintenance](Theme/UnionSuite-Guides/usage/source/README.md) | Maintainers: source files, generation and verification |
 | [Product context](PRODUCT.md) | Project scope, users, constraints and current artifacts |
 | [iMIS CMS structure](docs/IMIS-CMS-STRUCTURE.md) | Verified page/zone/iPart wrappers, native configuration and HTML entry points |
 | [Theme inventory](docs/THEME-INVENTORY.md) | Native component families and implementation status |
 | [Theme findings](docs/THEME-FINDINGS.md) | Historical measured cascade findings and integration pitfalls |
 | [Staff styling consolidation](docs/UTSTAFF-CONSOLIDATION.md) | Legacy component duplication and migration work |
-| [Banner guide](THeme/UnionSuite-Guides/usage/examples/Banner-README.md) | Banner installation, modes, slots, tokens and lifecycle |
+| [Banner guide](Theme/UnionSuite-Guides/usage/examples/Banner-README.md) | Banner installation, modes, slots, tokens and lifecycle |
 | [Banner tab plan](prototypes/wip/banner-tabs/Banner-Tabs-Plan.md) | Preferred page-zone adapter for lightweight dashboards and separate CCO option |
 | [Panel actions and IQA reports](docs/THEME-PANEL-ACTIONS.md) | Implemented report utilities plus the planned business-action registry |
 | [Activity-feed plan](docs/THEME-ACTIVITY-FEED.md) | Proposed source grouping, metadata and assembly |
@@ -65,9 +65,9 @@ colour tokens, size/group utilities, specialised controls and known gaps.
 
 ## Templates and previews
 
-- [Static dashboard banner](THeme/UnionSuite-Guides/usage/templates/Banner-Dashboard-Template.html) — Content HTML.
-- [Contact banner](THeme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html) — one current-record Query Template Display result; replace bracketed placeholders with actual fields.
-- [Complete banner template](THeme/UnionSuite-Guides/usage/templates/Banner-Template.html) — adaptable to Agreement, Contact or Staff; removable Actions and tabs divs.
+- [Static dashboard banner](Theme/UnionSuite-Guides/usage/templates/Banner-Dashboard-Template.html) — Content HTML.
+- [Contact banner](Theme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html) — one current-record Query Template Display result; replace bracketed placeholders with actual fields.
+- [Complete banner template](Theme/UnionSuite-Guides/usage/templates/Banner-Template.html) — adaptable to Agreement, Contact or Staff; removable Actions and tabs divs.
 - [Banner preview](references/Banner-Preview.html) — generated local example with scrolling and optional-block controls.
 - [Contact prototype](prototypes/legacy/crm-contact-Prototype.html), [staff dashboard prototype](prototypes/legacy/Staff-Task-Dashboard.html), and [agreement prototype](prototypes/legacy/Agreement%20Management/Agreement-Management-Prototype.html) — design references, not automatically installed theme features.
 
@@ -82,7 +82,7 @@ Menu and apply its documented iPart classes.
 
 Update the guide and relevant implementation notes in the same change as a
 feature, class, template, token or installation change. Edit
-`THeme/UnionSuite-Guides/usage/source/Usage-Guide.source.html` for prose; the generator imports
+`Theme/UnionSuite-Guides/usage/source/Usage-Guide.source.html` for prose; the generator imports
 tokens and banner code from their maintained sources. Do not hand-edit the
 generated guide or banner preview.
 
@@ -95,7 +95,7 @@ node tools/check-usage-sources.cjs
 ```
 
 When banner assets or the complete banner template change, first run
-`node THeme/UnionSuite-Guides/usage/build/build-banner-preview.cjs` to update the preview and synchronize
+`node Theme/UnionSuite-Guides/usage/build/build-banner-preview.cjs` to update the preview and synchronize
 the generated compatibility files from shared theme JS. These are maintainer-only generation commands;
 opening the guide and deploying the finished theme assets need no build tools.
 

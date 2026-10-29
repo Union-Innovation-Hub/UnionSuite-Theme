@@ -3,8 +3,8 @@ const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
 const read = file => fs.readFileSync(file, 'utf8');
-const css = ['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css', 'THeme/UnionSuite/99-Orion.css', 'THeme/UnionSuite/zUnionSuite.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g, '');
-const script = read('THeme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
+const css = ['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css', 'Theme/UnionSuite/99-Orion.css', 'Theme/UnionSuite/zUnionSuite.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g, '');
+const script = read('Theme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
 const panel = `<div class="panel"><div class="panel-heading Distinguish"><h2 class="panel-title">Staff Bulletin</h2></div><div class="panel-body-container"><div class="panel-body"><span class="template-header">Header</span><div class="QueryTemplateSet simplePaginateList"><section class="mb-3"><div class="card QueryTemplateItem"><div class="card-body"><div class="BulletinCard"><h3>Updated Membership Fees</h3><em>Peter Williams - 12/05/2025</em><div class="us-list__body"><p>The fee schedule is available.</p><a href="#fees">Latest Membership Fees</a></div></div></div></div></section></div><span class="template-footer">Footer</span></div></div></div>`;
 (async () => {
   const browser = await chromium.launch({channel:'msedge', headless:true});
@@ -33,7 +33,7 @@ const panel = `<div class="panel"><div class="panel-heading Distinguish"><h2 cla
     assert.equal(await page.locator('#banner > .panel').evaluate(n=>getComputedStyle(n).borderTopWidth), '0px');
     assert.equal(await page.locator('#banner .panel-body').evaluate(n=>getComputedStyle(n).paddingLeft), '0px');
     await page.addScriptTag({content:script});
-    await page.addScriptTag({content:read('THeme/UnionSuite/Scripts/ActionDefinitions.js')});
+    await page.addScriptTag({content:read('Theme/UnionSuite/Scripts/ActionDefinitions.js')});
     await page.evaluate(()=>{
       window.wrapperActionCount=0;
       UnionSuiteActions.define('test.add',{className:'us-action-test-add',owner:'test',source:'wrapper',presentation:{label:'Add bulletin'},context:{},action:{type:'function',run:()=>wrapperActionCount++}});

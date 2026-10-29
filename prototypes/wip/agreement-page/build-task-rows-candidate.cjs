@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '../../..');
-const themeFile = path.join(root, 'THeme/UnionSuite/zUnionSuite.js');
+const themeFile = path.join(root, 'Theme/UnionSuite/zUnionSuite.js');
 const outputFile = path.join(__dirname, 'theme-candidate-task-rows.js');
 
 const source = fs.readFileSync(themeFile, 'utf8').replace(/\r\n/g, '\n');

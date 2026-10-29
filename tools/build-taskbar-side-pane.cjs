@@ -1,7 +1,7 @@
 // Generates the offline side pane workshop: the theme's real header, taskbar and
 // bookmarks scripts (as deployed, with Pip switched off) plus the WIP side pane.
 // The header styles follow the guide's utility navigation example
-// (THeme/UnionSuite-Guides/usage/build/account-menu-example.cjs).
+// (Theme/UnionSuite-Guides/usage/build/account-menu-example.cjs).
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
@@ -9,7 +9,7 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\
 const script = text => text.replace(/<\/script/gi, '<\\/script');
 const attribute = text => text.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 const wip = 'prototypes/wip/taskbar-side-pane/';
-const usage = 'THeme/UnionSuite-Guides/usage/';
+const usage = 'Theme/UnionSuite-Guides/usage/';
 
 function section(source, name) {
   const code = source.match(new RegExp('/\\* ' + name + ':START[\\s\\S]*?/\\* ' + name + ':END \\*/'))?.[0];
@@ -18,7 +18,7 @@ function section(source, name) {
 }
 
 function nativeStyles() {
-  let native = (read(usage + 'vendor/10-UltraWaveResponsive.css') + '\n' + read('THeme/UnionSuite/99-Orion.css'))
+  let native = (read(usage + 'vendor/10-UltraWaveResponsive.css') + '\n' + read('Theme/UnionSuite/99-Orion.css'))
     .replace(/@import\s+[^;]+;/g, '')
     .replace(/@font-face\s*\{[^}]*\}/g, '');
   // Offline snapshot of the native iMIS icon sprite, as in the guide.
@@ -35,25 +35,25 @@ function nativeStyles() {
 
 function themeStyles() {
   const logo = 'data:image/svg+xml,' + encodeURIComponent(read(usage + 'source/utility-nav-logo.svg'));
-  const client = read('THeme/UnionSuite-Client/Override.css').replace('/images/Hub/UHUB_Logo.png', logo);
+  const client = read('Theme/UnionSuite-Client/Override.css').replace('/images/Hub/UHUB_Logo.png', logo);
   // The full Tabler set, as the theme loads it, with the font embedded.
-  const font = fs.readFileSync(path.join(root, 'THeme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64');
-  const tabler = read('THeme/UnionSuite/Tabler/tabler-icons.min.css')
+  const font = fs.readFileSync(path.join(root, 'Theme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64');
+  const tabler = read('Theme/UnionSuite/Tabler/tabler-icons.min.css')
     .replace(/url\("\.\/fonts\/tabler-icons\.woff2[^"]*"\)/, 'url(data:font/woff2;base64,' + font + ')');
   if (!tabler.includes('data:font/woff2')) throw new Error('Tabler font reference changed.');
   return [
     nativeStyles(),
     tabler,
-    read('THeme/UnionSuite/zUnionSuite.css'),
-    read('THeme/UnionSuite-Client/Branding.css'),
+    read('Theme/UnionSuite/zUnionSuite.css'),
+    read('Theme/UnionSuite-Client/Branding.css'),
     client,
     // Dark mode loads last, after client CSS.
-    read('THeme/UnionSuite/zzDarkMode.css')
+    read('Theme/UnionSuite/zzDarkMode.css')
   ].join('\n');
 }
 
 function frame() {
-  const core = read('THeme/UnionSuite/zUnionSuite.js');
+  const core = read('Theme/UnionSuite/zUnionSuite.js');
   const replacements = {
     '/* THEME_STYLES */': themeStyles(),
     '/* PAGE_STYLES */': read(wip + 'Side-Pane.page.css') + '\n' + read(wip + 'Side-Pane.css'),
@@ -62,8 +62,8 @@ function frame() {
     '/* FIXTURE_SCRIPT */': script(read(usage + 'source/taskbar-example.js') + '\n' + read(wip + 'Side-Pane.fixture.js')),
     // The theme sections the taskbar and Recents use: icons, busy states and copy.
     '/* THEME_SCRIPTS */': script(['US-ICONS', 'US-ACTION-ICONS', 'US-BUSY-PRESENTATION', 'US-COPY'].map(name => section(core, name)).join('\n')),
-    '/* TASKBAR_SCRIPT */': script(read('THeme/UnionSuite/Scripts/UnionSuiteTaskbar.js')),
-    '/* BOOKMARKS_SCRIPT */': script(read('THeme/UnionSuite/Scripts/UnionSuiteTaskbar-Bookmarks.js')),
+    '/* TASKBAR_SCRIPT */': script(read('Theme/UnionSuite/Scripts/UnionSuiteTaskbar.js')),
+    '/* BOOKMARKS_SCRIPT */': script(read('Theme/UnionSuite/Scripts/UnionSuiteTaskbar-Bookmarks.js')),
     '/* PANE_SCRIPT */': script(read(wip + 'Side-Pane.js'))
   };
   let html = read(wip + 'Side-Pane.frame.html');

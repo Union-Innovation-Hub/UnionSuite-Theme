@@ -8,20 +8,20 @@ real captured markup.
 
 Read §1–§3 before writing a single rule. They are what the first attempt cost.
 
-Current local implementation: `THeme/UnionSuite/zUnionSuite.css` contains the
+Current local implementation: `Theme/UnionSuite/zUnionSuite.css` contains the
 seeded tokens and approved IQA report CSS; `zUnionSuite.js` contains the shared
 behavior. `zzClientSpecific.css` is the client override layer. The old filenames
 and reset status below describe the earlier attempt. Current installation and
-iPart classes are in [the theme README](../THeme/UnionSuite/README.md). This local
+iPart classes are in [the theme README](../Theme/UnionSuite/README.md). This local
 integration has not itself published the assets or modified a live page.
 
 For current author instructions use the
-[standalone Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html). Banner styling
+[standalone Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html). Banner styling
 now lives in `zUnionSuite.css`, in separate page-layout and component sections.
 The existing separate script supplies sticky/condensing modes and Actions
 disclosure; its compatibility embed now contains no CSS. Tab switching remains
 deferred. See the
-[banner implementation guide](../THeme/UnionSuite-Guides/usage/examples/Banner-README.md). The measured findings
+[banner implementation guide](../Theme/UnionSuite-Guides/usage/examples/Banner-README.md). The measured findings
 below remain historical evidence, not a list of today's implemented features.
 
 ---
@@ -362,7 +362,7 @@ page. See IMIS-CMS-STRUCTURE.md §13.
 - `UT-theme.css` — **the abandoned first attempt.** Kept as reference only.
   Do not deploy. Its useful parts are the token block (§2.2) and the guards
   (§3.1); everything else is superseded by the rules in §6.
-- `THeme/UnionSuite/zAdditionalStyling.css` — **stale.** A copy of the
+- `Theme/UnionSuite/zAdditionalStyling.css` — **stale.** A copy of the
   abandoned theme, no longer matching the server.
 - `UTStaff.css` — edited (nav icons remapped to Tabler) but never uploaded, and
   now scheduled for deprecation anyway.

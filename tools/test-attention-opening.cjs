@@ -1,8 +1,8 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8');
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8');
 const runtime=source.match(/\/\* US-ATTENTION:START[\s\S]*?US-ATTENTION:END \*\//)[0];
-const css=fs.readFileSync('THeme/UnionSuite/zUnionSuite.css','utf8');
+const css=fs.readFileSync('Theme/UnionSuite/zUnionSuite.css','utf8');
 const card=(tag,id,attrs='')=>`<li><${tag} id="${id}" class="us-attention__card" ${attrs}><span class="us-attention__number">3</span><span class="us-attention__copy"><strong>Applications</strong><span>Awaiting review</span></span>${tag==='a'?'<svg class="us-attention__chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>':''}</${tag}></li>`;
 const html=`<!doctype html><html lang="en"><meta charset="utf-8"><style>${css}\nbody{margin:20px;background:var(--bg-page)}</style><body><section class="us-attention"><header class="us-attention__heading"><h2>Needs Attention</h2></header><ul class="us-attention__items">${card('a','linked','href="/report" aria-label="Applications queue"')}${card('a','second','href="/second"')}${card('div','static')}</ul></section><script>${runtime}</script></body></html>`;
 (async()=>{

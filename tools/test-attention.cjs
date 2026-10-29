@@ -1,11 +1,11 @@
 const fs=require('node:fs'), assert=require('node:assert/strict');
-const {guidePath}=require('../THeme/UnionSuite-Guides/usage/build/guide-output.cjs');
+const {guidePath}=require('../Theme/UnionSuite-Guides/usage/build/guide-output.cjs');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
 const read=f=>fs.readFileSync(f,'utf8');
-const themeJs=read('THeme/UnionSuite/zUnionSuite.js');
+const themeJs=read('Theme/UnionSuite/zUnionSuite.js');
 const script=themeJs.match(/\/\* US-ATTENTION:START[\s\S]*?US-ATTENTION:END \*\//)[0];
-const template=read('THeme/UnionSuite-Guides/usage/templates/Home/Needs-Attention-Content.html');
-const css=['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css','THeme/UnionSuite-Client/Branding.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
+const template=read('Theme/UnionSuite-Guides/usage/templates/Home/Needs-Attention-Content.html');
+const css=['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css','Theme/UnionSuite-Client/Branding.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
 const folder='$/_i4u_/SandBox/CRM Layouts/Home_Page/Trackers';
 const folderId='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0'));

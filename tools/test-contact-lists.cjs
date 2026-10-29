@@ -1,9 +1,9 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
 const read=file=>fs.readFileSync(file,'utf8'),esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const template=read('THeme/UnionSuite-Guides/usage/templates/List-Templates/Contacts-Query-Template.html');
-const source=read('THeme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
-const records=require('../THeme/UnionSuite-Guides/usage/source/contact-records.cjs').delegates;
+const template=read('Theme/UnionSuite-Guides/usage/templates/List-Templates/Contacts-Query-Template.html');
+const source=read('Theme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
+const records=require('../Theme/UnionSuite-Guides/usage/source/contact-records.cjs').delegates;
 const row=record=>'<section><div class="QueryTemplateItem">'+template.replace(/\{#query\.(\w+)\}/g,(_,field)=>esc(record[field]))+'</div></section>';
 const items=()=>records.map(row).join('')+'<section style="display:none" data-native-hidden><div class="QueryTemplateItem">'+template.replace(/\{#query\.(\w+)\}/g,(_,field)=>esc({...records[0],ContactName:'Native hidden',ContactId:'PAGED'}[field]))+'</div></section>';
 const panel=(bodyExtra='')=>'<div class="panel"><div class="panel-heading"><h2 class="panel-title">Delegates</h2></div><div class="panel-description">Supporting contacts</div><div class="panel-body-container"><div class="panel-body" '+bodyExtra+'><div class="QueryTemplateSet">'+items()+'</div></div></div></div>';
@@ -13,7 +13,7 @@ const wrap=(id,classes='us-list-scroll us-query-search',extra='')=>'<div class="
  try{
   const page=await browser.newPage({viewport:{width:1361,height:900}}),errors=[],requests=[];
   page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',route=>{requests.push(route.request().url());return route.abort();});
-  const css=['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
+  const css=['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
   await page.setContent('<!doctype html><html><body><main><div class="ContentItemContainer" id="direct">'+panel()+'</div>'+wrap('empty','')+wrap('wrapped')+wrap('optout','us-list-scroll us-query-search us-report-no-styling')+'<div class="ContentItemContainer"><div id="outer" class="us-list-scroll"><div class="panel"><div class="panel-body-container"><div class="panel-body">'+wrap('nested')+'</div></div></div></div></div>'+wrap('custom','us-list-scroll','tabindex="-1" role="group" aria-label="My custom label"')+'</main></body></html>');
   await page.addStyleTag({content:css+'html{height:auto}body{height:auto;margin:20px}main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.ContentItemContainer{min-width:0}'});
   await page.addScriptTag({content:source});

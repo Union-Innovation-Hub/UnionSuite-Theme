@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const documentHtml=require('../THeme/UnionSuite-Guides/usage/build/section-tabs-example.cjs').documentHtml;
+const documentHtml=require('../Theme/UnionSuite-Guides/usage/build/section-tabs-example.cjs').documentHtml;
 const measure=list=>{
  const button=list.querySelector('[aria-selected="true"]'),r=list.getBoundingClientRect(),b=button.getBoundingClientRect(),style=getComputedStyle(list,'::after'),matrix=new DOMMatrixReadOnly(style.transform);
  return {x:r.left+list.clientLeft+matrix.m41+10-list.scrollLeft,target:b.left+b.width/2,y:r.top+list.clientTop+matrix.m42-list.scrollTop,targetY:b.bottom-5,content:style.content,duration:style.transitionDuration,fallback:getComputedStyle(button,'::after').content,scrollWidth:list.scrollWidth,width:list.clientWidth};

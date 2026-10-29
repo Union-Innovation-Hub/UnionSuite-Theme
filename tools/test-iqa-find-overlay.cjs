@@ -1,6 +1,6 @@
 // Isolated lifecycle/geometry tests, using element doubles rather than a browser.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8');
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8');
 function node(){return {attrs:new Map(),style:{},children:[],hidden:false,isConnected:true,textContent:'',append(...items){this.children.push(...items);items.forEach(n=>n.parentElement=this);},remove(){this.parentElement.children=this.parentElement.children.filter(n=>n!==this);},getAttribute(k){return this.attrs.has(k)?this.attrs.get(k):null;},setAttribute(k,v){this.attrs.set(k,v);},removeAttribute(k){this.attrs.delete(k);},hasAttribute(k){return this.attrs.has(k);}};}
 const body=node(),progress=node(),target=node(),table=node(),owner=node(),grid=node();
 target.setAttribute('aria-busy','false');target.parentElement=table;table.parentElement=body;

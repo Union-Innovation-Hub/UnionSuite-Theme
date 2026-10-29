@@ -7,7 +7,7 @@ with offline fixtures. **Not in the theme, not approved and not deployed.** The
 card layout is being decided in the activity cards workbench
 (`prototypes/wip/activity-cards/`).
 
-The [Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html) lists this feature and
+The [Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html) lists this feature and
 its proposed classes under planned work. When it is promoted, update that entry
 with the markup and field contract below. Add working templates and class recipes
 to the guide only then.

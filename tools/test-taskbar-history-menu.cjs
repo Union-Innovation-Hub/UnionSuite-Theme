@@ -1,7 +1,7 @@
 // Regression: rebuilding the clicked history row must not count as an outside click.
 const assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const preview=require('../THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
+const preview=require('../Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
 const key='union-suite:preview:quick-search-history:100';
 (async()=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});

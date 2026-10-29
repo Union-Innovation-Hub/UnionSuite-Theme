@@ -1,12 +1,12 @@
 // Tests the IQA where-used extraction, index and lookup
-// (THeme/UnionSuite/Scripts/IQA-WhereUsed.js) against fixtures shaped like
+// (Theme/UnionSuite/Scripts/IQA-WhereUsed.js) against fixtures shaped like
 // the dev tenant probe results (prototypes/wip/iqa-where-used/README.md).
 // Run from the project root: node tools/test-where-used.cjs
 'use strict';
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const core = require('../THeme/UnionSuite/Scripts/IQA-WhereUsed.js');
+const core = require('../Theme/UnionSuite/Scripts/IQA-WhereUsed.js');
 
 const TARGET = { path: '$/_i4u_/SandBox/ContactRecords', documentKey: '75068202-0191-4ef3-bf87-66c58cc99744', versionKey: '18a19f51-065b-4e42-bbc8-209da92feda1' };
 const OTHER = { path: '$/_i4u_/SandBox/Other Query', documentKey: '11111111-2222-3333-4444-555555555555', versionKey: '66666666-7777-8888-9999-000000000000' };

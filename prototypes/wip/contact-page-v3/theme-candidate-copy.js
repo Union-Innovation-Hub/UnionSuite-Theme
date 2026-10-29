@@ -1,6 +1,6 @@
 /* ==========================================================================
    CONTACT PAGE v3 — THEME CANDIDATE: US-COPY 1.1 (not installed)
-   Replaces the US-COPY block in THeme/UnionSuite/zUnionSuite.js. Generated
+   Replaces the US-COPY block in Theme/UnionSuite/zUnionSuite.js. Generated
    from the theme block; the only changes are flashLength (the flash class
    lasts as long as the CSS animation instead of a fixed 700ms), the
    "Copied" label beside the button (copiedLabel) and the version. Loaded

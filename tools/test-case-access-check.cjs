@@ -2,7 +2,7 @@
 // no-access page; Granted, a failed check or no answer stays on the page.
 // The root's data-us-case-access tells US-CASE-ACCESS when to show it.
 const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
-const source = fs.readFileSync('THeme/UnionSuite/Scripts/ActionDefinitions.js', 'utf8');
+const source = fs.readFileSync('Theme/UnionSuite/Scripts/ActionDefinitions.js', 'utf8');
 const cloudToolz = 'https://cloudtoolz.test';
 
 async function load({pathname = '/Cases_ManageCase', search = '?CaseID=C202&CaseNum=198', pageClass = false, access, memberId, status = 200}) {

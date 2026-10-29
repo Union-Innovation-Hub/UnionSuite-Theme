@@ -1,6 +1,6 @@
 /* ==========================================================================
    CONTACT PAGE v3 — THEME CANDIDATE SCRIPT (not installed)
-   Proposed additions to THeme/UnionSuite/zUnionSuite.js. Styles are in
+   Proposed additions to Theme/UnionSuite/zUnionSuite.js. Styles are in
    theme-candidate.css (sections 8, 10, 12, 16, 17, 32 and 37).
    ========================================================================== */
 

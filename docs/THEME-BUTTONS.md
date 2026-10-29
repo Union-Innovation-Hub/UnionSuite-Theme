@@ -2,7 +2,7 @@
 
 The theme extends existing iMIS button classes. Native generated roles are preserved. Authored main actions that previously
 relied on plain TextButton being orange should add PrimaryButton. CSS is maintained between
-`US-NATIVE-BUTTONS:START/END` in `THeme/UnionSuite/zUnionSuite.css`, before the
+`US-NATIVE-BUTTONS:START/END` in `Theme/UnionSuite/zUnionSuite.css`, before the
 report and banner sections. The native stylesheets still own button dimensions,
 typography, size variants, grouping, icons and click/submit behaviour.
 
@@ -71,8 +71,8 @@ fictional data only. In production, native iMIS supplies the data operations.
 
 ## Inventory of the native sheets
 
-Inspected `THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css`, `legacy/Native CSS/Orion-99.css` and
-the current theme's `THeme/UnionSuite/99-Orion.css`. The two Orion captures are
+Inspected `Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css`, `legacy/Native CSS/Orion-99.css` and
+the current theme's `Theme/UnionSuite/99-Orion.css`. The two Orion captures are
 identical after normalising line endings. A class appearing in a selector is
 not evidence of a complete standalone component.
 

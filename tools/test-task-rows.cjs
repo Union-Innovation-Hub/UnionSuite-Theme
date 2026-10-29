@@ -2,11 +2,11 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
 const read=f=>fs.readFileSync(f,'utf8');
-const source=read('THeme/UnionSuite/zUnionSuite.js');
+const source=read('Theme/UnionSuite/zUnionSuite.js');
 const script=source.split('/* US-BANNER-BEHAVIOUR:START */')[0]+'\n'+source.match(/\/\* US-TASK-ROWS:START[\s\S]*?US-TASK-ROWS:END \*\//)[0];
-const css=['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css','THeme/UnionSuite-Client/Branding.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
-const template=read('THeme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Completion-Query-Template.html');
-const footer=read('THeme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Query-Footer.html');
+const css=['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css','Theme/UnionSuite-Client/Branding.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
+const template=read('Theme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Completion-Query-Template.html');
+const footer=read('Theme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Query-Footer.html');
 const records=[
  {TaskTitle:'Follow up application details',MemberName:'Hub TestLastName',IsCompleted:'False',TaskDateLabel:'17/09/2026'},
  {TaskTitle:'Confirm workplace details',MemberName:'Jordan Lee',IsCompleted:'0',TaskDateLabel:'18/09/2026'},

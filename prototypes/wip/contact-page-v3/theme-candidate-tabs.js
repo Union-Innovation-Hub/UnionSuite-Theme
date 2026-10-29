@@ -1,6 +1,6 @@
 /* ==========================================================================
    CONTACT PAGE v3 — THEME CANDIDATE: US-NATIVE-TABS 1.1 (not installed)
-   Replaces the US-NATIVE-TABS block in THeme/UnionSuite/zUnionSuite.js.
+   Replaces the US-NATIVE-TABS block in Theme/UnionSuite/zUnionSuite.js.
    Generated from the theme block; the only changes are label() (the picker
    names the open tab while the tab list is not rendered), its call in
    update() and the version. Open decision 5: the "Sections: …" label moves

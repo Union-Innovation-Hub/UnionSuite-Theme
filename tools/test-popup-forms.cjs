@@ -1,5 +1,5 @@
 // Tests the UnionSuite forms runtime's pure core and the task form's
-// definition (THeme/UnionSuite/Forms/UnionSuiteForms.js and TaskForm.js):
+// definition (Theme/UnionSuite/Forms/UnionSuiteForms.js and TaskForm.js):
 // context, visibility, validation, the payload sent to CloudToolz and the
 // popup close results. The drawing is checked in the browser
 // (prototypes/wip/task-form/task-form-preview.html).
@@ -8,8 +8,8 @@
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const forms = require('../THeme/UnionSuite/Forms/UnionSuiteForms.js');
-const task = require('../THeme/UnionSuite/Forms/TaskForm.js');
+const forms = require('../Theme/UnionSuite/Forms/UnionSuiteForms.js');
+const task = require('../Theme/UnionSuite/Forms/TaskForm.js');
 
 const client = {loggedInPartyId: '104002', isAnonymous: false};
 const context = (module, search = '', dataset = {}) =>

@@ -17,7 +17,7 @@ This is a proposed project policy, not an existing guarantee. [iMIS officially s
 
 ### 1. P2 — Search disclosure assumes a mouse click focuses its button
 
-Source: [zUnionSuite.js, line 639](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/THeme/UnionSuite/zUnionSuite.js:639>), in `finishTransition()`; activation is handled around line 407.
+Source: [zUnionSuite.js, line 639](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/Theme/UnionSuite/zUnionSuite.js:639>), in `finishTransition()`; activation is handled around line 407.
 
 After opening a search disclosure, focus is transferred only if `document.activeElement === entry.button`. Safari does not normally focus a button when it is clicked, so that condition fails. This is [documented browser behaviour](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button#clicking_and_focus).
 
@@ -35,7 +35,7 @@ Recommended fix: capture the intent to focus search when the disclosure is activ
 
 ### 2. P2 if older browsers are required — `:has()` is a JavaScript dependency without a compatibility guard
 
-Sources: [query-display selector, line 154](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/THeme/UnionSuite/zUnionSuite.js:154>), its execution at line 181, [action candidates, line 2667](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/THeme/UnionSuite/zUnionSuite.js:2667>), and [task selector, line 3388](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/THeme/UnionSuite/zUnionSuite.js:3388>). CSS also depends extensively on `:has()` for wrapper ownership and layout.
+Sources: [query-display selector, line 154](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/Theme/UnionSuite/zUnionSuite.js:154>), its execution at line 181, [action candidates, line 2667](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/Theme/UnionSuite/zUnionSuite.js:2667>), and [task selector, line 3388](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/Theme/UnionSuite/zUnionSuite.js:3388>). CSS also depends extensively on `:has()` for wrapper ownership and layout.
 
 Support starts at Chrome/Edge 105, Firefox 121 and Safari/iOS Safari 15.4. Earlier browsers can reject these selectors in DOM queries, interrupting component setup instead of merely omitting a visual enhancement. See [MDN compatibility data](https://github.com/mdn/browser-compat-data/blob/main/css/selectors/has.json) and [DOM query exceptions](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector#exceptions).
 
@@ -45,7 +45,7 @@ Recommended action: document the minimum feature requirements. If older clients 
 
 ### 3. P2 if older browsers are required — Sidebar tokens bypass the `color-mix()` fallback
 
-Source: [zUnionSuite.css, line 2360](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/THeme/UnionSuite/zUnionSuite.css:2360>), with consumers at lines 2363–2371 and in the foundation stylesheet.
+Source: [zUnionSuite.css, line 2360](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/Theme/UnionSuite/zUnionSuite.css:2360>), with consumers at lines 2363–2371 and in the foundation stylesheet.
 
 The initial colour ramps correctly place derived colours inside `@supports`, but `--nav-submenu-bg`, `--nav-hover-bg` and `--nav-selected-bg` are assigned `color-mix()` values unconditionally. On a browser without that function, consuming declarations become invalid at computed-value time. A fallback inside `var(--nav-selected-bg, ...)` does not rescue an already-defined but unusable token.
 
@@ -70,7 +70,7 @@ Recommended fix: parameterise the browser engine, assert the correct outcome for
 
 ## Lower-priority observations
 
-- The WebKit guide check emitted `ResizeObserver loop completed with undelivered notifications.` after its interaction checks passed. A likely source is [usage-guide.js, lines 175–192](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/THeme/UnionSuite-Guides/usage/source/usage-guide.js:175>), which changes iframe height directly from a body resize observer. Root cause and visible impact were not isolated; do not treat this as a confirmed broken layout. Investigate coalescing writes with `requestAnimationFrame` and avoiding unchanged height assignments, following [ResizeObserver guidance](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver#observation_errors).
+- The WebKit guide check emitted `ResizeObserver loop completed with undelivered notifications.` after its interaction checks passed. A likely source is [usage-guide.js, lines 175–192](<C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM Layouts/Theme/UnionSuite-Guides/usage/source/usage-guide.js:175>), which changes iframe height directly from a body resize observer. Root cause and visible impact were not isolated; do not treat this as a confirmed broken layout. Investigate coalescing writes with `requestAnimationFrame` and avoiding unchanged height assignments, following [ResizeObserver guidance](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver#observation_errors).
 - Contact details and membership cards depend on container queries for narrow-container reflow (`zUnionSuite.css`, lines 3111 and 3537–3538). Browsers before Chrome/Edge 105, Firefox 110 or Safari 16 will keep their base column arrangements. This matters if older devices are brought into scope. [Compatibility data](https://github.com/mdn/browser-compat-data/blob/main/css/properties/container-type.json).
 - Mobile tab overflow fades use unprefixed `mask-image` at lines 2885–2887. Chrome/Edge before 120 need the prefixed version. Scrolling remains available without the fade, so this is cosmetic. [Compatibility data](https://github.com/mdn/browser-compat-data/blob/main/css/properties/mask-image.json).
 - `scrollbar-color` was unsupported in the tested Windows WebKit port; scrollbars remained usable. That port result should not be presented as a guarantee about current macOS Safari. Safari added `scrollbar-width` and `scrollbar-gutter` in 18.2. [WebKit release notes](https://webkit.org/blog/16301/webkit-features-in-safari-18-2/).

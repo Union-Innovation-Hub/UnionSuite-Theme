@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
 const read = file => fs.readFileSync(file, 'utf8');
-const template = read('THeme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html');
+const template = read('Theme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html');
 const taskUrl = '/i4u_Sandbox/Styling-Elements/Home-Dashboard/Add-Task.aspx?ID=104019&Ordinal=219';
 const row = template.replace(/\{#query\.(\w+)\}/g, (_, key) => ({
   TaskTitle: 'Call Alex about renewal', TaskUrl: taskUrl, MemberName: 'Alex',
@@ -25,7 +25,7 @@ const row = template.replace(/\{#query\.(\w+)\}/g, (_, key) => ({
       window.refreshes = [];
       window.ShowDialog_NoReturnValue = (...args) => calls.push(args);
     });
-    await page.addScriptTag({content: read('THeme/UnionSuite/zUnionSuite.js')});
+    await page.addScriptTag({content: read('Theme/UnionSuite/zUnionSuite.js')});
     // Stub only native report refresh; exercise the real action and popup lifecycle.
     await page.evaluate(() => {
       window.UnionSuiteRefresh = {
@@ -37,7 +37,7 @@ const row = template.replace(/\{#query\.(\w+)\}/g, (_, key) => ({
         })
       };
     });
-    await page.addScriptTag({content: read('THeme/UnionSuite/Scripts/ActionDefinitions.js')});
+    await page.addScriptTag({content: read('Theme/UnionSuite/Scripts/ActionDefinitions.js')});
     const title = page.locator('.us-task__title');
     await page.waitForFunction(() => document.querySelector('.us-task__title').dataset.usCommandState === 'ready');
     assert.equal(await title.textContent(), 'Call Alex about renewal');

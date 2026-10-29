@@ -2,11 +2,11 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const native=read('THeme/UnionSuite/guides/usage/vendor/10-UltraWaveResponsive.css'),orion=read('THeme/UnionSuite/99-Orion.css'),shared=read('THeme/UnionSuite/zUnionSuite.css');
-const styles=g=>[native,orion.replace('--bs-gutter-x: 40px;','--bs-gutter-x: '+g+'px;'),shared,read('THeme/UnionSuite-Client/Branding.css'),read('THeme/UnionSuite-Client/Override.css')].join('\n').replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
+const native=read('Theme/UnionSuite/guides/usage/vendor/10-UltraWaveResponsive.css'),orion=read('Theme/UnionSuite/99-Orion.css'),shared=read('Theme/UnionSuite/zUnionSuite.css');
+const styles=g=>[native,orion.replace('--bs-gutter-x: 40px;','--bs-gutter-x: '+g+'px;'),shared,read('Theme/UnionSuite-Client/Branding.css'),read('Theme/UnionSuite-Client/Override.css')].join('\n').replace(/@import\s+[^;]+;/g,'').replace(/@font-face\s*\{[^}]*\}/g,'');
 const wrap=content=>'<div class="ContentItemContainer"><div class="WebPartZone"><div class="iMIS-WebPart"><div class="ContentItemContainer">'+content+'</div></div></div></div>';
 const banner='<div class="us-banner us-banner-collapsible"><header class="us-banner__surface"><div class="us-banner__summary"><div class="us-banner__identity"><h1 class="us-banner__title">Sample member</h1></div></div><div class="us-banner__details">Member details</div></header></div>';
-const summary=read('THeme/UnionSuite/guides/usage/templates/List-Templates/Tasks-Query-Template.html').replaceAll('{#query.TaskTitle}','Sample task').replaceAll('{#query.MemberName}','Example member').replaceAll('{#query.DueDate}','18 September 2026');
+const summary=read('Theme/UnionSuite/guides/usage/templates/List-Templates/Tasks-Query-Template.html').replaceAll('{#query.TaskTitle}','Sample task').replaceAll('{#query.MemberName}','Example member').replaceAll('{#query.DueDate}','18 September 2026');
 const row=(id,children,extra='')=>'<div id="'+id+'" class="row '+extra+'">'+children+'</div>';
 const column=(size,id,content)=>'<div class="col-sm-'+size+'"><div id="'+id+'" class="audit-content">'+content+'</div></div>';
 const fixture=row('balanced',column(8,'main-card',summary)+column(4,'side-card','Bulletin'))+
@@ -49,7 +49,7 @@ const cleanPage=(body,css)=>'<!doctype html><html><head><meta name="viewport" co
     const bannerDoc='<div id="hd" style="position:fixed;top:0;height:76px;width:100%">Header</div><main class="main" style="margin-top:120px"><div class="ContentPanel"><div>'+row('banner-row','<div class="col-sm-12">'+wrap(banner)+'</div>')+row('banner-cards',column(6,'banner-first','First card')+column(6,'banner-second','Second card'))+'</div></div><div style="height:1500px"></div></main>';
     await page.setContent(cleanPage(bannerDoc,styles(gutter)).replace('<body>','<body class="us-banner-page">'));
     const before=await page.locator('.us-banner__surface').evaluate(n=>{const r=n.getBoundingClientRect();return {left:r.left,width:r.width,inset:parseFloat(getComputedStyle(n).paddingLeft)}});
-    await page.addScriptTag({content:read('THeme/UnionSuite/zUnionSuite.js')});await page.evaluate(()=>scrollTo(0,300));
+    await page.addScriptTag({content:read('Theme/UnionSuite/zUnionSuite.js')});await page.evaluate(()=>scrollTo(0,300));
     await page.waitForFunction(()=>getComputedStyle(document.querySelector('.us-banner__surface')).position==='fixed');
     const after=await page.locator('.us-banner__surface').evaluate(n=>{const r=n.getBoundingClientRect(),s=n.closest('.us-banner').getBoundingClientRect();return {left:r.left,width:r.width,slotLeft:s.left,slotWidth:s.width,top:r.top,overflow:document.documentElement.scrollWidth-innerWidth}});
     assert(Math.abs(after.left-after.slotLeft)<1&&Math.abs(after.width-after.slotWidth)<1&&after.top===76&&after.overflow<=1,'banner pin geometry');results.push({kind:'banner',gutter,width,before,after});

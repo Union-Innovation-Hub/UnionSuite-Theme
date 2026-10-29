@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),{chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-(async()=>{const b=await chromium.launch({channel:'msedge',headless:true});try{const p=await b.newPage({viewport:{width:1300,height:950}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.route('https://switcher.test/**',r=>r.fulfill({contentType:'text/html',body:require('../THeme/UnionSuite-Guides/usage/build/section-tabs-example.cjs').documentHtml()}));await p.goto('https://switcher.test/home');await p.waitForTimeout(100);
+(async()=>{const b=await chromium.launch({channel:'msedge',headless:true});try{const p=await b.newPage({viewport:{width:1300,height:950}}),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.route('https://switcher.test/**',r=>r.fulfill({contentType:'text/html',body:require('../Theme/UnionSuite-Guides/usage/build/section-tabs-example.cjs').documentHtml()}));await p.goto('https://switcher.test/home');await p.waitForTimeout(100);
 const tab=(group,key)=>p.locator('[data-us-tabs="'+group+'"] [data-us-tab="'+key+'"]');
 assert.equal(await p.locator('.us-tabset-member:visible').count(),1);
 await tab('member','finance').click();
@@ -41,5 +41,5 @@ await p.evaluate(()=>{document.querySelector('[data-test="unlinked-notes"]').cla
 assert.equal(await tab('member','notes').isDisabled(),false,'tab re-enables once its panel is configured');assert.equal(await tab('member','notes').getAttribute('title'),null);
 await tab('member','notes').click();assert.equal(await p.locator('[data-test="unlinked-notes"]').isVisible(),true);assert.equal(await p.locator('.us-tabset-member:visible').count(),1);
 assert.deepEqual(errors,[]);console.log('Passed: a missing or misconfigured panel disables only its own tab.');
-await p.setContent(require('../THeme/UnionSuite-Guides/usage/build/section-tabs-example.cjs').documentHtml());await p.waitForTimeout(100);await p.screenshot({path:'.tmp-iqa-integration/section-switcher.png'});await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),390);
+await p.setContent(require('../Theme/UnionSuite-Guides/usage/build/section-tabs-example.cjs').documentHtml());await p.waitForTimeout(100);await p.screenshot({path:'.tmp-iqa-integration/section-switcher.png'});await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),390);
 console.log('Mobile overflow passed.');}finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});

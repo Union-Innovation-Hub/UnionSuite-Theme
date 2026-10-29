@@ -23,7 +23,7 @@ From repository root `C:/Users/James/OneDrive - Union Innovation Hub/Claude/CRM 
 | [test-probes.cjs](../../test-probes.cjs) | Synthetic Edge regression scenarios |
 | [Research findings](../custom-iframe-ipart/research/Findings-and-Decisions.md) | Earlier native/custom-CCO research plus verified identity/routing corrections |
 | [Custom iPart README](../custom-iframe-ipart/README.md) and [live verification](../custom-iframe-ipart/Live-Verification.md) | Separate retained-frame implementation and its remaining gates |
-| [Shared refresh source](../../../../../THeme/UnionSuite/zUnionSuite.js) | Supported Query Template/native IQA refresh helpers |
+| [Shared refresh source](../../../../../Theme/UnionSuite/zUnionSuite.js) | Supported Query Template/native IQA refresh helpers |
 | Existing frame implementation (archived locally: `archive/Custom CCO iPart/src/frames.js`) | Separate iframe lifecycle and 1,200 ms visible-frame reveal delay |
 
 Keep implementation changes in `prototypes/wip/cco-inline-loading/` while experimenting. Do not duplicate the probe into this handover folder. The old custom-iPart prompt to build its initial vertical slice is historical; that implementation exists and this work explores a different loading approach.

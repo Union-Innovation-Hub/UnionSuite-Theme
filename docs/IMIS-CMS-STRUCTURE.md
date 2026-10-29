@@ -3,7 +3,7 @@
 What you can attach styling to, and where each hook actually lands in the DOM.
 Captured DOM examples below come from real pages. The current report and banner
 contracts are documented in §§18–19. For author recipes and copyable HTML, use
-the [standalone Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html); §20 records
+the [standalone Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html); §20 records
 how that guide stays aligned with the implementation.
 
 Reference: [Creating custom layouts](https://documentation.advsol.com/imis/v4.0/docs/creating-custom-layouts)
@@ -147,7 +147,7 @@ regressions are `tools/test-query-display-wrappers.cjs` and
 These examples explain **generated output**. Authors enter the class in iMIS
 and paste only the inner Content HTML or single-result Query Template. They
 must not add the outer wrapper or move the class into each repeated card.
-See the [author guide's wrapper note](THeme/UnionSuite-Guides/Usage-Guide.html#ipart-class-wrapper).
+See the [author guide's wrapper note](Theme/UnionSuite-Guides/Usage-Guide.html#ipart-class-wrapper).
 
 Also note `ste_container_ci<Name>` — the id is derived from the content item
 name, sometimes with a GUID suffix. Do not assume a suffix means a duplicate:
@@ -580,8 +580,8 @@ This feature is documented for implementation and is not yet available in the th
 
 ## 18. Implemented Union Suite IQA report classes
 
-The approved report component now lives in `THeme/UnionSuite/zUnionSuite.css`
-and `THeme/UnionSuite/zUnionSuite.js`. See the [installation guide](../THeme/UnionSuite/README.md)
+The approved report component now lives in `Theme/UnionSuite/zUnionSuite.css`
+and `Theme/UnionSuite/zUnionSuite.js`. See the [installation guide](../Theme/UnionSuite/README.md)
 for the shared script include and removal of the old standalone embed.
 
 Enter the following in the Query Menu iPart's **CSS class** field, with no dots:
@@ -615,9 +615,9 @@ their shared header slot and button/text-link styling only.
 
 The banner supports both Query Template Display (one current-record result)
 and Content HTML (static content), using the same template HTML and classes.
-See the [banner usage guide](../THeme/UnionSuite-Guides/usage/examples/Banner-README.md) and
-[behaviour-only embed](../THeme/UnionSuite-Guides/usage/examples/Banner-Shared-Styles.html). All banner CSS is
-now in `THeme/UnionSuite/zUnionSuite.css`, in separate page-layout and component
+See the [banner usage guide](../Theme/UnionSuite-Guides/usage/examples/Banner-README.md) and
+[behaviour-only embed](../Theme/UnionSuite-Guides/usage/examples/Banner-Shared-Styles.html). All banner CSS is
+now in `Theme/UnionSuite/zUnionSuite.css`, in separate page-layout and component
 sections. Sticky/collapse and Actions are now in `zUnionSuite.js`, sharing the
 report include. Deploy and load the updated theme assets, retire old standalone
 banner includes, then reload and verify behaviour. Keep the visible HTML. The
@@ -642,7 +642,7 @@ of the page grid's nesting. The full-width CSS adapter still targets the
 captured top-level `col-sm-12` layout. Native columns supply the half-gutter via
 `--bs-gutter-x`; other content retains its padding automatically.
 
-The [copy/paste banner template](../THeme/UnionSuite-Guides/usage/templates/Banner-Template.html) now includes
+The [copy/paste banner template](../Theme/UnionSuite-Guides/usage/templates/Banner-Template.html) now includes
 optional `us-banner__actions` and `us-banner__nav` HTML blocks. Delete either
 complete div to omit it; no extra iPart class is required. The Actions
 disclosure is implemented, while individual command handlers still need
@@ -663,7 +663,7 @@ adapter for pages that intentionally retain its native navigation behaviour.
 
 ## 20. Author handbook and documentation maintenance
 
-The maintained [Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html) is a
+The maintained [Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html) is a
 standalone offline HTML document. It combines installation, the seeded branding
 model, searchable tokens/classes, iMIS configuration placement, banner templates,
 report recipes, interaction examples and troubleshooting. Its optional project
@@ -675,22 +675,22 @@ and `us-banner__*` classes belong inside authored template HTML. The supported
 prefix is `us-`; `ut-banner-sticky` is not an alias. Runtime classes and markers
 are script-owned and are not author settings.
 
-The template library includes the [complete banner](../THeme/UnionSuite-Guides/usage/templates/Banner-Template.html),
-[static dashboard](../THeme/UnionSuite-Guides/usage/templates/Banner-Dashboard-Template.html) and
-[Contact](../THeme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html). Bracketed values in the latter
+The template library includes the [complete banner](../Theme/UnionSuite-Guides/usage/templates/Banner-Template.html),
+[static dashboard](../Theme/UnionSuite-Guides/usage/templates/Banner-Dashboard-Template.html) and
+[Contact](../Theme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html). Bracketed values in the latter
 are author placeholders; replace them with the actual query field substitutions.
 The shared script and generated legacy fallbacks contain no record-specific data. Query Menu reports
 continue to use native configuration and HTML rather than a replacement grid.
 
-Edit guide prose in `THeme/UnionSuite-Guides/usage/source/Usage-Guide.source.html` and keep these
+Edit guide prose in `Theme/UnionSuite-Guides/usage/source/Usage-Guide.source.html` and keep these
 structural notes current when a verified wrapper or authoring contract changes.
-Run `node THeme/UnionSuite-Guides/usage/build/build-theme-usage.cjs` and then the same command with `--check`.
+Run `node Theme/UnionSuite-Guides/usage/build/build-theme-usage.cjs` and then the same command with `--check`.
 The generator imports tokens and banner snippets from their maintained sources;
 The five-seed editor injects validated overrides into the guide and all
 component previews, including the combined banner/button/report sample. Copy or
 download its CSS for the client stylesheet; edits do not write files. The build
 does not infer documentation for newly introduced behaviour. See
-[the maintenance workflow](../THeme/UnionSuite-Guides/usage/source/README.md).
+[the maintenance workflow](../Theme/UnionSuite-Guides/usage/source/README.md).
 
 ## 21. Outer row gutter gotcha
 
@@ -738,4 +738,4 @@ margins outside iPart/grid/popup components, not with a global theme gutter rese
 Its research is retained in
 [the CCO feature research](../prototypes/wip/cco-inline-loading/research/custom-iframe-ipart/README.md); the
 implementation is archived locally. See the
-[theme gotcha](THeme/UnionSuite-Guides/Usage-Guide.html#outer-row-gutters).
+[theme gotcha](Theme/UnionSuite-Guides/Usage-Guide.html#outer-row-gutters).

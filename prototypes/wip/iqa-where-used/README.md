@@ -9,7 +9,7 @@ pages, iParts and other IQAs would break if it were renamed, moved or changed.
 
 **Built in the theme, 12 October 2026; live verification on dev pending.**
 See [BUILD-PLAN.md](BUILD-PLAN.md) for what was built and the live checks.
-`THeme/UnionSuite/Scripts/IQA-WhereUsed.js`, the `where-used` loader module,
+`Theme/UnionSuite/Scripts/IQA-WhereUsed.js`, the `where-used` loader module,
 `US-WHERE-USED` in `zUnionSuite.css` (and its dark rule), guide
 `#iqa-where-used`, tests `tools/test-where-used.cjs`, and the assembled-path
 check in `tools/check-usage-sources.cjs`. The mock-up and probes below remain

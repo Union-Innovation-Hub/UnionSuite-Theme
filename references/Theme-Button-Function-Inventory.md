@@ -52,7 +52,7 @@ Repeated controls are valid. Competing definitions for one key, or two keys clai
 
 ## 4. Case examples — not installed by the standard theme
 
-`THeme/UnionSuite-Guides/usage/examples/Client-Actions.example.js` provides six definitions to adapt:
+`Theme/UnionSuite-Guides/usage/examples/Client-Actions.example.js` provides six definitions to adapt:
 
 | Key / class suffix after `us-action-cases-` | Example operation |
 |---|---|
@@ -94,7 +94,7 @@ Task celebration uses confetti normally, moon/stars in dark mode, and bats on 31
 
 ## 6. Taskbar controls
 
-Source: `THeme/UnionSuite/Scripts/UnionSuiteTaskbar.js`.
+Source: `Theme/UnionSuite/Scripts/UnionSuiteTaskbar.js`.
 
 | Button/link | Function / destination |
 |---|---|

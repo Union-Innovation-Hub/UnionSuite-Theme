@@ -1,6 +1,6 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const css=['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
+const css=['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
 const fields=['Name starts with','Product type','Product code'].map((label,i)=>`<div class="col-sm-4 pb-3 pr-0"><div><label for="field${i}">${label}</label><div>${i===1?'<select id="field1"><option>(Any)</option></select>':`<input type="text" id="field${i}">`}</div></div></div>`).join('');
 const fixture=`<div class="EmptyMasterContentPanel" style="overflow:auto;height:420px"><div id="ctl00_FinderAdder1_Lister1" data-gridid="sample" style="width:100%"><div class="panel FilterPanelHorizontal"><div><div><div id="generated_ctl02"><div id="sample_Sheet0"><div class="row pr-3">${fields}</div><input type="button" class="TextButton" value="Find"></div></div></div></div></div></div></div>`;
 (async()=>{

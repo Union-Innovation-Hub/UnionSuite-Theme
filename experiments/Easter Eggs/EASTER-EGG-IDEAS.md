@@ -54,7 +54,7 @@ rather than thirty times.
   animation, reduced-motion means it does not run — no static fallback that
   draws more attention than the animation would have.
 - **Styling location.** Behaviour in the shared script, presentation in
-  `THeme/UnionSuite/zUnionSuite.css`, dark-mode variants in `zzDarkMode.css`,
+  `Theme/UnionSuite/zUnionSuite.css`, dark-mode variants in `zzDarkMode.css`,
   client-specific art in `UnionSuite-Client/Override.css`.
 - **Never in a destructive or financial path.** No egg fires on a delete, a
   batch commit, a payment, a merge or a bulk update. The moment a user cannot

@@ -1,7 +1,7 @@
 // Local check: bookmarks toggle on state and bar slide. Fixture only, no tenant.
 const fs = require('node:fs');
 const { chromium } = require('../.tmp-iqa-integration/node_modules/playwright');
-const script = fs.readFileSync('THeme/UnionSuite/Scripts/UnionSuiteTaskbar-Bookmarks.js', 'utf8');
+const script = fs.readFileSync('Theme/UnionSuite/Scripts/UnionSuiteTaskbar-Bookmarks.js', 'utf8');
 
 async function page(browser, options = {}) {
   const p = await browser.newPage({ viewport: { width: 1100, height: 400 }, ...options });
@@ -12,7 +12,7 @@ async function page(browser, options = {}) {
     '<input id="__RequestVerificationToken" value="t" type="hidden">' +
     '<header id="hd" style="background:var(--bg-surface)"><div id="masterTopBarAuxiliary"><div id="injected-taskbar" style="display:flex;justify-content:flex-end;padding:8px 22px">' +
     '<nav class="us-taskbar__quick-links"></nav></div></div></header><main style="padding:20px">Page content</main></body></html>');
-  await p.addStyleTag({ content: fs.readFileSync('THeme/UnionSuite/zUnionSuite.css', 'utf8').replace(/@import\s+[^;]+;/g, '') });
+  await p.addStyleTag({ content: fs.readFileSync('Theme/UnionSuite/zUnionSuite.css', 'utf8').replace(/@import\s+[^;]+;/g, '') });
   await p.evaluate(() => {
     document.getElementById('__ClientContext').value = JSON.stringify({ loggedInPartyId: '123', websiteRoot: 'https://fixture.test/' });
     window.fetch = () => Promise.resolve(new Response(JSON.stringify({ Items: { $values: [{ Properties: { $values: [

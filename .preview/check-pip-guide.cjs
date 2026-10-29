@@ -5,7 +5,7 @@ const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
   try{
     const page=await browser.newPage({viewport:{width:1280,height:900}});
     await page.route('https://**/*',r=>r.abort());
-    await page.goto(pathToFileURL(path.resolve('THeme/UnionSuite/Usage-Guide.html')).href+'#taskbar-pip');
+    await page.goto(pathToFileURL(path.resolve('Theme/UnionSuite/Usage-Guide.html')).href+'#taskbar-pip');
     const element=page.locator('#taskbar-colours-demo');
     await element.scrollIntoViewIfNeeded();
     const frame=page.frameLocator('#taskbar-colours-demo');

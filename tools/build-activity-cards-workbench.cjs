@@ -16,19 +16,19 @@ const specimens = require('../prototypes/wip/activity-cards/record-specimens.cjs
 const template = file => read(source + file).replace(/<!--[\s\S]*?-->\s*/g, '').trim();
 
 function themeStyles() {
-  const icons = read('THeme/UnionSuite/Tabler/tabler-icons.min.css').replace(
+  const icons = read('Theme/UnionSuite/Tabler/tabler-icons.min.css').replace(
     /@font-face\s*\{[^}]*\}/g,
     '@font-face{font-family:tabler-icons;src:url(data:font/woff2;base64,'
-      + fs.readFileSync(path.join(root, 'THeme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64')
+      + fs.readFileSync(path.join(root, 'Theme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64')
       + ') format("woff2");font-display:block}'
   );
   return [
     // Native base first: it sets html{font-size:62.5%}, as on a real iMIS page.
-    read('THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css'),
-    read('THeme/UnionSuite/99-Orion.css'),
-    read('THeme/UnionSuite/zUnionSuite.css'),
-    read('THeme/UnionSuite-Client/Branding.css'),
-    read('THeme/UnionSuite/zzDarkMode.css'),
+    read('Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css'),
+    read('Theme/UnionSuite/99-Orion.css'),
+    read('Theme/UnionSuite/zUnionSuite.css'),
+    read('Theme/UnionSuite-Client/Branding.css'),
+    read('Theme/UnionSuite/zzDarkMode.css'),
     icons
   ].join('\n');
 }
@@ -36,7 +36,7 @@ function themeStyles() {
 // The same composition the task row workbench uses: everything before the
 // banner behaviour, which covers the native wrapper and list adapters.
 function sharedScript() {
-  return read('THeme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
+  return read('Theme/UnionSuite/zUnionSuite.js').split('/* US-BANNER-BEHAVIOUR:START */')[0];
 }
 
 // A blank field is how an IQA returns an unused optional alias.

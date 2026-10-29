@@ -152,9 +152,9 @@ Checked in the browser at 1280–1366px, light and dark, no console errors:
 4. On approval: move this folder to `prototypes/approved/agreement-page/`
    (AGENTS.md design lifecycle).
 5. Promotion: move each candidate into its named target in
-   `THeme/UnionSuite/zUnionSuite.css` / `zUnionSuite.js` and the actions into
+   `Theme/UnionSuite/zUnionSuite.css` / `zUnionSuite.js` and the actions into
    `Scripts/ActionDefinitions.js`; promote the templates to
-   `THeme/UnionSuite-Guides/usage/templates/` with field definitions in
+   `Theme/UnionSuite-Guides/usage/templates/` with field definitions in
    `query-field-definitions.cjs`; update the usage guide; then run
    `node tools/build-theme-usage.cjs`, its `--check`, and
    `node tools/check-usage-sources.cjs`.

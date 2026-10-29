@@ -4,16 +4,16 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
 const script = text => text.replace(/<\/script/gi, '<\\/script');
-const nativeButtons = read('THeme/UnionSuite/99-Orion.css').split('/* set up button base styles */')[1].split('/* ==========================================================================\n   ORION THEME STYLES')[0];
-const font = fs.readFileSync(path.join(root, 'THeme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64');
-const iconSource = read('THeme/UnionSuite/Tabler/tabler-icons.min.css');
+const nativeButtons = read('Theme/UnionSuite/99-Orion.css').split('/* set up button base styles */')[1].split('/* ==========================================================================\n   ORION THEME STYLES')[0];
+const font = fs.readFileSync(path.join(root, 'Theme/UnionSuite/Tabler/fonts/tabler-icons.woff2')).toString('base64');
+const iconSource = read('Theme/UnionSuite/Tabler/tabler-icons.min.css');
 const names = ['x', 'refresh', 'file-search', 'layout', 'arrow-up-right'];
 const iconRules = names.map(name => {
   const rule = iconSource.match(new RegExp('\\.ti-' + name + ':before\\{[^}]+\\}'));
   if (!rule) throw new Error('Missing Tabler icon: ' + name);
   return rule[0];
 }).join('\n');
-const styles = nativeButtons + '\n' + read('THeme/UnionSuite/zUnionSuite.css') + '\n' + read('THeme/UnionSuite/zzDarkMode.css')
+const styles = nativeButtons + '\n' + read('Theme/UnionSuite/zUnionSuite.css') + '\n' + read('Theme/UnionSuite/zzDarkMode.css')
   + '\n@font-face{font-family:workshop-tabler;src:url(data:font/woff2;base64,' + font + ') format("woff2");font-display:block}\n' + iconRules;
 
 let output = read('prototypes/approved/taskbar/Recents-Workshop.source.html');

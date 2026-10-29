@@ -1,6 +1,6 @@
 # Sign-in easter eggs
 
-Status: WIP trial. Built into `THeme/UnionSuite/Scripts/SignInPage.js` (loader
+Status: WIP trial. Built into `Theme/UnionSuite/Scripts/SignInPage.js` (loader
 release 0.3.7-trial); this folder holds the mockup and design notes.
 
 Hidden extras for the sign-in page's constellation background. People who

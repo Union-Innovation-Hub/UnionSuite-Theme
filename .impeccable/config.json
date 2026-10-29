@@ -64,7 +64,7 @@
           "prototypes/wip/agreement-page/theme-candidate.css"
         ],
         "createdAt": "2026-10-03T05:02:01.703Z",
-        "reason": "Theme convention: the Resolution status alert copies the existing US-ALERTS leading edge in THeme/UnionSuite/zUnionSuite.css (border-inline-start 4px solid var(--message-border)), so it matches the contact Summary alerts"
+        "reason": "Theme convention: the Resolution status alert copies the existing US-ALERTS leading edge in Theme/UnionSuite/zUnionSuite.css (border-inline-start 4px solid var(--message-border)), so it matches the contact Summary alerts"
       },
       {
         "rule": "flat-type-hierarchy",

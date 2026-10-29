@@ -14,10 +14,10 @@ Repo: `Union-Innovation-Hub/UnionSuite-Theme` on GitHub, branch `main` (commit s
 
 | Path | What it is | Tracked |
 |---|---|---|
-| [`THeme/`](THeme/) | The UnionSuite iMIS theme and its usage guide. The production source of truth for styling | yes |
+| [`Theme/`](Theme/) | The UnionSuite iMIS theme and its usage guide. The production source of truth for styling | yes |
 | [`embeds/`](embeds/) | Self-contained paste-in builds for iMIS pages that run without the theme | yes |
 | [`prototypes/`](prototypes/README.md) | Design lifecycle: `wip/` → `approved/` → theme; `legacy/` is unclassified older work | yes |
-| [`tools/`](tools/) | Command entry points: builders, tests, probes. Many forward to `THeme/UnionSuite-Guides/usage/build/` | yes |
+| [`tools/`](tools/) | Command entry points: builders, tests, probes. Many forward to `Theme/UnionSuite-Guides/usage/build/` | yes |
 | [`references/`](references/README.md) | Generated component reference pages (`index.html`), plus reference notes (`*.md`) | partly |
 | [`docs/`](docs/) | Project documentation: theme findings, inventories, plans, iMIS CMS structure | yes |
 | [`legacy/`](legacy/) | Pre-UnionSuite stylesheets and iMIS captures. Read for history and native behaviour; never loaded by the theme | yes |
@@ -33,24 +33,24 @@ Repo: `Union-Innovation-Hub/UnionSuite-Theme` on GitHub, branch `main` (commit s
 | [`PRODUCT.md`](PRODUCT.md) | Product context: users, constraints, design principles | yes |
 | [`TODO.md`](TODO.md) | Open work across the theme | yes |
 
-## The theme — `THeme/`
+## The theme — `Theme/`
 
-The folder keeps its original spelling (`THeme`); hundreds of paths depend on it.
+Git tracked this folder as `THeme` until 30 October 2026; older commits use that spelling.
 
 | Path | Owns |
 |---|---|
-| `THeme/UnionSuite/99-Orion.css` | Project-owned native foundation: fix native colours, spacing and states here |
-| `THeme/UnionSuite/zUnionSuite.css` | Design tokens and every UnionSuite component |
-| `THeme/UnionSuite/zUnionSuite.js` | Shared behaviour: reports, banners, composers, actions, loaders |
-| `THeme/UnionSuite/zzDarkMode.css` | All dark-mode palette and overrides; loads last |
-| `THeme/UnionSuite/zzClientSpecific.css` | Client overrides in the shared package |
-| `THeme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
-| `THeme/UnionSuite/Forms/` | Theme-built popup forms (task form) |
-| `THeme/UnionSuite/Tabler/`, `Tabler.css`, `images/` | Bundled icon font and images |
-| `THeme/UnionSuite/*.skin`, `ThemeSettings.xml`, `index.js` | iMIS theme package files |
-| `THeme/UnionSuite-Client/` | Per-client `Branding.css`, `Override.css`, `Config.js`, `Actions.js` |
-| `THeme/UnionSuite-Guides/usage/` | **The usage guide's sources: the documentation source of truth.** `source/` prose and guide UI, `templates/` copyable author templates, `examples/` offline fixtures, `build/` generators, `tests/` guide checks, `vendor/` native reference CSS |
-| `THeme/Other/Orion/` | The stock Orion theme package (skins, settings, override CSS) for reference |
+| `Theme/UnionSuite/99-Orion.css` | Project-owned native foundation: fix native colours, spacing and states here |
+| `Theme/UnionSuite/zUnionSuite.css` | Design tokens and every UnionSuite component |
+| `Theme/UnionSuite/zUnionSuite.js` | Shared behaviour: reports, banners, composers, actions, loaders |
+| `Theme/UnionSuite/zzDarkMode.css` | All dark-mode palette and overrides; loads last |
+| `Theme/UnionSuite/zzClientSpecific.css` | Client overrides in the shared package |
+| `Theme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
+| `Theme/UnionSuite/Forms/` | Theme-built popup forms (task form) |
+| `Theme/UnionSuite/Tabler/`, `Tabler.css`, `images/` | Bundled icon font and images |
+| `Theme/UnionSuite/*.skin`, `ThemeSettings.xml`, `index.js` | iMIS theme package files |
+| `Theme/UnionSuite-Client/` | Per-client `Branding.css`, `Override.css`, `Config.js`, `Actions.js` |
+| `Theme/UnionSuite-Guides/usage/` | **The usage guide's sources: the documentation source of truth.** `source/` prose and guide UI, `templates/` copyable author templates, `examples/` offline fixtures, `build/` generators, `tests/` guide checks, `vendor/` native reference CSS |
+| `Theme/Other/Orion/` | The stock Orion theme package (skins, settings, override CSS) for reference |
 
 **Build and check the guide** (from the repo root):
 
@@ -63,7 +63,7 @@ node tools/check-usage-sources.cjs
 The guide (`Usage-Guide.html`, ~190 MB) and `Theme-Config.html` are written
 **outside the repo** to `C:\Dev\UHUB\Theme\Usage-Guide`
 (`build/guide-output.cjs`; override with `UNIONSUITE_GUIDE_DIR`). A stale copy
-may still sit in `THeme/UnionSuite-Guides/`; it is ignored and not current.
+may still sit in `Theme/UnionSuite-Guides/`; it is ignored and not current.
 Every build also rewrites the companion pages in `references/`.
 
 ## Embeds — `embeds/`
@@ -110,13 +110,13 @@ and the guide links several. Check what reads a file before moving it.
 
 | Pattern | Purpose |
 |---|---|
-| `build-theme-usage.cjs`, `build-theme-config.cjs`, `check-usage-sources.cjs`, `build-banner-preview.cjs` and other forwarders | Compatibility entry points; the implementations live in `THeme/UnionSuite-Guides/usage/build/` |
+| `build-theme-usage.cjs`, `build-theme-config.cjs`, `check-usage-sources.cjs`, `build-banner-preview.cjs` and other forwarders | Compatibility entry points; the implementations live in `Theme/UnionSuite-Guides/usage/build/` |
 | `build-*-comparison.cjs`, `build-*-preview.cjs`, `build-*-reference.cjs` | Generate the `references/*.html` pages from `prototypes/legacy/` and theme sources |
 | `test-*.cjs` | Headless browser and unit tests. They load Playwright from `.tmp-iqa-integration/node_modules`; see `tools/README-actions.md` for the action suites |
 | `probe-*.js` | Console probes to paste into a live iMIS page |
 | `package-*.ps1` | Package a feature for upload |
 
-Guide tests are in `THeme/UnionSuite-Guides/usage/tests/`.
+Guide tests are in `Theme/UnionSuite-Guides/usage/tests/`.
 
 **Test baseline, 28 Oct 2026:** these fail on the last commit before the
 restructure as well as after it, so they are not regressions:
@@ -148,7 +148,7 @@ Several fail loading the 190 MB guide into the browser.
 
 | Making | Put it in |
 |---|---|
-| A change to shared styling or behaviour | The owner file in `THeme/UnionSuite/` (see AGENTS.md → Stylesheet ownership), plus the guide sources in the same change |
+| A change to shared styling or behaviour | The owner file in `Theme/UnionSuite/` (see AGENTS.md → Stylesheet ownership), plus the guide sources in the same change |
 | A new idea or mockup | `prototypes/wip/<feature>/` with a README |
 | An approved spec not yet built | `prototypes/approved/<feature>/` |
 | A paste-in build that must run without the theme | `embeds/<name>/` with its own build script and README; ignore its built output |

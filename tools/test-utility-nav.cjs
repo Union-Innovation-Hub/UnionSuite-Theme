@@ -1,6 +1,6 @@
 // Isolated event/lifecycle tests; browser preview separately checks native CSS.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8');
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8');
 const code=source.slice(source.indexOf('/* US-UTILITY-NAV:START'),source.indexOf('/* US-UTILITY-NAV:END'));
 const clicks=[],windowEvents={},timers=new Map(),frames=new Map(),shown=new Set(),dialogs=[];
 const begin=new Set(),end=new Set(),loads=new Set();

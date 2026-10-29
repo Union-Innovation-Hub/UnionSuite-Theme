@@ -83,7 +83,7 @@ Details`.
 
 | Sandbox IQA or folder | Used by |
 | --- | --- |
-| `$/_i4u_/SandBox/CA/ZenFileTags` | Attachment tag suggestions. **Already in the shipped theme** (`THeme/UnionSuite/zUnionSuite.js`, `US-ATTACHMENTS`). |
+| `$/_i4u_/SandBox/CA/ZenFileTags` | Attachment tag suggestions. **Already in the shipped theme** (`Theme/UnionSuite/zUnionSuite.js`, `US-ATTACHMENTS`). |
 | `$/_i4u_/SandBox/CA/Agreement Summary` | Field groups: `Agreement-Field-Groups-Query-Template.html` |
 | `$/_i4u_/SandBox/CA/Agreement Details` | Field groups: same template |
 | `$/_i4u_/SandBox/CA/Agreement Key Dates` | Field groups: same template |

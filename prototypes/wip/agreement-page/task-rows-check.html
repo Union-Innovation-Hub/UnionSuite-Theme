@@ -10,10 +10,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Task Rows Check</title>
-  <link rel="stylesheet" href="../../../THeme/UnionSuite/99-Orion.css">
-  <link rel="stylesheet" href="../../../THeme/UnionSuite/zUnionSuite.css">
-  <link rel="stylesheet" href="../../../THeme/UnionSuite/Tabler/tabler-icons.min.css">
-  <link rel="stylesheet" href="../../../THeme/UnionSuite/zzDarkMode.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/Tabler/tabler-icons.min.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zzDarkMode.css">
   <style>
     body {
       margin: 0;
@@ -54,7 +54,7 @@
   ];
 
   async function render() {
-    const template = await (await fetch('../../../THeme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html')).text();
+    const template = await (await fetch('../../../Theme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html')).text();
     const escape = value => String(value).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
     const html = rows.map(row => '<div class="QueryTemplateItem">' +
       template.replace(/\{#query\.(\w+)\}/g, (_, name) => escape(row[name] ?? '')) + '</div>').join('');

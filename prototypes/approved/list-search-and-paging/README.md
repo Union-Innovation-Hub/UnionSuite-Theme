@@ -2,7 +2,7 @@
 
 **Status: approved (owner, 10 October 2026), not implemented.** Pick up in a new
 session. This is a shared-theme change: `US-QUERY-SEARCH` and `US-ACTIVITY-FEED`
-in `THeme/UnionSuite/zUnionSuite.js` and `zUnionSuite.css`, with the usage guide
+in `Theme/UnionSuite/zUnionSuite.js` and `zUnionSuite.css`, with the usage guide
 updated in the same change (`AGENTS.md`, Guide workflow).
 
 ## Problem

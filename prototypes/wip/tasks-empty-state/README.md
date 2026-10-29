@@ -2,7 +2,7 @@
 
 Status: implemented in the shared theme for `us-home-tasks`. This original visual
 mockup remains as the accepted design reference, not a second implementation.
-Maintained behaviour/drawing now lives in `THeme/UnionSuite/zUnionSuite.js`, with
+Maintained behaviour/drawing now lives in `Theme/UnionSuite/zUnionSuite.js`, with
 component CSS in `zUnionSuite.css`. Installation, the No results template and the
 live supported example are in the canonical usage guide, `#home-tasks-empty`.
 

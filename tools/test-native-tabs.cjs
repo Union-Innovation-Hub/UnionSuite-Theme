@@ -32,7 +32,7 @@ const document={body:node('body'),documentElement:node('html'),readyState:'compl
 class Observer {constructor(fn){this.fn=fn;observers.push(this);}observe(){}disconnect(){this.disconnected=true;}}
 const context=vm.createContext({document,window:{matchMedia:()=>media,addEventListener(){},ResizeObserver:Observer},
  ResizeObserver:Observer,MutationObserver:Observer,requestAnimationFrame:fn=>frames.push(fn)});
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8').split('/* US-NATIVE-TABS:START */')[1].split('/* US-NATIVE-TABS:END */')[0];
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8').split('/* US-NATIVE-TABS:START */')[1].split('/* US-NATIVE-TABS:END */')[0];
 vm.runInContext(source,context);
 const api=context.window.UnionSuiteTabs;
 listeners.pointerdown({target:{closest:()=>strip}});

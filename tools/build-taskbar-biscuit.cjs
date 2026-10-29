@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
-const {frameDocument} = require('../THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
+const {frameDocument} = require('../Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs');
 
 // Keep the Biscuit review URL working, now using the approved production assets.
 // Its fixture has a separate daily key so either preview can be replayed alone.

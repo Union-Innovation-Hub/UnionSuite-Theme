@@ -2,7 +2,7 @@
 // formatting, tag pairing and field suggestions. Run from the project root:
 //   node tools/test-html-source-editor.cjs
 const assert = require('node:assert/strict');
-const api = require('../THeme/UnionSuite/Scripts/HtmlSourceEditor.js');
+const api = require('../Theme/UnionSuite/Scripts/HtmlSourceEditor.js');
 
 let passed = 0;
 const test = (name, fn) => {

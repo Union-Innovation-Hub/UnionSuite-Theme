@@ -4,7 +4,7 @@ Reviewed 20 September 2026. **Option C taskbar design approved and locked for im
 
 Updated 21 September 2026: a trial loader has been built and exercised against the dev tenant. See [Loader trial: step 1 results](#loader-trial-step-1-results). The trial confirms the delivery mechanism only; feature migration remains planned.
 
-Updated 3 October 2026: **the loader is confirmed** as the theme's header include, after the trial (owner). `THeme/UnionSuite/index.js` is no longer marked as a trial and its release is `1.0.0`. The installation steps in the usage guide and the theme README now use it. Context classification, the client folder and the file renames below are still planned.
+Updated 3 October 2026: **the loader is confirmed** as the theme's header include, after the trial (owner). `Theme/UnionSuite/index.js` is no longer marked as a trial and its release is `1.0.0`. The installation steps in the usage guide and the theme README now use it. Context classification, the client folder and the file renames below are still planned.
 
 Updated 22 September 2026: the agreed target combines the taskbar, bookmarks, navigation catalogue handling and Recents in `Taskbar.js`, keeps destination definitions in `Data/Navigation.json`, and groups shared helpers in `Shared.js`. The feature name is **Quick Navigation**, with **Go to…** retained on the taskbar button. DevTools becomes one file controlled by a single **Dev Mode** switch available only while Easy Edit is active. These are planning decisions; the runtime files have not yet been merged or renamed.
 
@@ -14,7 +14,7 @@ Reviewed inputs:
 
 - [Implementation plan](<../iMIS Enhanced/IMPLEMENTATION-PLAN.md>) and [feature plan](<../iMIS Enhanced/ENHANCEMENTS-PLAN.md>), updated 19 September.
 - [Current IQA output](<../iMIS Enhanced/upload/IQA-Theme/IQA-Enhancements.js>), 216,748 bytes at review. This is the current integration input; the older 55 KB baseline is incomplete by comparison.
-- Existing [theme core](../THeme/UnionSuite/zUnionSuite.js), [taskbar](../THeme/UnionSuite/Scripts/UnionSuiteTaskbar.js), action registrations, client settings and stylesheet ownership.
+- Existing [theme core](../Theme/UnionSuite/zUnionSuite.js), [taskbar](../Theme/UnionSuite/Scripts/UnionSuiteTaskbar.js), action registrations, client settings and stylesheet ownership.
 - RiSE/metadata/source-overlay probes, the reviewed route catalogue and existing IQA module sources, available locally.
 - Approved [Option C taskbar reference](../references/Taskbar-Workshop.html), [Recents reference](../references/Recents-Workshop.html), their maintained `prototypes/` sources and shared `prototypes/approved/taskbar/Popup-Shell.css`. The design contract below supersedes earlier Pencil/Done and alternative-layout requirements for these features.
 
@@ -45,7 +45,7 @@ The target below uses classic browser-ready scripts with explicit registration a
 This is the target structure. Current deployed names remain in the trial evidence below. JavaScript uses PascalCase feature names without the redundant UnionSuite prefix, with the conventional `index.js` entry point retained. Stylesheets retain their established names and load order in this JavaScript packaging change.
 
 ```text
-THeme/
+Theme/
 ├── UnionSuite/
 │   ├── index.js                         # the only header script include
 │   ├── Theme.js                        # existing zUnionSuite.js behaviour
@@ -274,7 +274,7 @@ Important loader contracts:
 
 ## Loader trial: step 1 results
 
-Implementation order step 1 was carried out on 21 September 2026 using a trial `THeme/UnionSuite/index.js`. The trial loads only existing deployed theme files and implements the URL capture, versioned child requests, promise caching, registration checks and failure isolation described above. Route selection, context classification, the client folder and the remaining feature files were out of scope.
+Implementation order step 1 was carried out on 21 September 2026 using a trial `Theme/UnionSuite/index.js`. The trial loads only existing deployed theme files and implements the URL capture, versioned child requests, promise caching, registration checks and failure isolation described above. Route selection, context classification, the client folder and the remaining feature files were out of scope.
 
 ### Verified locally
 
@@ -416,6 +416,6 @@ Recommended sequence:
 3. Establish `Shared.js` with lifecycle/context/UI/editor helper sections; adopt them incrementally without rewriting unrelated core features. Port `RiseEditor.js` and the three page-scoped sections in `AdminTools.js`, plus confirmed shared dialog shortcuts.
 4. Consolidate taskbar attachment, Quick Navigation, catalogue handling, bookmarks/storage and Recents in `Taskbar.js` with distinct sections. Extract destinations to `Data/Navigation.json` and add schema/build validation using `Data/Navigation.schema.json`. Port the approved interaction and shell styles into their owners; keep historical A/B layouts and demo fixtures out of runtime. Preserve contact search/history, appearance and existing save/load race guards throughout.
 5. Add the separately installed GM owner and the combined `DevTools.js`, with ownership/startup-order checks and Easy Edit/Dev Mode lifecycle checks, including leaving Easy Edit during a pending load. Keep IQA/RiSE Enhance preferences independent.
-6. Update installation instructions, copyable include, feature status/examples and the standalone usage guide as implementation lands. Regenerate with `node THeme/UnionSuite-Guides/usage/build/build-theme-usage.cjs` and verify `--check`; browser-check changed guide examples. Keep generated previews in `references/` and the guide offline.
+6. Update installation instructions, copyable include, feature status/examples and the standalone usage guide as implementation lands. Regenerate with `node Theme/UnionSuite-Guides/usage/build/build-theme-usage.cjs` and verify `--check`; browser-check changed guide examples. Keep generated previews in `references/` and the guide offline.
 
 Acceptance follows the original plan's section 15: delayed/missing dependencies, double includes, partial replacements, off/on cycles, stale responses, native form persistence, clipboard rejection, correct popup focus, both bookmark owners/startup orders and actual supported-tenant smoke tests. This review does not claim those tests have run.

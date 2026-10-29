@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const { chromium } = require('../.tmp-iqa-integration/node_modules/playwright');
-const example = require('../THeme/UnionSuite-Guides/usage/build/page-layout-example.cjs');
+const example = require('../Theme/UnionSuite-Guides/usage/build/page-layout-example.cjs');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const block = /\/\* US-PAGE-LAYOUT-GUTTERS:START \*\/[\s\S]*?\/\* US-PAGE-LAYOUT-GUTTERS:END \*\//;
@@ -104,7 +104,7 @@ const result = () => {
       assert.equal(before.inset, 12);
       near(before.left + before.inset, before.card, 'banner text aligns with page content');
       near(before.right, width, 'full-width banner edge');
-      await bannerPage.addScriptTag({ content: read('THeme/UnionSuite/zUnionSuite.js') });
+      await bannerPage.addScriptTag({ content: read('Theme/UnionSuite/zUnionSuite.js') });
       await bannerPage.evaluate(() => scrollTo(0, 300));
       await bannerPage.waitForFunction(() => getComputedStyle(document.querySelector('.us-banner__surface')).position === 'fixed');
       const pinned = await bannerPage.locator('.us-banner__surface').evaluate(n => ({ bounds: n.getBoundingClientRect().toJSON(), slot: n.closest('.us-banner').getBoundingClientRect().toJSON(), overflow: document.documentElement.scrollWidth - innerWidth }));

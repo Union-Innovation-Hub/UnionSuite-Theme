@@ -1,5 +1,5 @@
 const fs=require('node:fs');
-const file='THeme/UnionSuite/guides/usage/source/Usage-Guide.source.html';
+const file='Theme/UnionSuite/guides/usage/source/Usage-Guide.source.html';
 let source=fs.readFileSync(file,'utf8');
 source=source.replace('Management shortcuts are generated immediately before Quick Search, separated by a vertical divider:', 'Management shortcuts are generated before Pip’s reserved section and Quick Search, with vertical dividers between the sections:');
 source=source.replace('Leaving the page, hiding it or tearing down the taskbar cancels the visit and its timers/listeners.', 'Leaving the page, hiding it or tearing down the taskbar cancels the visit and its animation timers. Teardown also removes the listeners.');

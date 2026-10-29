@@ -1,6 +1,6 @@
 const fs=require('fs');
 const read=p=>fs.readFileSync(p,'utf8'),write=(p,s)=>fs.writeFileSync(p,s);
-const jsPath='THeme/UnionSuite/zUnionSuite.js';
+const jsPath='Theme/UnionSuite/zUnionSuite.js';
 const status=`
 /* Member profile status colours: independent of the scrolling enhancement. */
 (function(){
@@ -47,11 +47,11 @@ const member=`
 .us-banner .us-banner__surface--member .us-banner__badge--member-status:not(:where(.us-report-no-styling *)){background:var(--member-status-colour);color:#fff;border:1px solid rgb(255 255 255 / 33%);border-radius:99px;padding:7px 13px;font-size:13px;font-weight:600;line-height:20px}
 .us-banner.us-banner--compact .us-banner__surface--member .us-banner__badge--member-status:not(:where(.us-report-no-styling *)){padding-block:3px}
 `+transform(glass)+transform(tabs);
-const cssPath='THeme/UnionSuite/zUnionSuite.css';
+const cssPath='Theme/UnionSuite/zUnionSuite.css';
 write(cssPath,read(cssPath).replace('/* US-BANNER-COMPONENT:END */',member+'\n/* US-BANNER-COMPONENT:END */'));
-let template=read('THeme/UnionSuite/guides/usage/templates/Banner-Contact-Template.html').replace('<header class="us-banner__surface">','<header class="us-banner__surface us-banner__surface--member" data-us-status-colour="{#query.StatusColour}">').replace('<span class="us-banner__badge">[Record status]</span>','<span class="us-banner__badge us-banner__badge--member-status">{#query.StatusDescription}</span>').replace('      <span class="us-banner__badge">[Financial status]</span>\n','');
+let template=read('Theme/UnionSuite/guides/usage/templates/Banner-Contact-Template.html').replace('<header class="us-banner__surface">','<header class="us-banner__surface us-banner__surface--member" data-us-status-colour="{#query.StatusColour}">').replace('<span class="us-banner__badge">[Record status]</span>','<span class="us-banner__badge us-banner__badge--member-status">{#query.StatusDescription}</span>').replace('      <span class="us-banner__badge">[Financial status]</span>\n','');
 const actions='<div class="us-banner__actions"><div class="us-actions"><button type="button" class="us-actions__toggle">Quick Actions</button><ul class="us-actions__list"><li class="dropdown-header">Communication</li><li><button type="button" class="us-actions__item" data-us-action="member.email">Email Member</button></li><li><button type="button" class="us-actions__item" data-us-action="member.sms">SMS Member</button></li><li class="divider"></li><li class="dropdown-header">Member records</li><li><button type="button" class="us-actions__item" data-us-action="member.add-note">Add Note</button></li><li><button type="button" class="us-actions__item" data-us-action="member.add-job">Add New Job</button></li></ul></div></div>';
 template=template.replace('  <div class="us-banner__details">','  <div class="us-banner__details">'); // summary insertion
 template=template.replace('    </div>\n  </div>\n  <div class="us-banner__details">','    </div>\n    '+actions+'\n  </div>\n  <div class="us-banner__details">');
 template=template.replace('Optional Actions/tabs blocks are in Banner-Template.html.','Quick Actions requires the site popup functions. Optional tabs are in Banner-Template.html.\n     StatusColour must return #RRGGBB; StatusDescription is plain text. Rename these IQA aliases as needed.');
-write('THeme/UnionSuite/guides/usage/templates/Banner-Contact-Template.html',template);
+write('Theme/UnionSuite/guides/usage/templates/Banner-Contact-Template.html',template);

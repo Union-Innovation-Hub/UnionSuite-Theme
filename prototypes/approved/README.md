@@ -15,5 +15,5 @@ the feature is already deployed or that its design can be discarded.
   `prototypes/wip/cco-inline-loading/` until implementation.
 
 Move reusable implemented author templates and documentation examples into
-`THeme/UnionSuite-Guides/usage/` after integration, testing and guide updates.
+`Theme/UnionSuite-Guides/usage/` after integration, testing and guide updates.
 Only then move superseded alternatives into the ignored root `archive/` folder.

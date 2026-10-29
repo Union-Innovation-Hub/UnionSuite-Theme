@@ -17,7 +17,7 @@ const pages = new Map([
   ['/references/CCO-Tabs-Comparison.html', 'references/CCO-Tabs-Comparison.html'],
   ['/references/Data-Panel-Comparison.html', 'references/Data-Panel-Comparison.html'],
   ['/references/index.html', 'references/index.html'],
-  ['/THeme/UnionSuite/Usage-Guide.html', 'THeme/UnionSuite/Usage-Guide.html']
+  ['/Theme/UnionSuite/Usage-Guide.html', 'Theme/UnionSuite/Usage-Guide.html']
 ]);
 http.createServer((req, res) => {
   const file = pages.get(new URL(req.url, 'http://127.0.0.1').pathname);

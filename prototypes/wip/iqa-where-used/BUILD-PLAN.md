@@ -16,11 +16,11 @@ index.
 
 | File | Change |
 |---|---|
-| `THeme/UnionSuite/Scripts/IQA-WhereUsed.js` | **New.** Index builder, store, lookup, drawer and header button. Exposes `window.UnionSuiteWhereUsed`. |
-| `THeme/UnionSuite/index.js` | Register `where-used`, gated to the IQA designer like `iqa`, after `core`. Expose the module paths on `window.UnionSuiteLoader` so the theme scan can read every script. Bump `RELEASE`. |
-| `THeme/UnionSuite/zUnionSuite.css` | `US-WHERE-USED` section: the drawer, from the mock-up. |
-| `THeme/UnionSuite/zzDarkMode.css` | The dark count badge. |
-| `THeme/UnionSuite-Guides/usage/build/check-usage-sources.cjs` | Fail when a theme script assembles a `$/` path from parts, so the theme scan stays complete. |
+| `Theme/UnionSuite/Scripts/IQA-WhereUsed.js` | **New.** Index builder, store, lookup, drawer and header button. Exposes `window.UnionSuiteWhereUsed`. |
+| `Theme/UnionSuite/index.js` | Register `where-used`, gated to the IQA designer like `iqa`, after `core`. Expose the module paths on `window.UnionSuiteLoader` so the theme scan can read every script. Bump `RELEASE`. |
+| `Theme/UnionSuite/zUnionSuite.css` | `US-WHERE-USED` section: the drawer, from the mock-up. |
+| `Theme/UnionSuite/zzDarkMode.css` | The dark count badge. |
+| `Theme/UnionSuite-Guides/usage/build/check-usage-sources.cjs` | Fail when a theme script assembles a `$/` path from parts, so the theme scan stays complete. |
 | `tools/test-where-used.cjs` | **New.** Node tests of the extraction and lookup against fixtures shaped like the probe results. |
 | Usage guide source, `docs/THEME-INVENTORY.md`, `TODO.md`, this folder's README | Documentation, status and a visual example. |
 

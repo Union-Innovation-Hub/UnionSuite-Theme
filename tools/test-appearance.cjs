@@ -1,6 +1,6 @@
 // Document preference tests; no browser launch or live iMIS calls.
 const assert=require('node:assert/strict'),vm=require('node:vm');
-const {appearanceScript}=require('../THeme/UnionSuite-Guides/usage/build/build-taskbar-dark-mode.cjs');
+const {appearanceScript}=require('../Theme/UnionSuite-Guides/usage/build/build-taskbar-dark-mode.cjs');
 const code=appearanceScript();
 class CustomEvent extends Event { constructor(type,options={}) {super(type);this.detail=options.detail;} }
 function fixture({saved=null,dark=false,enabled=true,blocked=false,parent=null,key}={}) {

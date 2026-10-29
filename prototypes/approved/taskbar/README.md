@@ -18,5 +18,5 @@ the accepted direction. See the integration plan for remaining production work.
 
 Use the existing theme tokens and shared popup conventions when implementing the
 design. Move implemented documentation, author templates and maintained examples
-into `THeme/UnionSuite-Guides/usage/`. Archive alternatives only after their useful
+into `Theme/UnionSuite-Guides/usage/`. Archive alternatives only after their useful
 decisions are preserved there and no maintained build depends on them.

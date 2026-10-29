@@ -100,7 +100,7 @@ const html = `<!doctype html>
       <p>Try your own hex value above before comparing the alternatives. The collapsed views are static samples; scroll behaviour belongs to the shared banner.</p>
     </aside>
   </main>
-  <script src="../THeme/UnionSuite/zUnionSuite.js"></script>
+  <script src="../Theme/UnionSuite/zUnionSuite.js"></script>
   <script src="../prototypes/legacy/banner-status-comparison.js"></script>
 </body>
 </html>`;

@@ -1,8 +1,8 @@
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
-const css = fs.readFileSync('THeme/UnionSuite/zUnionSuite.css', 'utf8');
-const js = fs.readFileSync('THeme/UnionSuite/zUnionSuite.js', 'utf8');
+const css = fs.readFileSync('Theme/UnionSuite/zUnionSuite.css', 'utf8');
+const js = fs.readFileSync('Theme/UnionSuite/zUnionSuite.js', 'utf8');
 
 const banner = `<header class="us-banner__surface us-banner__surface--member" data-us-status-colour="#23845B">
   <div class="us-banner__summary"><div class="us-banner__identity">

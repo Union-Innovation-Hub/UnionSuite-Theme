@@ -1,7 +1,7 @@
 # iPart CSS class budget and section presets
 
 Status: active WIP. Two presets, `us-home-tasks` and `us-contact-methods`, are
-**implemented** in `THeme/UnionSuite/zUnionSuite.js` (and `zUnionSuite.css`
+**implemented** in `Theme/UnionSuite/zUnionSuite.js` (and `zUnionSuite.css`
 for `us-home-tasks`). The wider naming and
 registry work below is discussed, not built. This folder records the
 constraint and the options so the next change does not re-derive them.

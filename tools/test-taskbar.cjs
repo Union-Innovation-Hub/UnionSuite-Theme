@@ -1,10 +1,10 @@
 // Browser checks use fictional local responses. No iMIS requests are made.
-const {guidePath}=require('../THeme/UnionSuite-Guides/usage/build/guide-output.cjs');
+const {guidePath}=require('../Theme/UnionSuite-Guides/usage/build/guide-output.cjs');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const { chromium } = require('../.tmp-iqa-integration/node_modules/playwright');
-const script = fs.readFileSync('THeme/UnionSuite/Scripts/UnionSuiteTaskbar.js', 'utf8');
-const css = fs.readFileSync('THeme/UnionSuite/zUnionSuite.css', 'utf8');
+const script = fs.readFileSync('Theme/UnionSuite/Scripts/UnionSuiteTaskbar.js', 'utf8');
+const css = fs.readFileSync('Theme/UnionSuite/zUnionSuite.css', 'utf8');
 const presentation = script.replace(/\.style\.setProperty\('--pip-(?:gaze-[xy]|turn|perch-offset)'/g, 'setPipCoordinate(');
 assert(!/\.style\.|createElement\(['"]style|const CSS/.test(presentation), 'Only dynamic Pip coordinates belong in JS; CSS stays in the stylesheet');
 const fixture = `<div id="hd"><div class="searchfieldplus-dropdown"><div class="RecentHistoryList"><div class="RecentHistoryItem"><a href="/Party.aspx?ID=104019">Alex Morgan (104019)</a></div></div></div></div><input id="__ClientContext" type="hidden"><input id="__RequestVerificationToken" type="hidden" value="fixture-token">`;
@@ -107,7 +107,7 @@ const fixture = `<div id="hd"><div class="searchfieldplus-dropdown"><div class="
     await page.locator('#taskbar-colours-demo').evaluate(frame => frame.scrollIntoView());
     const preview = await browser.newPage({viewport:{width:1100,height:650}});
     await preview.route('**/*', route => route.abort());
-    await preview.setContent(require('../THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs').frameDocument());
+    await preview.setContent(require('../Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs').frameDocument());
     await preview.locator('#us-taskbar-search').fill('Morgan');
     await preview.locator('.tb-dd-name').filter({hasText:'Morgan Engineering'}).waitFor();
     await preview.screenshot({path:'.tmp-iqa-integration/taskbar-guide.png'});

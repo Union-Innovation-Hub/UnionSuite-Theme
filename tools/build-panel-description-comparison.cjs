@@ -3,7 +3,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = f => fs.readFileSync(path.join(root, f), 'utf8');
 const esc = s => s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-const theme = ['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css','THeme/UnionSuite-Client/Override.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
+const theme = ['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css','Theme/UnionSuite-Client/Override.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
 const options = [
  ['current','A · Previous combined header','The description shares the heading background. The divider is below the description, making the shaded header appear taller.'],
  ['divider','B · Divider only (alternative)','The title bar keeps its own divider and standard padding. The description retains the shaded background, so the overall shaded area is still taller.'],

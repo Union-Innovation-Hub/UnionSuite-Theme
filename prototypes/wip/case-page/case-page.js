@@ -531,14 +531,14 @@
       // open, and iMIS writes the No results field (the C6 marker) instead.
       {set: 'cp-resolved', template: 'Case-Resolved-Query-Template.html', rows: closed ? [{CaseNum: '214'}] : [], empty: '<span class="us-case-unresolved" hidden></span>'},
       // The member card's template is the guide's (US-CASE-WORKPLACE is in the theme).
-      {set: 'cp-member', template: 'Case-Member-Query-Template.html', src: '../../../THeme/UnionSuite-Guides/usage/templates/List-Templates/Case-Member-Query-Template.html', rows: rows.member},
+      {set: 'cp-member', template: 'Case-Member-Query-Template.html', src: '../../../Theme/UnionSuite-Guides/usage/templates/List-Templates/Case-Member-Query-Template.html', rows: rows.member},
       {set: 'cp-recent', template: 'Case-Recent-Activity-Query-Template.html', rows: [{Ordinal: '214'}]},
       {set: 'cp-all-activity', template: 'Case-All-Activity-Query-Template.html', rows: [{Ordinal: '214'}]},
       // The change history template is the guide's (US-CHANGE-FIELDS is in the theme).
-      {set: 'cp-changes', template: 'Change-History-Query-Template.html', src: '../../../THeme/UnionSuite-Guides/usage/templates/List-Templates/Change-History-Query-Template.html', rows: changes,
+      {set: 'cp-changes', template: 'Change-History-Query-Template.html', src: '../../../Theme/UnionSuite-Guides/usage/templates/List-Templates/Change-History-Query-Template.html', rows: changes,
         empty: '<p>No changes recorded yet.</p>'},
       // The parties template is the guide's (US-CASE-PARTIES is in the theme).
-      {set: 'cp-parties', template: 'Case-Parties-Query-Template.html', src: '../../../THeme/UnionSuite-Guides/usage/templates/List-Templates/Case-Parties-Query-Template.html', rows: rows.parties},
+      {set: 'cp-parties', template: 'Case-Parties-Query-Template.html', src: '../../../Theme/UnionSuite-Guides/usage/templates/List-Templates/Case-Parties-Query-Template.html', rows: rows.parties},
       {set: 'cp-staff', template: 'Case-Staff-Query-Template.html', rows: rows.staff},
       {set: 'cp-tasks', template: 'Case-Tasks-Query-Template.html', rows: rows.tasks.map(taskColumns), empty: emptyState('ti-checklist', 'No tasks yet', 'Add the first step for this case.', 'us-action-cases-add-task')},
       {set: 'cp-meetings-detail', template: 'Case-Meetings-Detail-Query-Template.html', rows: rows.meetings, empty: emptyState('ti-calendar-plus', 'No meetings', 'Schedule one to meet the member or the employer.', 'us-action-cases-add-meeting')},

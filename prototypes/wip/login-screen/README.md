@@ -1,7 +1,7 @@
 # Hub sign-in screen
 
 Status: WIP trial. Concept A (card) with the constellation background (v2) is
-in the shared theme as `THeme/UnionSuite/Scripts/SignInPage.js`, loaded by the
+in the shared theme as `Theme/UnionSuite/Scripts/SignInPage.js`, loaded by the
 theme loader on pages with a `SignIn-Container` zone. Not yet documented in the
 usage guide.
 
@@ -184,8 +184,8 @@ so screenshots taken straight after a load can show the intro's hidden state.
 
 ## Maintained files
 
-- `THeme/UnionSuite/Scripts/SignInPage.js`: the sign-in page design
-- `THeme/UnionSuite/index.js`: the loader entry (`signin` module)
+- `Theme/UnionSuite/Scripts/SignInPage.js`: the sign-in page design
+- `Theme/UnionSuite/index.js`: the loader entry (`signin` module)
 - `v2/index.html`, `v2/hub-logo.png`: the mockup
 - `eggs/`: the easter eggs mockup (the v2 card with controls that show each egg)
 - `ideas/`: the background explorations, including the constellation

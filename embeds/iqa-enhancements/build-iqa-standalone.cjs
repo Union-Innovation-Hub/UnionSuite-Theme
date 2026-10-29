@@ -31,9 +31,9 @@ const fail = message => { console.error('build-iqa-standalone: ' + message); pro
 // keeps working wherever it sits inside the project.
 function findTheme(from) {
   for (let dir = from; ; dir = path.dirname(dir)) {
-    const candidate = path.join(dir, 'THeme', 'UnionSuite');
+    const candidate = path.join(dir, 'Theme', 'UnionSuite');
     if (fs.existsSync(path.join(candidate, 'zUnionSuite.css'))) return candidate;
-    if (path.dirname(dir) === dir) fail('no THeme/UnionSuite folder above ' + from);
+    if (path.dirname(dir) === dir) fail('no Theme/UnionSuite folder above ' + from);
   }
 }
 

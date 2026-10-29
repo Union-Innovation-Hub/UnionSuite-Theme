@@ -1,4 +1,4 @@
-const fs=require('fs');const p='THeme/UnionSuite/guides/usage/source/Usage-Guide.source.html';let s=fs.readFileSync(p,'utf8');
+const fs=require('fs');const p='Theme/UnionSuite/guides/usage/source/Usage-Guide.source.html';let s=fs.readFileSync(p,'utf8');
 const section=`
 <section id="section-switcher" class="section">
 <h2>Banner navigation and standalone submenus</h2>
@@ -33,5 +33,5 @@ s=s.replace('<section id="native-tabs"',section+'\n<section id="native-tabs"');
 s=s.replace('Optional banner tabs keep a faint selected fill, white semibold text and the status-coloured underline. Tab content integration still requires an adapter; styling does not replace the CCO or implement content loading.','Optional banner tabs use the darker full-width 6B band, neutral segmented selection and inset pressed shading. Connect explicit page sections using the section-switcher instructions; native CCO loading remains separate.');
 s=s.replace('The 8px left rail, pill and selected-tab underline share the derived display colour.','The 8px left rail and pill share the derived display colour. Banner tabs use neutral selection without a status-coloured underline.');
 fs.writeFileSync(p,s);
-const b='THeme/UnionSuite/guides/usage/build/build-theme-usage.cjs';s=fs.readFileSync(b,'utf8').replace('const fingerprint = hash.digest','hash.update(read("THeme/UnionSuite/guides/usage/build/section-tabs-example.cjs"));\nconst fingerprint = hash.digest');
+const b='Theme/UnionSuite/guides/usage/build/build-theme-usage.cjs';s=fs.readFileSync(b,'utf8').replace('const fingerprint = hash.digest','hash.update(read("Theme/UnionSuite/guides/usage/build/section-tabs-example.cjs"));\nconst fingerprint = hash.digest');
 s=s.replace('  CONTACT_DEMO:','  SECTION_TABS_DEMO: iframe("section-tabs-demo","Shared banner and standalone section switching",require("./section-tabs-example.cjs").documentHtml(),true),\n  CONTACT_DEMO:');fs.writeFileSync(b,s);

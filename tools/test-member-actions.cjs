@@ -1,6 +1,6 @@
 // Standard definitions: retain the six legacy contracts and verify native add and create-case routes.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('THeme/UnionSuite/Scripts/ActionDefinitions.js','utf8'),defs=new Map();
+const source=fs.readFileSync('Theme/UnionSuite/Scripts/ActionDefinitions.js','utf8'),defs=new Map();
 const window={UnionSuiteActions:{define(key,value){assert.equal(value.owner,'UnionSuite');assert.equal(value.source,'ActionDefinitions.js:'+key);defs.set(key,value);}}};
 const context=vm.createContext({window,URL,location:{origin:'https://theme.test'}});
 (async()=>{

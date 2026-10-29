@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require(path.resolve(__dirname, '../../../.tmp-iqa-integration/node_modules/playwright'));
 const source = fs.readFileSync(path.join(__dirname, 'Native-Partial-Postback-Trial.js'), 'utf8');
-const themeDirectory = path.resolve(__dirname, '../../../THeme/UnionSuite');
+const themeDirectory = path.resolve(__dirname, '../../../Theme/UnionSuite');
 
 const base = 'ctl01_TemplateBody_WebPartManager1_gwpciAccountpagetabs_ciAccountpagetabs_';
 const uniqueBase = base.replaceAll('_', '$');

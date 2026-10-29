@@ -1,6 +1,6 @@
 /* ==========================================================================
    CONTACT PAGE v3 — THEME CANDIDATE: US-IQA-COLUMNS 1.5 (not installed)
-   Replaces the US-IQA-COLUMNS block in THeme/UnionSuite/zUnionSuite.js.
+   Replaces the US-IQA-COLUMNS block in Theme/UnionSuite/zUnionSuite.js.
    Generated from the theme block by make-iqa-columns (scratch); the only
    changes are fitPanelWidth, entry.base/userSized, the word-width floor
    (wordWidth, entry.floor) and the version. Loaded BEFORE zUnionSuite.js so

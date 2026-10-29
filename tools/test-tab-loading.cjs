@@ -4,7 +4,7 @@ const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
  const browser=await chromium.launch({channel:'msedge',headless:true});
  try{
   const page=await browser.newPage();await page.route('**/*',r=>r.abort());
-  await page.setContent(require('../THeme/UnionSuite-Guides/usage/build/tab-loading-example.cjs')());
+  await page.setContent(require('../Theme/UnionSuite-Guides/usage/build/tab-loading-example.cjs')());
   const tab=page.getByRole('tab',{name:'Preferences'});
   const width=await tab.evaluate(el=>el.getBoundingClientRect().width);
   const labelOffset=()=>tab.evaluate(el=>{

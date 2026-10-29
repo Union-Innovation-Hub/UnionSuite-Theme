@@ -1,4 +1,4 @@
-const fs=require('fs'),p='THeme/UnionSuite/zUnionSuite.css';let s=fs.readFileSync(p,'utf8'),a=s.indexOf('/* Quiet selected navigation;'),b=s.indexOf('/* US-BANNER-COMPONENT:END */',a);
+const fs=require('fs'),p='Theme/UnionSuite/zUnionSuite.css';let s=fs.readFileSync(p,'utf8'),a=s.indexOf('/* Quiet selected navigation;'),b=s.indexOf('/* US-BANNER-COMPONENT:END */',a);
 s=s.slice(0,a)+`
 /* Approved 6B: full-width darker navigation with neutral segmented tabs. */
 .us-banner .us-banner__surface:has(> .us-banner__nav > .us-banner__tabs){--us-tab-inset:var(--banner-padding);padding-inline:var(--us-tab-inset)}

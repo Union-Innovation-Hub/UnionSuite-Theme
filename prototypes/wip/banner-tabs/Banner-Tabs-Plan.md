@@ -12,13 +12,13 @@ A working standalone preview is now available at [Standalone-Tabs-Preview.html](
 the switcher later. The [project TODO](../../../TODO.md) records the agreed scope and
 resume checklist; retain the current visual-only template until then.
 
-Status: the visual row is available in [Banner-Template.html](../../../THeme/UnionSuite-Guides/usage/templates/Banner-Template.html),
-with shared styling in [zUnionSuite.css](../../../THeme/UnionSuite/zUnionSuite.css).
+Status: the visual row is available in [Banner-Template.html](../../../Theme/UnionSuite-Guides/usage/templates/Banner-Template.html),
+with shared styling in [zUnionSuite.css](../../../Theme/UnionSuite/zUnionSuite.css).
 The row remains visible in the expanded and compact banner. The reusable
 template's tab buttons are deliberately disabled until a content adapter is
 connected. No CCO controls are hidden and no real sections are switched yet.
 
-The [standalone Theme Usage Guide](../../../THeme/UnionSuite-Guides/Usage-Guide.html) includes
+The [standalone Theme Usage Guide](../../../Theme/UnionSuite-Guides/Usage-Guide.html) includes
 the visual template and a summary of this plan. When an adapter is implemented,
 update both documents with the verified source classes, mappings, keyboard
 behaviour, postback recovery and fallback. The guide's snippets are imported from

@@ -3,7 +3,7 @@
 One task form for every module: personal tasks (home page), cases and
 agreements, adding and editing. Owner, 19 October 2026.
 
-**Status: built in the theme, 20 October 2026** (`THeme/UnionSuite/Forms/`:
+**Status: built in the theme, 20 October 2026** (`Theme/UnionSuite/Forms/`:
 `UnionSuiteForms.js`, `UnionSuiteForms.css`, `TaskForm.js`; documented in the
 usage guide's `#popup-forms`; tests `tools/test-popup-forms.cjs`). Waiting on
 the owner's IQAs, CloudToolz endpoint and three pages (TODO.md), then live
@@ -102,7 +102,7 @@ Adding only; edit has Save changes alone.
 |---|---|
 | `task-form.html` | The mock-up: Module, Add/Edit, Agreement assign list (all / agreement staff), Task tags, Styling (theme / none) and Appearance switches; the form in a shadow root; the side panel shows the page placeholder, the popup address, and what Save or Cancel would send and how the popup would close. |
 | `task-form.css` | The mock-up's stylesheet, the prototype of `Forms/UnionSuiteForms.css`. |
-| `task-form-preview.html` | The built form: loads the real `THeme/UnionSuite/Forms/` files, with iMIS, the IQAs (sample rows), CloudToolz and the popup stubbed; the side panel shows the requests, what Save sends and the close result. Switches: module, add/edit, agreement assign list, task tags, endpoint stubbed or not set up, theme or none, light or dark. |
+| `task-form-preview.html` | The built form: loads the real `Theme/UnionSuite/Forms/` files, with iMIS, the IQAs (sample rows), CloudToolz and the popup stubbed; the side panel shows the requests, what Save sends and the close result. Switches: module, add/edit, agreement assign list, task tags, endpoint stubbed or not set up, theme or none, light or dark. |
 
 Preview: serve the project root (`static-node`, port 8778) and open
 `/prototypes/wip/task-form/task-form.html`. URL parameters:

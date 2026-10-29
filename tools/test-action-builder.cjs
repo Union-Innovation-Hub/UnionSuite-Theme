@@ -4,7 +4,7 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const {pathToFileURL} = require('node:url');
 const {chromium} = require('../.tmp-iqa-integration/node_modules/playwright');
-const core = require('../THeme/UnionSuite-Guides/usage/examples/Action-Builder/builder-core.js');
+const core = require('../Theme/UnionSuite-Guides/usage/examples/Action-Builder/builder-core.js');
 
 function compile(model) {
   let definition;
@@ -155,7 +155,7 @@ function compile(model) {
     assert.equal(await page.locator('#label').inputValue(), 'Run imported action');
     // Confirm the exported snippets are accepted by the actual production validator.
     const validator = await browser.newPage();
-    await validator.addScriptTag({content: fs.readFileSync('THeme/UnionSuite/zUnionSuite.js', 'utf8')});
+    await validator.addScriptTag({content: fs.readFileSync('Theme/UnionSuite/zUnionSuite.js', 'utf8')});
     for (const kind of ['job', 'popup', 'function', 'navigate']) {
       const config = core.preset(kind);
       config.command += '-' + kind;

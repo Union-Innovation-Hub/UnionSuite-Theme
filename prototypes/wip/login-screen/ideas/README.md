@@ -10,7 +10,7 @@ Explore four distinctive, interactive backgrounds behind one consistent Hub sign
 
 - `index.html` owns this exploration's markup, CSS, canvas effects and demo interactions. It is a complete offline file with no external fonts, scripts, stylesheets, image requests or build step.
 - The embedded PNG is the captured Hub logo from the existing login-screen reference. It is embedded directly so the file has no dependency on disposable captures.
-- The teal, cyan, orange, type stacks and control radii come from `THeme/UnionSuite/zUnionSuite.css`. Display fonts use local fallbacks when the named theme fonts are unavailable. Background artwork and layout are experimental and local to this mockup.
+- The teal, cyan, orange, type stacks and control radii come from `Theme/UnionSuite/zUnionSuite.css`. Display fonts use local fallbacks when the named theme fonts are unavailable. Background artwork and layout are experimental and local to this mockup.
 
 ## Preview
 

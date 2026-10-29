@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const shell = require('./banner-preview-shell.cjs');
-let banner = fs.readFileSync(path.join(root, 'THeme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html'), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+let banner = fs.readFileSync(path.join(root, 'Theme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html'), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
 const values = {'[Contact ID]':'103885','[Full name]':'Tony Fin Stark','[Member type]':'Regular member','[Join date]':'12 March 2018','[Email address]':'tony@example.org','[Mobile number]':'0400 123 777','[Employer name]':'Harbour Services','[Branch name]':'Sydney Metro','[Organiser name]':'Alex Morgan','{#query.StatusColour}':'#23845B','{#query.StatusDescription}':'<span class="status-label">Financial member</span>'};
 for (const [key,value] of Object.entries(values)) banner = banner.replaceAll(key,value);
 banner = banner.replaceAll('us-action-member-', 'us-action-preview-');
@@ -16,7 +16,7 @@ ${shell.styles}
 <body class="us-banner-page status-final"><main class="main member-preview-shell">${shell.wrap(banner)}
 <section class="member-preview-content"><h2>Contact banner — shared theme</h2><p>Scroll to see the shared banner condense. Square corners and full-width gutters come from the native page layout. Sample actions display feedback only.</p>
 <form class="controls"><label>Sample status<select id="preset"><option value="0">Financial member</option><option value="1">Overdue member</option><option value="2">Former member</option><option value="3">Non member</option></select></label><label>Status label<input id="label" value="Financial member" maxlength="80"></label><label>Client colour<input id="colour" type="color" value="#23845b"></label><label>Hex code<input id="hex" value="#23845B" maxlength="7"></label><label><input type="checkbox" id="show-tabs"> Show optional banner tabs</label><p id="feedback" role="status"></p></form>
-<p id="action-feedback" role="status">Sample actions will show feedback here.</p><p><a href="Case-Banner-Prototype.html">Compare the case banner</a> · <a href="../THeme/UnionSuite-Guides/Usage-Guide.html#member-profile-banner">Usage guide</a></p><p>Both previews load the local shared foundation, component CSS, client branding and overrides, then dark-mode CSS. Status labels and colours here are fictional sample data. Optional tabs demonstrate selection styling only.</p></section></main>
-<script src="../THeme/UnionSuite/zUnionSuite.js"></script><script src="../prototypes/legacy/banner-status-final.js"></script><script src="../prototypes/legacy/banner-status-comparison.js"></script></body></html>`;
+<p id="action-feedback" role="status">Sample actions will show feedback here.</p><p><a href="Case-Banner-Prototype.html">Compare the case banner</a> · <a href="../Theme/UnionSuite-Guides/Usage-Guide.html#member-profile-banner">Usage guide</a></p><p>Both previews load the local shared foundation, component CSS, client branding and overrides, then dark-mode CSS. Status labels and colours here are fictional sample data. Optional tabs demonstrate selection styling only.</p></section></main>
+<script src="../Theme/UnionSuite/zUnionSuite.js"></script><script src="../prototypes/legacy/banner-status-final.js"></script><script src="../prototypes/legacy/banner-status-comparison.js"></script></body></html>`;
 fs.writeFileSync(path.join(root,'references/Banner-Status-Final.html'),html);
 console.log('Updated references/Banner-Status-Final.html using shared template and native wrappers.');

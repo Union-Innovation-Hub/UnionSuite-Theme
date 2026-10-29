@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const { chromium } = require('../.tmp-iqa-integration/node_modules/playwright');
-const script = fs.readFileSync('THeme/UnionSuite/Scripts/UnionSuiteTaskbar-Bookmarks.js', 'utf8');
+const script = fs.readFileSync('Theme/UnionSuite/Scripts/UnionSuiteTaskbar-Bookmarks.js', 'utf8');
 const primary = 'community.groups';
 const added = 'community.communities';
 const star = id => '[data-star="' + id + '"]';
@@ -16,7 +16,7 @@ async function fixture(browser) {
     '<input id="__RequestVerificationToken" value="fixture-token" type="hidden">' +
     '<header id="hd"><div id="masterTopBarAuxiliary"><div id="injected-taskbar">' +
     '<nav class="us-taskbar__quick-links"></nav></div></div></header></body></html>');
-  await page.addStyleTag({ content: fs.readFileSync('THeme/UnionSuite/zUnionSuite.css', 'utf8').replace(/@import\s+[^;]+;/g, '') });
+  await page.addStyleTag({ content: fs.readFileSync('Theme/UnionSuite/zUnionSuite.css', 'utf8').replace(/@import\s+[^;]+;/g, '') });
   await page.evaluate(() => {
     document.getElementById('__ClientContext').value = JSON.stringify({ loggedInPartyId: '123', websiteRoot: 'https://fixture.test/' });
     window.requests = [];

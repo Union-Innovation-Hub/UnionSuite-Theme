@@ -1,6 +1,6 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8');
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8');
 const adapter=source.split('/* US-NATIVE-SAVE-BUSY:START')[1].split('/* US-NATIVE-SAVE-BUSY:END */')[0].replace(/^[\s\S]*?\*\//,'');
 (async()=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});

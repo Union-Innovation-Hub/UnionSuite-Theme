@@ -3,8 +3,8 @@ const fs=require('fs'),assert=require('node:assert/strict'),{chromium}=require('
 try{
  const p=await b.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
  const header='<header class="us-banner__surface us-banner__surface--member" data-us-status-colour="#FFFFFF"><span class="us-banner__badge us-banner__badge--member-status"></span></header>';
- await p.setContent('<style>'+fs.readFileSync('THeme/UnionSuite/zUnionSuite.css','utf8')+'</style><div class="ContentItemContainer"><div class="us-banner">'+header+'</div></div><div class="ContentItemContainer"><div class="us-report-no-styling"><div class="us-banner">'+header+'</div></div></div>');
- await p.addScriptTag({content:fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8')});
+ await p.setContent('<style>'+fs.readFileSync('Theme/UnionSuite/zUnionSuite.css','utf8')+'</style><div class="ContentItemContainer"><div class="us-banner">'+header+'</div></div><div class="ContentItemContainer"><div class="us-report-no-styling"><div class="us-banner">'+header+'</div></div></div>');
+ await p.addScriptTag({content:fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8')});
  await p.waitForTimeout(120);
  const hs=p.locator('.us-banner__surface--member');
  assert.equal(await hs.first().evaluate(n=>n.style.getPropertyValue('--member-status-colour')),'#767676');

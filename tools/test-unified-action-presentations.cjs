@@ -1,5 +1,5 @@
 // Browser checks for the generated offline guide and actual shared renderers.
-const {guidePath}=require('../THeme/UnionSuite-Guides/usage/build/guide-output.cjs');
+const {guidePath}=require('../Theme/UnionSuite-Guides/usage/build/guide-output.cjs');
 // Supersedes the retired report-icon, popup and conflict API fixture tests.
 const path=require('node:path'),{pathToFileURL}=require('node:url'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');

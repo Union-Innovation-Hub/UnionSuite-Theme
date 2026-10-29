@@ -1,8 +1,8 @@
 // Exercises the shared production controller with simulated GET /api/query responses.
-const fs=require('node:fs'),assert=require('node:assert/strict'),example=require('../THeme/UnionSuite-Guides/usage/build/membership-stats-example.cjs');
+const fs=require('node:fs'),assert=require('node:assert/strict'),example=require('../Theme/UnionSuite-Guides/usage/build/membership-stats-example.cjs');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8'),css=fs.readFileSync('THeme/UnionSuite/zUnionSuite.css','utf8');
-const snapshot=JSON.parse(fs.readFileSync('THeme/UnionSuite-Guides/usage/templates/Home/Stats/captured-data.json','utf8').replace(/^\uFEFF/,''));
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8'),css=fs.readFileSync('Theme/UnionSuite/zUnionSuite.css','utf8');
+const snapshot=JSON.parse(fs.readFileSync('Theme/UnionSuite-Guides/usage/templates/Home/Stats/captured-data.json','utf8').replace(/^\uFEFF/,''));
 const runtime=example.runtime(source),card=example.card;
 const clone=()=>structuredClone(snapshot);
 const all=['summary','financial','groups','categories'].map(card).join('');

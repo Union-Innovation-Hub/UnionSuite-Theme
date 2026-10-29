@@ -8,8 +8,8 @@ and stays supported. See [Compact and full rows](#compact-and-full-rows-19-octob
 **Earlier status: accepted and implemented.** The detail layout was the task list
 format for new lists, on the homepage and on a dedicated tasks page.
 
-- Template: `THeme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html`
-- Styles: the `US-TASK-ROWS` section of `THeme/UnionSuite/zUnionSuite.css`, opted
+- Template: `Theme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html`
+- Styles: the `US-TASK-ROWS` section of `Theme/UnionSuite/zUnionSuite.css`, opted
   into with `us-task--detail` on the row
 - Behaviour: the shipped `US-TASK-ROWS` section of `zUnionSuite.js`, which now
   saves completion to `i4u_UT_Interactions`

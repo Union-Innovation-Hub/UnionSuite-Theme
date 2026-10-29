@@ -294,7 +294,7 @@ Telemetry CORS messages reference Application Insights `.../v2/track`. The suppl
 
 ## Shared refresh and popup behaviour
 
-The relevant shared source remains `THeme/UnionSuite/zUnionSuite.js`. The user's confirmed Query Template command is:
+The relevant shared source remains `Theme/UnionSuite/zUnionSuite.js`. The user's confirmed Query Template command is:
 
 ```js
 await UnionSuiteRefresh.queryTemplate('#ste_container_ciTasks');

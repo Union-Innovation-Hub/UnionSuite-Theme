@@ -1,10 +1,10 @@
-// Tests the IQA finder's search (THeme/UnionSuite/Scripts/IQA-Finder.js).
+// Tests the IQA finder's search (Theme/UnionSuite/Scripts/IQA-Finder.js).
 // Run from the project root: node --test tools/test-iqa-finder.cjs
 'use strict';
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const finder = require('../THeme/UnionSuite/Scripts/IQA-Finder.js');
+const finder = require('../Theme/UnionSuite/Scripts/IQA-Finder.js');
 
 const entries = [
   { k: '1', n: 'Milestones', p: '$/_i4u_/Core/CA/v2/Reports/Milestones' },

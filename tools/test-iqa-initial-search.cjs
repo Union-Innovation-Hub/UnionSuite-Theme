@@ -2,8 +2,8 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
 (async()=>{const browser=await chromium.launch({channel:'msedge',headless:true});try{
  const page=await browser.newPage();
- const css=['THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','THeme/UnionSuite/99-Orion.css','THeme/UnionSuite/zUnionSuite.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
- const script=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8').split('/* US-BANNER-BEHAVIOUR:START */')[0];
+ const css=['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
+ const script=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8').split('/* US-BANNER-BEHAVIOUR:START */')[0];
  const native=fs.readFileSync('.preview/native.html','utf8');
  // Extract the captured pre-Find query's own panel, without executing native scripts.
  await page.setContent(native.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,''));

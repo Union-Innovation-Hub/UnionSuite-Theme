@@ -2,7 +2,7 @@
 
 Status: WIP visual/interaction mockup. Not implemented in the shared theme.
 
-The current Stats cards (`THeme/UnionSuite-Guides/usage/templates/Home/Stats/`)
+The current Stats cards (`Theme/UnionSuite-Guides/usage/templates/Home/Stats/`)
 are read-only. This mockup brings back click-to-filter: selecting a member
 category, membership type, financial status or gender recalculates every card.
 
@@ -41,7 +41,7 @@ category, membership type, financial status or gender recalculates every card.
 ## Files and preview
 
 Maintained files: `index.html`, `filters.css`, `filters.js` and
-`build-standalone.cjs`. Card styling comes from `THeme/UnionSuite/zUnionSuite.css`.
+`build-standalone.cjs`. Card styling comes from `Theme/UnionSuite/zUnionSuite.css`.
 `filters.css` holds only the page layout, the selected/dimmed/chip states, the
 trend charts and the filter panel.
 

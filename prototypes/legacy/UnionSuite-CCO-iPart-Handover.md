@@ -135,14 +135,14 @@ https://developer.imis.com/v20.3.208/docs/developing-a-client-based-ipart
 The documentation describes client HTML/JS deployment via iPartSource ZIP files and registration as a client-based content type. Verify the current site's supported workflow and configuration persistence API before implementation. This is distinct from pointing a new server-based registration at ContentDisplayCommon.
 
 Existing related files:
-- THeme/UnionSuite/zUnionSuite.css — UnionSuite tokens/components, V5/H2 styling.
-- THeme/UnionSuite/zUnionSuite.js — native tabs, sticky sidebar and shared behaviours. Preserve native adapters.
-- THeme/UnionSuite-Guides/usage/source/Usage-Guide.source.html and generated Usage-Guide.html.
+- Theme/UnionSuite/zUnionSuite.css — UnionSuite tokens/components, V5/H2 styling.
+- Theme/UnionSuite/zUnionSuite.js — native tabs, sticky sidebar and shared behaviours. Preserve native adapters.
+- Theme/UnionSuite-Guides/usage/source/Usage-Guide.source.html and generated Usage-Guide.html.
 - references/CCO-Tabs-Comparison.html — existing visual alternatives.
 - prototypes/wip/banner-tabs/Banner-Tabs-Plan.md — separate deferred zone-switching proposal; do not treat it as the selected architecture for this iPart.
-- THeme/UnionSuite-Guides/usage/build/build-theme-usage.cjs — usage guide build/check.
+- Theme/UnionSuite-Guides/usage/build/build-theme-usage.cjs — usage guide build/check.
 
-Follow current stylesheet ownership: project-owned native foundation in THeme/UnionSuite/99-Orion.css; UnionSuite additions/tokens in zUnionSuite.css; client differences in THeme/UnionSuite-Client/Override.css. Do not duplicate production CSS into generated reference pages.
+Follow current stylesheet ownership: project-owned native foundation in Theme/UnionSuite/99-Orion.css; UnionSuite additions/tokens in zUnionSuite.css; client differences in Theme/UnionSuite-Client/Override.css. Do not duplicate production CSS into generated reference pages.
 
 When implementation begins, update usage-guide sources, exact author recipes, examples, packaging/install instructions and supported limits in the same change. Run the prescribed build and --check and inspect generated examples in a browser. No new author classes, package names or settings APIs have been committed by this handover.
 

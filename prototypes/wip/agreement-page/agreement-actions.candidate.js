@@ -1,5 +1,5 @@
 /* Agreement page — candidate action definitions.
-   Target: THeme/UnionSuite/Scripts/ActionDefinitions.js (core UnionSuite:
+   Target: Theme/UnionSuite/Scripts/ActionDefinitions.js (core UnionSuite:
    agreements are part of the shared suite, not a client layer). Load after
    zUnionSuite.js and ActionDefinitions.js, before UnionSuite-Client/Actions.js.
 

@@ -2,7 +2,7 @@
 
 Keep current ideas and accepted implementation specifications in Git. The
 maintained guide and implemented author templates live in
-`THeme/UnionSuite-Guides/usage/`.
+`Theme/UnionSuite-Guides/usage/`.
 
 | Stage | Location | Exit condition |
 |---|---|---|

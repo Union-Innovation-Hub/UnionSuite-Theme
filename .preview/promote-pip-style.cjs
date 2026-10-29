@@ -50,7 +50,7 @@ ${drawing}
 }
 /* US-TASKBAR-PIP:END */
 `;
-const file = 'THeme/UnionSuite/zUnionSuite.css';
+const file = 'Theme/UnionSuite/zUnionSuite.css';
 const original = fs.readFileSync(file, 'utf8');
 if (original.includes('/* US-TASKBAR-PIP:START */')) throw Error('Pip CSS already promoted; edit the theme directly.');
 fs.writeFileSync(file, original + css);

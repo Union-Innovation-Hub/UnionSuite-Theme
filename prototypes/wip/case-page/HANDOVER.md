@@ -300,7 +300,7 @@ was run.
   often tiny: emulate a viewport (`resize_window` 1100×700) for screenshots,
   and reset it after.
 - **Cache:** reload changed files with `fetch(file, {cache: 'reload'})` then
-  `location.reload()`; the theme file is at `../../../THeme/UnionSuite/zUnionSuite.js`.
+  `location.reload()`; the theme file is at `../../../Theme/UnionSuite/zUnionSuite.js`.
 - **A guide example frame's `location.origin` reads `"null"`** (srcdoc),
   so a page read there must use `url: 'about:blank'` (also `null`) and a
   stubbed fetch, as the refresh and composer examples do.

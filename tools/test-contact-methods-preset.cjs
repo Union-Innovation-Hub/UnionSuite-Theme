@@ -12,9 +12,9 @@ const panel=(id,classes)=>`<div class="ContentItemContainer" id="part-${id}"><di
   await page.route('https://theme.test/**',route=>route.fulfill({contentType:'text/html',body:html}));
   await page.goto('https://theme.test/Party.aspx?ID=103885');
   await page.evaluate(()=>{window.nativeCalls=[];window.ShowDialog_NoReturnValue=(...args)=>nativeCalls.push(args);});
-  await page.addStyleTag({content:read('THeme/UnionSuite/zUnionSuite.css')});
-  await page.addScriptTag({content:read('THeme/UnionSuite/zUnionSuite.js')});
-  await page.addScriptTag({content:read('THeme/UnionSuite/Scripts/ActionDefinitions.js')});
+  await page.addStyleTag({content:read('Theme/UnionSuite/zUnionSuite.css')});
+  await page.addScriptTag({content:read('Theme/UnionSuite/zUnionSuite.js')});
+  await page.addScriptTag({content:read('Theme/UnionSuite/Scripts/ActionDefinitions.js')});
 
   const owner=page.locator('#owner-methods');
   await page.waitForFunction(()=>document.querySelectorAll('[data-us-command-key="member.add-contact-method"]').length===1);

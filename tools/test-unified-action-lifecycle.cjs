@@ -1,6 +1,6 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
-const source=fs.readFileSync('THeme/UnionSuite/zUnionSuite.js','utf8');
+const source=fs.readFileSync('Theme/UnionSuite/zUnionSuite.js','utf8');
 const asi=fs.readFileSync('../API Reference/Asi.js','utf8');
 const forwarder=asi.match(/function ShowDialog_NoReturnValue\([^)]*\)\{[^}]+\}/)[0];
 (async()=>{

@@ -19,7 +19,7 @@ It covers:
 - Touch and narrow screens — never `hover`/`pointer` media queries; touch
   sizes and touch-visible controls follow `(max-width: 950px)`
 - The iPart wrapper contract (an iPart CSS class inserts an extra `<div>`)
-- The guide workflow — `THeme/UnionSuite-Guides/usage/` is the documentation
+- The guide workflow — `Theme/UnionSuite-Guides/usage/` is the documentation
   source of truth; update it alongside features and rebuild with
   `node tools/build-theme-usage.cjs`, then run its `--check` and
   `node tools/check-usage-sources.cjs`

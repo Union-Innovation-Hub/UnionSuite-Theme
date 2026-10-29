@@ -1,35 +1,35 @@
 # Usage guide optimisation and source ownership
 
-Reviewed 20 September 2026. The measurements below describe the original generated guide. Maintained inputs have since been consolidated under `THeme/UnionSuite-Guides/usage/`, and generated outputs are excluded from Git. The smaller index/topic-page publication format and shared-asset optimisation remain proposed; no Git history has been rewritten.
+Reviewed 20 September 2026. The measurements below describe the original generated guide. Maintained inputs have since been consolidated under `Theme/UnionSuite-Guides/usage/`, and generated outputs are excluded from Git. The smaller index/topic-page publication format and shared-asset optimisation remain proposed; no Git history has been rewritten.
 
 ## Recommendation
 
-Use `THeme/UnionSuite-Guides/Usage-Guide.html` as a small index, with topic pages and shared assets under `THeme/UnionSuite-Guides/usage/`. Generate the pages from maintained sources and retain every example, recipe, field definition and interaction. Package the index and folder together for offline use. A single-file export can remain an optional build product from the same sources if needed.
+Use `Theme/UnionSuite-Guides/Usage-Guide.html` as a small index, with topic pages and shared assets under `Theme/UnionSuite-Guides/usage/`. Generate the pages from maintained sources and retain every example, recipe, field definition and interaction. Package the index and folder together for offline use. A single-file export can remain an optional build product from the same sources if needed.
 
 Splitting the HTML alone will improve navigation and initial loading, but will not remove repeated assets. The main size saving comes from storing shared CSS, JavaScript and fonts once and referencing them from the relevant examples.
 
 ## What is the source of truth?
 
-`THeme/UnionSuite-Guides/Usage-Guide.html` is generated output. The build check currently reproduces it from maintained inputs. There is no demonstrated need to preserve content solely from the generated HTML.
+`Theme/UnionSuite-Guides/Usage-Guide.html` is generated output. The build check currently reproduces it from maintained inputs. There is no demonstrated need to preserve content solely from the generated HTML.
 
 However, **not every template has its own HTML file**. The guide has several source owners:
 
 | Content | Maintained source | How it reaches the guide |
 |---|---|---|
-| Explanations, placement rules, class reference, installation, troubleshooting and many small recipes | [Usage-Guide.source.html](../THeme/UnionSuite-Guides/usage/source/Usage-Guide.source.html) | Used as the document skeleton; literal examples are already authored there |
-| Banner templates, case details and agreement facts | [guide templates](../THeme/UnionSuite-Guides/usage/templates/), including `Banner-Template.html`, `Banner-Case-Template.html`, `Banner-Contact-Template.html`, `Banner-Dashboard-Template.html`, `Case-Details-Content.html` and `Banner-Agreement-Facts.html` | Imported by the builder for copy/download and previews |
-| Copy-button and Actions menu templates | `THeme/UnionSuite-Guides/usage/templates/Copy-Button-Template.html`, `THeme/UnionSuite-Guides/usage/templates/Action-Menu-Template.html`, `THeme/UnionSuite-Guides/usage/examples/Client-Actions.example.js` | Imported snippets and examples |
-| Bulletin, contact, task, note, history and other list templates | [prototypes/List-Templates/](../THeme/UnionSuite-Guides/usage/templates/List-Templates/), plus `source/list-query-examples.cjs` | `THeme/UnionSuite-Guides/usage/build/list-template-examples.cjs` builds recipes and fixtures from those files |
-| Home greeting and attention templates | `THeme/UnionSuite-Guides/usage/templates/Home/Welcome-Content.html`, `THeme/UnionSuite-Guides/usage/templates/Home/Needs-Attention-Content.html` | Imported copyable markup and generated iMIS preview wrappers |
-| Membership Stats templates | [prototypes/Home/Stats/](../THeme/UnionSuite-Guides/usage/templates/Home/Stats/), plus `THeme/UnionSuite-Guides/usage/templates/Home/Stats-Content.html` | `THeme/UnionSuite-Guides/usage/build/membership-stats-example.cjs` composes templates, recipes and a captured-data fixture |
-| Query field definitions | `THeme/UnionSuite-Guides/usage/source/query-field-definitions.cjs` | `THeme/UnionSuite-Guides/usage/build/query-template-fields.cjs` validates coverage and renders definition tables |
-| Button and icon recipes | `THeme/UnionSuite-Guides/usage/source/action-catalog.cjs`, [theme-gallery.cjs](../THeme/UnionSuite-Guides/usage/build/theme-gallery.cjs), `source/Button-Examples.html` | Many snippets are generated from catalogue entries and builder functions, rather than separate template files |
-| Native forms, badges, Document Loader and dummy IQA | `THeme/UnionSuite-Guides/usage/examples/Form-Fields.source.html`, `source/badge-example.html`, `source/document-loader-example.html`, `source/IQA-Example.source.html`, `source/iqa-example.js` | Fixtures embedded with real theme assets and local simulations |
-| Busy-state demonstrations | `THeme/UnionSuite-Guides/usage/source/busy-examples.cjs` | Supplies demo CSS, markup and simulation; production spinner/behaviour stays in the shared theme |
-| Interactive Action Builder | [prototypes/Action-Builder/](../THeme/UnionSuite-Guides/usage/examples/Action-Builder/), [build-action-builder.cjs](../THeme/UnionSuite-Guides/usage/build/build-action-builder.cjs) | Embedded application with its own preview and appearance frames |
-| Other component previews | `tools/*-example.cjs`, `THeme/UnionSuite-Guides/usage/build/taskbar-preview.cjs`, related prototype/fixture sources | Builder functions compose markup, styles and simulated behaviour |
-| Additional examples authored in builder code | [build-theme-usage.cjs](../THeme/UnionSuite-Guides/usage/build/build-theme-usage.cjs) | Includes banner-parts markup, message demonstrations, condition controls and Query Template shell examples |
-| Guide search, copy/download, print, seed editing and frame resizing | `source/guide-search.js`, [usage-guide.js](../THeme/UnionSuite-Guides/usage/source/usage-guide.js), `source/usage-guide.css` | Inlined into the generated guide |
+| Explanations, placement rules, class reference, installation, troubleshooting and many small recipes | [Usage-Guide.source.html](../Theme/UnionSuite-Guides/usage/source/Usage-Guide.source.html) | Used as the document skeleton; literal examples are already authored there |
+| Banner templates, case details and agreement facts | [guide templates](../Theme/UnionSuite-Guides/usage/templates/), including `Banner-Template.html`, `Banner-Case-Template.html`, `Banner-Contact-Template.html`, `Banner-Dashboard-Template.html`, `Case-Details-Content.html` and `Banner-Agreement-Facts.html` | Imported by the builder for copy/download and previews |
+| Copy-button and Actions menu templates | `Theme/UnionSuite-Guides/usage/templates/Copy-Button-Template.html`, `Theme/UnionSuite-Guides/usage/templates/Action-Menu-Template.html`, `Theme/UnionSuite-Guides/usage/examples/Client-Actions.example.js` | Imported snippets and examples |
+| Bulletin, contact, task, note, history and other list templates | [prototypes/List-Templates/](../Theme/UnionSuite-Guides/usage/templates/List-Templates/), plus `source/list-query-examples.cjs` | `Theme/UnionSuite-Guides/usage/build/list-template-examples.cjs` builds recipes and fixtures from those files |
+| Home greeting and attention templates | `Theme/UnionSuite-Guides/usage/templates/Home/Welcome-Content.html`, `Theme/UnionSuite-Guides/usage/templates/Home/Needs-Attention-Content.html` | Imported copyable markup and generated iMIS preview wrappers |
+| Membership Stats templates | [prototypes/Home/Stats/](../Theme/UnionSuite-Guides/usage/templates/Home/Stats/), plus `Theme/UnionSuite-Guides/usage/templates/Home/Stats-Content.html` | `Theme/UnionSuite-Guides/usage/build/membership-stats-example.cjs` composes templates, recipes and a captured-data fixture |
+| Query field definitions | `Theme/UnionSuite-Guides/usage/source/query-field-definitions.cjs` | `Theme/UnionSuite-Guides/usage/build/query-template-fields.cjs` validates coverage and renders definition tables |
+| Button and icon recipes | `Theme/UnionSuite-Guides/usage/source/action-catalog.cjs`, [theme-gallery.cjs](../Theme/UnionSuite-Guides/usage/build/theme-gallery.cjs), `source/Button-Examples.html` | Many snippets are generated from catalogue entries and builder functions, rather than separate template files |
+| Native forms, badges, Document Loader and dummy IQA | `Theme/UnionSuite-Guides/usage/examples/Form-Fields.source.html`, `source/badge-example.html`, `source/document-loader-example.html`, `source/IQA-Example.source.html`, `source/iqa-example.js` | Fixtures embedded with real theme assets and local simulations |
+| Busy-state demonstrations | `Theme/UnionSuite-Guides/usage/source/busy-examples.cjs` | Supplies demo CSS, markup and simulation; production spinner/behaviour stays in the shared theme |
+| Interactive Action Builder | [prototypes/Action-Builder/](../Theme/UnionSuite-Guides/usage/examples/Action-Builder/), [build-action-builder.cjs](../Theme/UnionSuite-Guides/usage/build/build-action-builder.cjs) | Embedded application with its own preview and appearance frames |
+| Other component previews | `tools/*-example.cjs`, `Theme/UnionSuite-Guides/usage/build/taskbar-preview.cjs`, related prototype/fixture sources | Builder functions compose markup, styles and simulated behaviour |
+| Additional examples authored in builder code | [build-theme-usage.cjs](../Theme/UnionSuite-Guides/usage/build/build-theme-usage.cjs) | Includes banner-parts markup, message demonstrations, condition controls and Query Template shell examples |
+| Guide search, copy/download, print, seed editing and frame resizing | `source/guide-search.js`, [usage-guide.js](../Theme/UnionSuite-Guides/usage/source/usage-guide.js), `source/usage-guide.css` | Inlined into the generated guide |
 | Actual UI styles and behaviour | `99-Orion.css`, `zUnionSuite.css`, `zzDarkMode.css`, `zUnionSuite.js`, `Scripts/` and established client sources | Canonical theme implementations, composed according to each preview's dependencies |
 
 The source HTML contains **66 literal `<pre><code>` blocks**, of which **39 contain HTML markup**. These include installation snippets and native-structure references as well as author templates; the count is not 66 standalone deployable components. Additional small visual examples also appear directly in this source.
@@ -77,7 +77,7 @@ No production loader was implemented. This is a serialization/round-trip measure
 ## Proposed published layout
 
 ```text
-THeme/UnionSuite/
+Theme/UnionSuite/
 ├── Usage-Guide.html                 # small index; existing entry URL retained
 └── guides/usage/
     ├── getting-started.html         # installation, status and iPart wrapper rules
@@ -111,7 +111,7 @@ Names are proposed. Group the current sections by topic while retaining all sect
 
 Generated assets in this folder must come from existing canonical sources. They are not new maintained copies of production CSS or JS. Preserve each example's asset selection and cascade order: a tokens-only banner, native baseline and fully enhanced report do not all load the same set of styles.
 
-For maintained prose, extract chapters to `THeme/UnionSuite-Guides/usage/source/usage/chapters/*.source.html`, with a small manifest mapping page names, titles, section IDs, examples and source dependencies. Keep reusable templates in their existing canonical locations. Extract guide-owned recipes to named source fragments when reuse justifies it; tiny explanatory snippets can remain beside their documentation. Generate the index, chapters, search index and print view from this manifest.
+For maintained prose, extract chapters to `Theme/UnionSuite-Guides/usage/source/usage/chapters/*.source.html`, with a small manifest mapping page names, titles, section IDs, examples and source dependencies. Keep reusable templates in their existing canonical locations. Extract guide-owned recipes to named source fragments when reuse justifies it; tiny explanatory snippets can remain beside their documentation. Generate the index, chapters, search index and print view from this manifest.
 
 ## Preserve functionality during the split
 
@@ -139,7 +139,7 @@ Defer offscreen previews only after the packaging split works. Lazy loading is a
 2. Introduce a shared asset/dependency manifest. Deduplicate complete assets and fonts without pruning selectors, dropping glyphs or changing script order.
 3. Split chapter sources and generate the new index/pages from the same maintained inputs. Preserve all author content and code text; keep preview-only fixtures separate from templates.
 4. Migrate search, seed preview, frame preparation, compatibility links and full-book printing. Keep optional portable export derived from these same sources, if retained.
-5. Extend `node THeme/UnionSuite-Guides/usage/build/build-theme-usage.cjs --check` to validate the manifest, every generated output, link/anchor targets, query field coverage, recipe/download equivalence and size budgets.
+5. Extend `node Theme/UnionSuite-Guides/usage/build/build-theme-usage.cjs --check` to validate the manifest, every generated output, link/anchor targets, query field coverage, recipe/download equivalence and size budgets.
 6. Run the existing guide-search, Action Builder, Query Search and Membership Stats guide checks after adapting their navigation to chapters. Browser-check the complete offline folder, all live previews, dark/light states, printing and copy/download paths. The current tests depend on Playwright under `.tmp-iqa-integration`; make that test dependency reproducible as part of the workflow update.
 7. Update AGENTS.md, docs/README, guide maintenance instructions, reference links and release packaging together. The current documented single-file contract needs to be replaced with the selected folder-bundle/optional-export contract when the restructure is implemented.
 

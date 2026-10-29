@@ -1,7 +1,7 @@
 # Element inventory — what the native CSS actually styles
 
 Extracted from `legacy/Native CSS/Orion-99.css` (1,030 rule blocks, 563 classes) and
-`THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css` (3,831 blocks, 2,678 classes) by
+`Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css` (3,831 blocks, 2,678 classes) by
 parsing selectors and weighting each class by how many declarations target it.
 Presence checked against the captured `legacy/Orion page.html`.
 
@@ -9,16 +9,16 @@ Companion to [THEME-FINDINGS.md](THEME-FINDINGS.md) — read §3 and §6 there
 before styling anything on this list.
 
 Current implementation: the approved Query Menu / IQA component is now in
-`THeme/UnionSuite/zUnionSuite.css` and `zUnionSuite.js`. Use `us-report` on the
+`Theme/UnionSuite/zUnionSuite.css` and `zUnionSuite.js`. Use `us-report` on the
 iPart; optional modifiers are `us-filters-collapsible`, `us-filters-collapsed`
 and `us-report-expandable`. `SearchContactsClass` remains a supported alias.
-Use the [standalone Theme Usage Guide](THeme/UnionSuite-Guides/Usage-Guide.html) for
+Use the [standalone Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html) for
 author-facing classes, tokens, templates and feature status, and the
-[theme README](../THeme/UnionSuite/README.md) for integration details.
+[theme README](../Theme/UnionSuite/README.md) for integration details.
 The [current condensed CSV](crm-member-profile/CRM-Member-Profile-Component-Types-Updated.csv) and
 [detailed mapping CSV](crm-member-profile/CRM-Member-Profile-iPart-Mapping-Theme.csv) include the
 report classes and distinguish implemented utilities from planned business actions.
-See the [CSV version note](../THeme/UnionSuite/README.md#mapping-csvs) for the locked originals.
+See the [CSV version note](../Theme/UnionSuite/README.md#mapping-csvs) for the locked originals.
 
 ---
 
@@ -51,15 +51,15 @@ it does not imply every native screen or state has been verified live.
 | Profile banners | Custom shared banner implemented | Native profile-banner family is separate and still needs review |
 | Content output | Query/report and custom banner output supported | Bulletin cards and recent-history variants need review; combined activity feed remains planned |
 | Panel business actions | Shared report action slot and visual treatments implemented | Named action injection and verified business handlers remain planned |
-| Popup forms: the task form | Implemented 20 October 2026: `THeme/UnionSuite/Forms/` (`UnionSuiteForms.js` runtime, `UnionSuiteForms.css` in each form's shadow root, `TaskForm.js`), loader module `forms` (pages with `[data-us-form]`; works without the theme), `UnionSuiteTaskForms` page paths in Scripts/ActionDefinitions.js (blank: the task buttons keep today's forms), guide `#popup-forms` (staff use, page setup, payload and close results, the form format), tests `tools/test-popup-forms.cjs`, preview `prototypes/wip/task-form/task-form-preview.html` | Owner to build: the six IQAs and the CloudToolz endpoint (blank in TaskForm.js CONFIG) and the three pages; then set the page paths and verify live |
+| Popup forms: the task form | Implemented 20 October 2026: `Theme/UnionSuite/Forms/` (`UnionSuiteForms.js` runtime, `UnionSuiteForms.css` in each form's shadow root, `TaskForm.js`), loader module `forms` (pages with `[data-us-form]`; works without the theme), `UnionSuiteTaskForms` page paths in Scripts/ActionDefinitions.js (blank: the task buttons keep today's forms), guide `#popup-forms` (staff use, page setup, payload and close results, the form format), tests `tools/test-popup-forms.cjs`, preview `prototypes/wip/task-form/task-form-preview.html` | Owner to build: the six IQAs and the CloudToolz endpoint (blank in TaskForm.js CONFIG) and the three pages; then set the page paths and verify live |
 | Task rows: compact and full | Implemented 19 October 2026: US-TASK-ROWS 1.2 in zUnionSuite.css / .js (`us-task--compact` default, `us-task--full` optional, on `us-task--detail`): plain title and pencil, badge and buttons on the title's first line, note read in place (details button, or two lines and More; sliding), tags with a "+N" button. `home.edit-task` in Scripts/ActionDefinitions.js. Guide `#task-rows`, templates Tasks-Compact / Tasks-Full, examples `#task-compact` / `#task-full`; the agreement and case task templates moved onto it; workbench `references/Task-Rows-Workbench.html` | Live: upload the theme files, paste the templates on the homepage, agreement and case pages, and the IQA column changes in TODO.md |
 | Taskbar search | Standalone Scripts/UnionSuiteTaskbar.js implemented. Header row at every width (US-TASKBAR-LAYOUT, 13 October 2026): one row while it fits with a shrinking search field, icon-only Add bookmarks / Go to below 1100px, the taskbar on its own row at 960px and below, search on its own row at 780px and below | Replaces old injection; all styling in shared CSS; accent colours and lifecycle cleanup. Guide `#taskbar-responsive` |
 | Biscuit taskbar greeting | Approved in theme: five-minute daily visit, 15-second scratch/tilt idles, wave/hop/goodbye clicks. Hidden below 1200px, as the approved design specifies (previously 600px; the 1060px rule had stopped matching) | Client Config.js on/off switch; header divider perch; normal timed exit; reduced motion; preview controls stay offline. Upload updated theme/client archives and retain script load order |
 | Banner tab switching | Presentation exists; behavior deferred by owner | Do not enable template tabs until zone-switching integration is implemented |
 
-Production truth: [shared CSS](../THeme/UnionSuite/zUnionSuite.css),
-[shared JS](../THeme/UnionSuite/zUnionSuite.js) and the
-[usage guide](THeme/UnionSuite-Guides/Usage-Guide.html).
+Production truth: [shared CSS](../Theme/UnionSuite/zUnionSuite.css),
+[shared JS](../Theme/UnionSuite/zUnionSuite.js) and the
+[usage guide](Theme/UnionSuite-Guides/Usage-Guide.html).
 Visual references: [native forms](references/Native-Form-Integration.html),
 [choices/dropdowns](references/Choice-Dropdown-Comparison.html),
 [calendar](references/Calendar-Comparison.html) and
@@ -110,7 +110,7 @@ confirmed live, not just present in the stylesheet.
 ### 1. Buttons — *do first, appears everywhere*
 
 Current implementation: native `TextButton`/`btn` and existing variants now
-consume shared tokens in `THeme/UnionSuite/zUnionSuite.css`; no replacement
+consume shared tokens in `Theme/UnionSuite/zUnionSuite.css`; no replacement
 class is required. See [THEME-BUTTONS.md](THEME-BUTTONS.md) for the complete
 native inventory, size/group controls, semantic mapping, specialised-control
 boundaries and missing secondary/warning variants. The findings below remain
@@ -205,7 +205,7 @@ new styling.
   `.main` **[seen]**, `.sidebar`
 - `.header`, `.navbar` **[seen]**, `.nav-auxiliary`, `.navbar-toggle`
 - `.sub-nav` **[seen]**, `.sub-nav-body`, `.sub-nav-head`, `.Nav-Icon-wrapper`
-  (the 8 staff nav icon mappings are now in `THeme/UnionSuite/zUnionSuite.css`,
+  (the 8 staff nav icon mappings are now in `Theme/UnionSuite/zUnionSuite.css`,
   block `US-STAFF-NAV-ICONS`; `UTStaff.css` is the legacy source)
 - `.footer-main` **[seen]**, `.breadcrumb`
 - `.account-menu` **[seen]**, `.account-toggle`, `.obo-toggle` **[seen]**,
@@ -418,13 +418,13 @@ banner on scroll, and `us-banner us-banner-collapsible` to retain and condense
 it. Collapsible includes sticky; the two modifiers need not be combined.
 The same contract supports Query Template Display and static Content HTML.
 `us-banner-page` is a separate page-layout class for full width and native
-gutters. All styling is now in `THeme/UnionSuite/zUnionSuite.css`, with page-layout
+gutters. All styling is now in `Theme/UnionSuite/zUnionSuite.css`, with page-layout
 and component rules kept separate. Interaction still uses the existing banner
 script; the legacy-named embed is now behaviour only. The native profile-banner
 selectors above are a different component family. See the
-[banner usage guide](../THeme/UnionSuite-Guides/usage/examples/Banner-README.md).
+[banner usage guide](../Theme/UnionSuite-Guides/usage/examples/Banner-README.md).
 
-The [complete template](../THeme/UnionSuite-Guides/usage/templates/Banner-Template.html) includes an optional
+The [complete template](../Theme/UnionSuite-Guides/usage/templates/Banner-Template.html) includes an optional
 Actions disclosure inside the summary and tabs after the details. Delete either
 whole div to omit it. Both remain visible when compact. Dropdown behaviour is
 implemented; sample commands are disabled until connected to verified handlers.
@@ -432,8 +432,8 @@ Tabs supply presentation only. Direct zone switching is the preferred planned
 adapter for lightweight dashboards, with multiple zones per tab and shared zones
 remaining visible. CCO integration remains a separate option. Zone titles and
 grid space must follow visibility; hiding a zone does not defer its initial IQA.
-Separate [dashboard](../THeme/UnionSuite-Guides/usage/templates/Banner-Dashboard-Template.html) and
-[Contact](../THeme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html) templates provide simpler
+Separate [dashboard](../Theme/UnionSuite-Guides/usage/templates/Banner-Dashboard-Template.html) and
+[Contact](../Theme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html) templates provide simpler
 starting points. The standalone guide embeds these maintained sources rather
 than carrying independently edited copies.
 
@@ -507,7 +507,7 @@ Headers, separators, disabled/danger states, one submenu level, keyboard focus,
 400ms opening/closing and the 1000ms inline line glint are implemented.
 Namespaced explicit function registration replaces inline onclick for new HTML.
 Other native context/Telerik menus remain unreviewed. See
-[usage and examples](THeme/UnionSuite-Guides/Usage-Guide.html#action-menus).
+[usage and examples](Theme/UnionSuite-Guides/Usage-Guide.html#action-menus).
 Live iMIS popup/postback/permission testing remains required.
 
 
@@ -522,7 +522,7 @@ now use shared typography, navy hover, inset pressed borders and red Close
 states. Popup-document dividers use the theme border; load shared CSS/JS inside
 the iframe as well as the parent. The captured HTML omits iframe footer markup,
 so verify that coverage live. Alert/confirm/prompt content remains unreviewed.
-See [usage and preview](THeme/UnionSuite-Guides/Usage-Guide.html#dialog-chrome).
+See [usage and preview](Theme/UnionSuite-Guides/Usage-Guide.html#dialog-chrome).
 
 
 ### Deferred: alert, confirm and prompt dialogs

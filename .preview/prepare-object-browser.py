@@ -59,7 +59,7 @@ parser.feed(capture.read_text(encoding='utf-8-sig'))
 html = ''.join(parser.parts)
 assert html.count('ObjectBrowserWrapper') == 2
 assert 'WebForm_' not in html and '<script' not in html and 'SummaryFrame' in html
-(root / 'THeme/UnionSuite/docs/object-browser-example.html').write_text(
+(root / 'Theme/UnionSuite/docs/object-browser-example.html').write_text(
     '<!-- Captured native structure; scripts, postbacks, navigation and hidden state removed. -->\n' + html,
     encoding='utf-8')
 print('Prepared native Object Browser fixture.')

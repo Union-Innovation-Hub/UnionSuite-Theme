@@ -30,12 +30,12 @@ as a theme section that follows the conventions below.
 
 | Part | Owner | Notes |
 | --- | --- | --- |
-| Behaviour | `THeme/UnionSuite/zUnionSuite.js`, new section `/* US-CCO-SWITCH:START — ... */` … `/* US-CCO-SWITCH:END */` | Place it after `US-TAB-BUSY` and `US-CCO-STICKY-TABS`. Guard it with `if (window.UnionSuiteCcoSwitch) return;` like the other sections. |
-| Loading styles | `THeme/UnionSuite/zUnionSuite.css`, new `US-CCO-SWITCH` section | Two-space indentation, one declaration per line (AGENTS). Reuse the existing `section-loader-spinning-circles`, `us-tab-loading-spinner` and `us-iqa-refresh-status` classes. |
-| Dark mode | `THeme/UnionSuite/zzDarkMode.css` | Only the cover surface, if `--bg-surface` does not already follow dark mode. |
-| Site-wide setting | `THeme/UnionSuite-Client/Config.js` | Add `window.UnionSuiteCcoSwitchConfig = { ...window.UnionSuiteCcoSwitchConfig, enabled: true };` with a comment in the file's existing style. |
+| Behaviour | `Theme/UnionSuite/zUnionSuite.js`, new section `/* US-CCO-SWITCH:START — ... */` … `/* US-CCO-SWITCH:END */` | Place it after `US-TAB-BUSY` and `US-CCO-STICKY-TABS`. Guard it with `if (window.UnionSuiteCcoSwitch) return;` like the other sections. |
+| Loading styles | `Theme/UnionSuite/zUnionSuite.css`, new `US-CCO-SWITCH` section | Two-space indentation, one declaration per line (AGENTS). Reuse the existing `section-loader-spinning-circles`, `us-tab-loading-spinner` and `us-iqa-refresh-status` classes. |
+| Dark mode | `Theme/UnionSuite/zzDarkMode.css` | Only the cover surface, if `--bg-surface` does not already follow dark mode. |
+| Site-wide setting | `Theme/UnionSuite-Client/Config.js` | Add `window.UnionSuiteCcoSwitchConfig = { ...window.UnionSuiteCcoSwitchConfig, enabled: true };` with a comment in the file's existing style. |
 | Behaviour tests | `tools/test-cco-switch.cjs` | Follow the existing `tools/test-*.cjs`: Playwright from `../.tmp-iqa-integration/node_modules/playwright`, `channel: 'msedge'`, headless, requests intercepted. Port the trial's fixtures. |
-| Guide | `THeme/UnionSuite-Guides/usage/source/Usage-Guide.source.html` | A section near the native tabs and `EmbeddedCCO` sections, plus installation-table entries for `Config.js`. Rebuild and check (below). |
+| Guide | `Theme/UnionSuite-Guides/usage/source/Usage-Guide.source.html` | A section near the native tabs and `EmbeddedCCO` sections, plus installation-table entries for `Config.js`. Rebuild and check (below). |
 
 Public API: `window.UnionSuiteCcoSwitch` with `refresh()`, `report()`, `enable()`
 and `disable()`. Nothing else is global.

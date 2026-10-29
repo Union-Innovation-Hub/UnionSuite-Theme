@@ -2,10 +2,10 @@
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const { chromium } = require('../.tmp-iqa-integration/node_modules/playwright');
-const source = fs.readFileSync('THeme/UnionSuite/zUnionSuite.js', 'utf8');
+const source = fs.readFileSync('Theme/UnionSuite/zUnionSuite.js', 'utf8');
 const script = source.split('/* US-BANNER-BEHAVIOUR:START */')[0] + '\n' +
   source.match(/\/\* US-TASK-ROWS:START[\s\S]*?US-TASK-ROWS:END \*\//)[0];
-const template = fs.readFileSync('THeme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html', 'utf8');
+const template = fs.readFileSync('Theme/UnionSuite-Guides/usage/templates/List-Templates/Tasks-Detail-Query-Template.html', 'utf8');
 const record = {
   TaskTitle: 'Follow up renewal', TaskUrl: '#task', TaskNote: 'Call the member',
   MemberName: 'Alex Morgan', MemberUrl: '#member', IsCompleted: 'false',

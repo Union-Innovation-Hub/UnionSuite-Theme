@@ -1,5 +1,5 @@
-const fs=require('node:fs'),assert=require('node:assert/strict'),example=require('../THeme/UnionSuite-Guides/usage/build/embedded-cco-example.cjs');
-const {guidePath}=require('../THeme/UnionSuite-Guides/usage/build/guide-output.cjs');
+const fs=require('node:fs'),assert=require('node:assert/strict'),example=require('../Theme/UnionSuite-Guides/usage/build/embedded-cco-example.cjs');
+const {guidePath}=require('../Theme/UnionSuite-Guides/usage/build/guide-output.cjs');
 const {chromium}=require('../.tmp-iqa-integration/node_modules/playwright');
 (async()=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});

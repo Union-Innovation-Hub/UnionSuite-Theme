@@ -12,7 +12,7 @@ function Get-EntryHash($entry) {
 }
 
 function Update-TaskbarArchive($folder, $files) {
-    $archivePath = [System.IO.Path]::GetFullPath((Join-Path $taskbarProjectRoot ('THeme/' + $folder + '.zip')))
+    $archivePath = [System.IO.Path]::GetFullPath((Join-Path $taskbarProjectRoot ('Theme/' + $folder + '.zip')))
     $temporary = $archivePath + '.' + [Guid]::NewGuid().ToString('N') + '.new'
     foreach ($target in @($archivePath, $temporary)) {
         if (-not $target.StartsWith($taskbarProjectRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -21,7 +21,7 @@ function Update-TaskbarArchive($folder, $files) {
     }
     $sources = @{}
     foreach ($file in $files) {
-        $source = Join-Path $taskbarProjectRoot ('THeme/' + $folder + '/' + $file)
+        $source = Join-Path $taskbarProjectRoot ('Theme/' + $folder + '/' + $file)
         if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "Missing source: $source" }
         $sources[$folder + '/' + $file] = $source
     }

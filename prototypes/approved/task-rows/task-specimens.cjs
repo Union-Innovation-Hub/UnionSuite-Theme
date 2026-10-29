@@ -1,6 +1,6 @@
 // Specimen content for the task row workbench. Data only.
 //
-// Each scenario renders twice from THeme/UnionSuite-Guides/usage/templates/List-Templates/:
+// Each scenario renders twice from Theme/UnionSuite-Guides/usage/templates/List-Templates/:
 // the accepted task row and the older two-line row, so the two can be compared on
 // one page at the same list width. Both use the shipped theme CSS.
 //
