@@ -5294,7 +5294,17 @@ label:where([class^="us-"], [class*=" us-"]):not(:where(.us-report-no-styling, .
   padding-right: 44px;
 }
 
-.us-form input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator {
+/* Firefox draws its own icon inside the padding: no room needed. */
+@supports not selector(::-webkit-calendar-picker-indicator) {
+  .us-form .PanelFieldValue > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    padding-right: 10px;
+  }
+}
+
+/* BeyondFormz date fields (US-BEYOND-FORMS) take the same calendar box,
+   in place of 99-Orion.css's shorter one. */
+.us-form input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator,
+[data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 0;
   top: 0;
@@ -5311,7 +5321,8 @@ label:where([class^="us-"], [class*=" us-"]):not(:where(.us-report-no-styling, .
   background: var(--neutral-200) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23003a4c' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16M8 15h2M14 15h2'/%3E%3C/svg%3E") center/20px no-repeat;
 }
 
-.us-form input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator:hover {
+.us-form input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator:hover,
+[data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator:hover {
   background-color: var(--brand-100);
 }
 
@@ -6448,6 +6459,13 @@ input[type="radio"]:not(:where(.RadButton *, .RadCheckBox *, .RadRadioButton *, 
   padding-right: 44px;
 }
 
+/* Firefox draws its own icon inside the padding: no room needed. */
+@supports not selector(::-webkit-calendar-picker-indicator) {
+  .PanelFieldValue > input[type=date]:not(:where([data-gridid] *, .us-form *, .RadComboBox *, .RadPicker *)):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    padding-right: 10px;
+  }
+}
+
 .PanelFieldValue > textarea:not(:where([data-gridid] *, .us-form *, .RadComboBox *, .RadPicker *)):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   height: auto;
   min-height: 100px;
@@ -7277,6 +7295,14 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
 [data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   position: relative;
   padding-right: 44px;
+}
+
+/* Firefox has no pinnable icon: its own sits inside the padding, so the
+   room would leave it short of the edge. */
+@supports not selector(::-webkit-calendar-picker-indicator) {
+  [data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    padding-right: 10px;
+  }
 }
 
 [data-beyondformid] .rendered-form .form-group > textarea:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
