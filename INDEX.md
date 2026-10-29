@@ -131,7 +131,9 @@ Several fail loading the 190 MB guide into the browser.
   wrappers; read before markup work), `THEME-FINDINGS.md`, `THEME-INVENTORY.md`,
   `THEME-BUTTONS.md`, `THEME-PANEL-ACTIONS.md`, `THEME-ACTIVITY-FEED.md`,
   `THEME-ENHANCEMENTS-INTEGRATION-PLAN.md`, `THEME-BROWSER-COMPATIBILITY.md`,
-  `UTSTAFF-CONSOLIDATION.md`, `MVP.md`, `design-qa.md`, and
+  `UTSTAFF-CONSOLIDATION.md`, `MVP.md`, `design-qa.md`,
+  `BEYONDFORMZ-DYNAMIC-FIELDS.md` (fields added by script reach the flow;
+  planned flow-driven fields), and
   `crm-member-profile/` (component and iPart mapping CSVs). The guide build
   reads four of these as sources; it is configured with their `docs/` paths.
 - **`legacy/`**: `Orion.css` and `Orion page.html` (captures of stock iMIS),

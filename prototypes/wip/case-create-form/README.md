@@ -77,6 +77,10 @@ saves blocked):**
   `Get Staff Members` (104023 was not; the list does include an
   organisation and Hub Record).
 
+The script-added fields findings, the test and the planned flow-driven
+fields are written up in
+[`docs/BEYONDFORMZ-DYNAMIC-FIELDS.md`](../../../docs/BEYONDFORMZ-DYNAMIC-FIELDS.md).
+
 **Real save (29 October 2026, owner's request):** test case C221
 (CaseNum 220, member 100020, "TEST - script-added fields check (safe to
 delete)") was created with three fields added by script after load: a
