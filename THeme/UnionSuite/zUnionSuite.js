@@ -10276,11 +10276,14 @@ SOFTWARE.
   if(compact){if(!saved.label)button.setAttribute('aria-label',label());button.classList.add('us-busy-hide-label')}
   else{button.style.paddingLeft=((parseFloat(style.paddingLeft)||0)+24)+'px';button.style.textAlign='center'}
   document.body.append(spinner);
-  function position(){const r=button.getBoundingClientRect(),st=getComputedStyle(button);let x=r.left+(r.width-16)/2;if(!compact){const centre=r.left+(parseFloat(st.borderLeftWidth)||0)+(parseFloat(st.paddingLeft)||0)+(button.clientWidth-(parseFloat(st.paddingLeft)||0)-(parseFloat(st.paddingRight)||0))/2;x=centre-textWidth()/2-24}spinner.style.left=x+'px';spinner.style.top=(r.top+(r.height-16)/2)+'px';spinner.hidden=!button.isConnected||!r.width||!r.height}
-  function clear(){if(active.get(button)!==handle)return;active.delete(button);spinner.remove();for(const key of ['width','minWidth','paddingLeft','textAlign'])button.style[key]=saved[key];if(!saved.hadClass)button.classList.remove('us-busy-hide-label');for(const [attr,value] of [['aria-busy',saved.aria],['aria-label',saved.label]]){if(value===null)button.removeAttribute(attr);else button.setAttribute(attr,value)}window.removeEventListener('scroll',position,true);window.removeEventListener('resize',position);observer?.disconnect()}
-  const observer=typeof ResizeObserver==='function'?new ResizeObserver(position):null;const handle={button,clear};active.set(button,handle);observer?.observe(button);position();window.addEventListener('scroll',position,true);window.addEventListener('resize',position);return handle;
+  function position(){const r=button.getBoundingClientRect(),st=getComputedStyle(button);let x=r.left+(r.width-16)/2;if(!compact){const centre=r.left+(parseFloat(st.borderLeftWidth)||0)+(parseFloat(st.paddingLeft)||0)+(button.clientWidth-(parseFloat(st.paddingLeft)||0)-(parseFloat(st.paddingRight)||0))/2;x=centre-textWidth()/2-24}spinner.style.left=Math.round(x)+'px';spinner.style.top=Math.round(r.top+(r.height-16)/2)+'px';spinner.hidden=!button.isConnected||!r.width||!r.height}
+  // Re-placed every frame, not on resize or scroll alone: a button can move without resizing (the sign-in card re-centres as its message closes) or change its label (Signing In…).
+  let frame=0;
+  function follow(){position();frame=requestAnimationFrame(follow)}
+  function clear(){if(active.get(button)!==handle)return;active.delete(button);cancelAnimationFrame(frame);spinner.remove();for(const key of ['width','minWidth','paddingLeft','textAlign'])button.style[key]=saved[key];if(!saved.hadClass)button.classList.remove('us-busy-hide-label');for(const [attr,value] of [['aria-busy',saved.aria],['aria-label',saved.label]]){if(value===null)button.removeAttribute(attr);else button.setAttribute(attr,value)}}
+  const handle={button,clear};active.set(button,handle);follow();return handle;
  }
- window.UnionSuiteBusy={version:'1.0',show,clear:button=>active.get(button)?.clear()};
+ window.UnionSuiteBusy={version:'1.1',show,clear:button=>active.get(button)?.clear()};
  window.addEventListener('pagehide',()=>{for(const h of active.values())h.clear()});
 })();
 /* US-BUSY-PRESENTATION:END */
