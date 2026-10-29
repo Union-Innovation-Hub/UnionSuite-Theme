@@ -1,0 +1,72 @@
+<!doctype html>
+<!--
+  Create case form: the built BeyondFormz export, run on a stand-in for
+  BeyondFormz's renderer (preview.js). It draws the export's fields as
+  formRender does, runs the export's own scripts, and answers the flows
+  with sample data, so the scripts can be tried before importing.
+
+  Build first: node build-form.cjs <export.json>. Serve the project root
+  (static-node) and open this page.
+  ?prefill=today|new: what Cases/Create-Prefill returns (today's flow, or
+  the planned answer with the member, jobs, note and subtypes).
+  ?from=member|note, ?save=ok|fail, ?scheme=light|dark.
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Case Export Preview</title>
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css">
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite/Tabler/tabler-icons.min.css">
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite-Client/Branding.css">
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite-Client/Override.css">
+  <link rel="stylesheet" href="../../../../THeme/UnionSuite/zzDarkMode.css">
+  <style>
+    /* Preview page only. */
+    body {
+      margin: 0;
+      padding: var(--space-6) var(--space-4);
+      background: var(--bg-page);
+      color: var(--text-base);
+      font: 14px/1.5 var(--font-ui);
+    }
+
+    .pv-panel {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: var(--space-6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+    }
+
+    /* Stands in for CloudToolz's Bootstrap sheet: fields fill their column. */
+    [data-beyondformid] .rendered-form .form-control {
+      display: block;
+      width: 100%;
+    }
+
+    .pv-log {
+      max-width: 820px;
+      margin: var(--space-4) auto 0;
+      font: 12px/1.45 ui-monospace, Consolas, monospace;
+      white-space: pre-wrap;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <input type="hidden" id="__ClientContext" value='{"baseUrl":"/","isAnonymous":false,"loggedInPartyId":"23264"}'>
+  <div class="pv-panel">
+    <div id="formrender_preview" data-beyondformid=""></div>
+  </div>
+  <pre class="pv-log" data-pv-log></pre>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+  <script src="preview.js"></script>
+</body>
+</html>

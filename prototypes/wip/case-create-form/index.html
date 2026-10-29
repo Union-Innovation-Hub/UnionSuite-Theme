@@ -1,0 +1,408 @@
+<!doctype html>
+<!--
+  Create case (staff): a streamlined BeyondFormz form, mock-up (owner,
+  29 October 2026). Replaces "Create Case - Staff Form" on
+  /_i4u_/Core/Cases/Create-Case-Staff.aspx?ID=<member>, which the contact
+  page's Create case action opens in the same window.
+
+  The form below is drawn as BeyondFormz renders it ([data-beyondformid] >
+  .rendered-form > .row > .form-group.field-<Name>), so the theme's
+  US-BEYOND-FORMS rules style it as they would the real one. What the form
+  builder cannot do on its own (the subtype filter, workplace list, Access
+  buttons, hints, checks on Create) is the form's injected script; the
+  mock-up's version of it is case-create-form.js. Sample data only; nothing
+  saves.
+
+  ?jobs=several|one|none&standing=financial|new|unfinancial&from=member|note
+  &save=ok|fail&scheme=light|dark. Serve the project root (static-node) and
+  open this page.
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Case Form</title>
+  <link rel="stylesheet" href="../../../THeme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css">
+  <link rel="stylesheet" href="../../../THeme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../THeme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../THeme/UnionSuite/Tabler/tabler-icons.min.css">
+  <link rel="stylesheet" href="../../../THeme/UnionSuite-Client/Branding.css">
+  <link rel="stylesheet" href="../../../THeme/UnionSuite-Client/Override.css">
+  <link rel="stylesheet" href="../../../THeme/UnionSuite/zzDarkMode.css">
+  <link rel="stylesheet" href="case-create-form.candidate.css">
+  <style>
+    /* Mock-up page only. */
+    body.cc-page {
+      margin: 0;
+      background: var(--bg-page);
+      color: var(--text-base);
+      font: 14px/1.5 var(--font-ui);
+    }
+
+    .cc-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+
+    .cc-toolbar h1 {
+      margin: 0 var(--space-3) 0 0;
+      color: var(--text-strong);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .cc-segmented {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      border-radius: var(--radius);
+      background: var(--bg-sunken);
+    }
+
+    .cc-segmented button {
+      padding: 4px 10px;
+      border: 0;
+      border-radius: calc(var(--radius) - 2px);
+      background: transparent;
+      color: var(--text-base);
+      font: 600 12px/20px var(--font-ui);
+      cursor: pointer;
+    }
+
+    .cc-segmented button[aria-pressed="true"] {
+      background: var(--bg-surface);
+      color: var(--text-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cc-stage {
+      display: grid;
+      grid-template-columns: minmax(0, 820px) minmax(300px, 420px);
+      justify-content: center;
+      align-items: start;
+      gap: var(--space-6);
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+
+    @media (max-width: 1260px) {
+      .cc-stage {
+        grid-template-columns: minmax(0, 820px);
+      }
+    }
+
+    /* The page's panel, as iMIS draws a Content item. */
+    .cc-panel {
+      padding: var(--space-6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+    }
+
+    @media (max-width: 600px) {
+      .cc-panel {
+        padding: var(--space-4);
+      }
+    }
+
+    .cc-notes {
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      font-size: 13px;
+    }
+
+    .cc-notes h2 {
+      margin: 0 0 var(--space-2);
+      color: var(--text-strong);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .cc-notes h2:not(:first-child) {
+      margin-top: var(--space-5);
+    }
+
+    .cc-notes :is(ol, ul) {
+      margin: 0;
+      padding-inline-start: 18px;
+    }
+
+    .cc-notes li + li {
+      margin-top: 6px;
+    }
+
+    .cc-notes strong {
+      color: var(--text-strong);
+    }
+
+    .cc-notes code {
+      padding: 0 3px;
+      border-radius: 3px;
+      background: var(--bg-sunken);
+      color: var(--text-strong);
+      font: 12px ui-monospace, Consolas, monospace;
+    }
+
+    .cc-table {
+      overflow-x: auto;
+    }
+
+    .cc-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .cc-table :is(th, td) {
+      padding: 5px 6px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .cc-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .cc-sent {
+      margin-top: var(--space-3);
+    }
+
+    .cc-sent pre {
+      overflow-x: auto;
+      margin: var(--space-2) 0 0;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: var(--bg-sunken);
+      color: var(--text-strong);
+      font: 12px/1.45 ui-monospace, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    /* Stands in for CloudToolz's own Bootstrap sheet, which BeyondFormz
+       loads on the real page: fields fill their column. */
+    [data-beyondformid] .rendered-form .form-control {
+      display: block;
+      width: 100%;
+    }
+
+    /* Select2 option with a second line (the workplace list). */
+    .cc-option__line {
+      display: block;
+      color: inherit;
+      opacity: .75;
+      font-size: 12px;
+    }
+
+    .cc-option__name {
+      display: block;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="cc-page">
+  <div class="cc-toolbar">
+    <h1>Create case</h1>
+    <div class="cc-segmented" role="group" aria-label="Member's jobs" data-control="jobs">
+      <button type="button" data-value="several">Several jobs</button>
+      <button type="button" data-value="one">One job</button>
+      <button type="button" data-value="none">No jobs</button>
+    </div>
+    <div class="cc-segmented" role="group" aria-label="Member standing" data-control="standing">
+      <button type="button" data-value="financial">Financial</button>
+      <button type="button" data-value="new">New member</button>
+      <button type="button" data-value="unfinancial">Unfinancial</button>
+    </div>
+    <div class="cc-segmented" role="group" aria-label="Opened from" data-control="from">
+      <button type="button" data-value="member">From member page</button>
+      <button type="button" data-value="note">From a note</button>
+    </div>
+    <div class="cc-segmented" role="group" aria-label="Save" data-control="save">
+      <button type="button" data-value="ok">Save succeeds</button>
+      <button type="button" data-value="fail">Save fails</button>
+    </div>
+    <div class="cc-segmented" role="group" aria-label="Appearance" data-control="scheme">
+      <button type="button" data-value="light">Light</button>
+      <button type="button" data-value="dark">Dark</button>
+    </div>
+  </div>
+
+  <main class="cc-stage">
+    <section class="cc-panel" aria-label="Create case form">
+      <div id="formrender_preview" data-beyondformid="new-create-case-staff">
+        <div class="rendered-form formbuilder-embedded-bootstrap">
+
+          <!-- header (h2), className us-bf-title -->
+          <h2 class="us-bf-title">New case</h2>
+
+          <!-- paragraph, className us-bf-for: Create-Prefill fills it -->
+          <p class="us-bf-for" data-cc-for></p>
+
+          <!-- paragraph, className us-bf-origin: Create-Prefill fills it
+               when the page has NoteOrdinal or InteractionOrdinal, and
+               hides it otherwise -->
+          <p class="us-bf-origin" data-cc-origin hidden></p>
+
+          <!-- header (h3), className us-bf-section -->
+          <h3 class="us-bf-section">The case</h3>
+
+          <div class="row">
+            <div class="formbuilder-text form-group field-CaseName row-1 col-md-12">
+              <label for="CaseName" class="formbuilder-text-label">Title<span class="formbuilder-required">*</span></label>
+              <input id="CaseName" type="text" class="form-control" name="CaseName" maxlength="400" required aria-required="true" placeholder="e.g. Bullying complaint – night shift supervisor">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="formbuilder-select form-group field-CaseTypes row-2 col-md-6">
+              <label for="CaseTypes" class="formbuilder-select-label">Type<span class="formbuilder-required">*</span></label>
+              <select id="CaseTypes" class="form-control" name="CaseTypes[]" multiple required aria-required="true"></select>
+            </div>
+            <!-- className us-bf-reveal: shown only when the chosen types
+                 have subtypes -->
+            <div class="formbuilder-select form-group field-CaseSubTypes row-2 col-md-6 us-bf-reveal" data-closed>
+              <label for="CaseSubTypes" class="formbuilder-select-label">Subtype <span class="us-bf-optional">(optional)</span></label>
+              <select id="CaseSubTypes" class="form-control" name="CaseSubTypes[]" multiple></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="formbuilder-textarea form-group field-CaseDescription row-3 col-md-12">
+              <label for="CaseDescription" class="formbuilder-textarea-label">What happened?<span class="formbuilder-required">*</span></label>
+              <textarea id="CaseDescription" class="form-control" name="CaseDescription" maxlength="4000" rows="5" required aria-required="true" placeholder="What the member told you, who was involved, and what they want to happen."></textarea>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="formbuilder-select form-group field-PrimaryWorkplaceID row-4 col-md-8" data-cc-workplace-field>
+              <label for="PrimaryWorkplaceID" class="formbuilder-select-label">Workplace <span class="us-bf-optional">(optional)</span></label>
+              <select id="PrimaryWorkplaceID" class="form-control" name="PrimaryWorkplaceID"></select>
+            </div>
+            <div class="formbuilder-date form-group field-DateIncident row-4 col-md-4">
+              <label for="DateIncident" class="formbuilder-date-label">Date of incident <span class="us-bf-optional">(optional)</span></label>
+              <input id="DateIncident" type="date" class="form-control" name="DateIncident">
+            </div>
+          </div>
+
+          <h3 class="us-bf-section">Handling</h3>
+
+          <div class="row">
+            <div class="formbuilder-select form-group field-CaseStaffMembers row-5 col-md-6">
+              <label for="CaseStaffMembers" class="formbuilder-select-label">Lead staff member<span class="us-bf-optional" data-cc-lead-optional> (optional)</span><span class="formbuilder-required" data-cc-lead-required hidden>*</span></label>
+              <select id="CaseStaffMembers" class="form-control" name="CaseStaffMembers"></select>
+            </div>
+            <div class="formbuilder-select form-group field-CasePriority row-5 col-md-6">
+              <label for="CasePriority" class="formbuilder-select-label">Priority</label>
+              <select id="CasePriority" class="form-control" name="CasePriority"></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="formbuilder-select form-group field-CaseAccessLevel row-6 col-md-12">
+              <label for="CaseAccessLevel" class="formbuilder-select-label" id="CaseAccessLevel-label">Who can see it</label>
+              <select id="CaseAccessLevel" class="form-control" name="CaseAccessLevel" hidden>
+                <option value="Open" selected>Open</option>
+                <option value="Team">Team</option>
+                <option value="Individual">Individual</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- hidden fields -->
+          <input type="hidden" name="CaseStatus" value="New">
+          <input type="hidden" id="MemberID" name="MemberID" value="20544">
+          <input type="hidden" id="NoteOrdinal" name="NoteOrdinal" value="">
+          <input type="hidden" id="InteractionOrdinal" name="InteractionOrdinal" value="">
+          <input type="hidden" id="CurrentDate" name="CurrentDate" value="">
+
+          <div class="us-bf-actions">
+            <p class="Message" role="status" aria-live="polite">&nbsp;</p>
+            <div class="formbuilder-button form-group field-CancelButton">
+              <button id="CancelButton" type="button" class="btn-default btn us-outline-button" name="CancelButton">Cancel</button>
+            </div>
+            <div class="formbuilder-button form-group field-CreateCaseButton">
+              <button id="CreateCaseButton" type="button" class="btn-primary btn PrimaryButton" name="CreateCaseButton">Create case</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="cc-notes">
+      <h2>What changes</h2>
+      <ol>
+        <li><strong>It says who the case is for.</strong> The member's name, number and type, with the standing badge the case page uses (new member, unfinancial, resigned). Opened from a note, the note shows under it and is linked to the case on save; its text starts the description without the "Created from Note:" prefix.</li>
+        <li><strong>Workplace</strong> (new): the member's jobs, current, not started and former, each with its employer, classification and dates, then "Not about a workplace". One current job is chosen for you; with several, nothing is, and it stays optional (the case's member card can change it later). No jobs: the field is not drawn.</li>
+        <li><strong>Subtype shows only when it applies</strong>: it fades in once a chosen type has subtypes, filtered from a list the prefill brings. No hidden buttons, session storage or one-second wait.</li>
+        <li><strong>Lead staff starts as you</strong>, and becomes required when access is Individual (the create flow already refuses that case without one, with a generic error).</li>
+        <li><strong>Who can see it</strong> is three buttons with a line saying what each means. Open stays the default.</li>
+        <li><strong>Gone:</strong> Status (a new case is New; sent as a hidden field), Workbench (the create flow never saves it) and the second Validate round trip. Priority starts at Normal, not Lowest. Date of incident starts empty (today was saved for cases about older events) and cannot be in the future.</li>
+        <li><strong>Every field shows at once</strong>, required ones marked. Today all fields are hidden until the prefill answers, then appear. The FormFields table can still hide fields or change what is required.</li>
+        <li><strong>Create case is never greyed out.</strong> Pressed with something missing, each missing field says what it needs and the first takes focus. While saving, the button spins ("Creating case…"); on success the page opens the new case, instead of a message with a link.</li>
+      </ol>
+
+      <h2>Build it in BeyondFormz</h2>
+      <div class="cc-table">
+        <table>
+          <thead>
+            <tr><th>Field</th><th>Type · name</th><th>className / source</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>New case</td><td>header h2</td><td><code>us-bf-title</code></td></tr>
+            <tr><td>For line</td><td>paragraph</td><td><code>us-bf-for</code>; prefill returns <code>class-html-us-bf-for</code></td></tr>
+            <tr><td>From note</td><td>paragraph</td><td><code>us-bf-origin</code>; prefill, only with a NoteOrdinal / InteractionOrdinal</td></tr>
+            <tr><td>The case / Handling</td><td>header h3</td><td><code>us-bf-section</code></td></tr>
+            <tr><td>Title</td><td>text · <code>CaseName</code></td><td><code>row-1 col-md-12</code>, required</td></tr>
+            <tr><td>Type</td><td>select, multiple · <code>CaseTypes</code></td><td><code>row-2 col-md-6</code>; CaseTags IQA, as now</td></tr>
+            <tr><td>Subtype</td><td>select, multiple · <code>CaseSubTypes</code></td><td><code>row-2 col-md-6 us-bf-reveal</code>; options from the prefill's <code>SubTypes</code></td></tr>
+            <tr><td>What happened?</td><td>textarea · <code>CaseDescription</code></td><td><code>row-3 col-md-12</code>, required, 5 rows</td></tr>
+            <tr><td>Workplace</td><td>select · <code>PrimaryWorkplaceID</code> (new)</td><td><code>row-4 col-md-8</code>; options from the prefill's <code>Workplaces</code></td></tr>
+            <tr><td>Date of incident</td><td>date · <code>DateIncident</code></td><td><code>row-4 col-md-4</code>; no default</td></tr>
+            <tr><td>Lead staff member</td><td>select · <code>CaseStaffMembers</code></td><td><code>row-5 col-md-6</code>; Get Staff Members IQA; the script picks you</td></tr>
+            <tr><td>Priority</td><td>select · <code>CasePriority</code></td><td><code>row-5 col-md-6</code>; Priority IQA; the script picks Normal</td></tr>
+            <tr><td>Who can see it</td><td>select · <code>CaseAccessLevel</code></td><td><code>row-6 col-md-12</code>; Access IQA; the script draws the buttons</td></tr>
+            <tr><td>Status</td><td>hidden · <code>CaseStatus</code></td><td>value <code>New</code></td></tr>
+            <tr><td>Message, Cancel, Create case</td><td>paragraph <code>Message</code>, two buttons</td><td><code>row-7</code>; Cancel's className adds <code>us-outline-button</code>; the script gathers them into <code>us-bf-actions</code>. Create case runs <code>Cases/Create-Case-Staff</code> directly</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Kept as they are: the <code>NoteOrdinal</code>, <code>InteractionOrdinal</code> and <code>ID</code> (MemberID) URL parameters, <code>CurrentDate</code>, <code>Module</code>, <code>Area</code>, <code>Prefill</code> and the autoexecute prefill. Removed: <code>CaseWorkBench</code>, <code>HiddenSubmitButton</code>, <code>SubTypeSession</code>, <code>SubTypeFire</code>.</p>
+
+      <h2>Flow changes</h2>
+      <ul>
+        <li><strong>Case: Create-Prefill</strong> returns, beside <code>ReqVals</code>: the for line (member name, number, type, standing), the member's jobs (the workplace jobs IQA by member ID, as <code>API - Manage Case - Primary Contacts Workplaces</code> returns them by case), all subtypes with their parent tag (what <code>Cases/SetSessionStorage</code> returns now), the signed-in user's ID, and the note for the origin line. Both branches run the same FormFields query today; one is enough.</li>
+        <li><strong>Cases: Create Case Staff</strong> saves <code>PrimaryWorkplaceID</code> (blank: not chosen; 0: not about a workplace) to iMIS and CloudToolz, and answers <code>{CaseID, CaseNum}</code> so the page can open the case. When the lead is the creator, one staff row (Primary), not two.</li>
+        <li>Its required check (type, status, description) stays as the safety net; <code>Form/Validation</code> is no longer called from this form.</li>
+      </ul>
+
+      <h2>To decide</h2>
+      <ol>
+        <li>Is Title required? It is optional today; the case banner and lists lead with it.</li>
+        <li>Several current jobs: leave Workplace empty (as here), or pick the member's primary job?</li>
+        <li>Cancel: back to the member's page (as here), or ask first when something has been typed?</li>
+        <li>The staff list includes organisations (Pecan Street, Inc) and Hub Record: clean up the Get Staff Members IQA?</li>
+      </ol>
+
+      <div class="cc-sent" data-cc-sent hidden>
+        <h2>Create case would send</h2>
+        <pre data-cc-sent-body></pre>
+      </div>
+    </aside>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+  <script src="case-create-form.js"></script>
+</body>
+</html>

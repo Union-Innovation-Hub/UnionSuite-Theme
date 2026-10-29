@@ -91,6 +91,7 @@ Recents), `list-search-and-paging/`, `cco-inline-loading/`, `task-rows/`.
 |---|---|
 | `agreement-page/` | WIP, not approved |
 | `case-page/` | WIP; parts are in the theme. Start with `HANDOVER.md` |
+| `case-create-form/` | Streamlined staff Create case BeyondFormz form: mock-up, and the export build in `beyondformz/` (not yet imported) |
 | `contact-page-v3/` | Approved direction; paused, see its README handover |
 | `contact-page-v2/` | Earlier layout prototype; v3 is the approved direction |
 | `activity-cards/`, `dues-adjustments/`, `membership-stats-filters/`, `bulletin-markdown/`, `login-screen/`, `workplace-reassign/` | WIP mockups, not in the theme |

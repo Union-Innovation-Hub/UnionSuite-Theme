@@ -46,3 +46,6 @@ THeme/**/*.zip
 
 # Built paste-in embeds; rebuild with each embed's build script
 /embeds/finance-dashboard/dist/
+
+# Built BeyondFormz exports; rebuild with the folder's build-form.cjs
+/prototypes/wip/case-create-form/beyondformz/dist/
