@@ -3801,6 +3801,7 @@ SOFTWARE.
     ], plus: ["M12 5v14", "M5 12h14"],
     search: ["M21 21l-4.34-4.34", "M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0"],
     download: ["M12 15V3", "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", "m7 10 5 5 5-5"],
+    send: ["M10 14 21 3", "M21 3l-6.5 18a.55 .55 0 0 1-1 0L10 14l-7-3.5a.55 .55 0 0 1 0-1z"],
     expand: ["M8 3H5a2 2 0 0 0-2 2v3", "M21 8V5a2 2 0 0 0-2-2h-3", "M3 16v3a2 2 0 0 0 2 2h3", "M16 21h3a2 2 0 0 0 2-2v-3"],
     restore: ["M8 3v3a2 2 0 0 1-2 2H3", "M21 8h-3a2 2 0 0 1-2-2V3", "M3 16h3a2 2 0 0 1 2 2v3", "M16 21v-3a2 2 0 0 1 2-2h3"] })[name];
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -3936,6 +3937,149 @@ SOFTWARE.
       render(entry);
       saveState(entry);
     }
+  }
+
+  // The filter form (owner, 30 October 2026, from the Email Invoices
+  // concept): "Any" in empty fields, each field in use marked, and a row of
+  // Find, Clear filters and a note at the foot. Find is the native submit,
+  // moved into the row with its handlers. Clear filters empties the fields
+  // and runs Find; it is disabled while no field is in use. Telerik and
+  // Chosen's own inputs are left alone. Runs again after every postback.
+  var filterFields = "input[type='text'], input[type='search'], input[type='number'], textarea, select";
+
+  // A field is a PanelField or, in the Bootstrap-row layout (directory
+  // searches), the div inside each column.
+  function filterFieldsOf(sheet) {
+    return Array.from(sheet.querySelectorAll(":scope > .PanelField, :scope > .row > [class*='col-'] > div"));
+  }
+
+  function filterControls(root) {
+    return Array.from(root.querySelectorAll(filterFields)).filter(function (control) {
+      return !control.closest(".RadComboBox, .RadInput, .RadPicker, .RadUpload, .chosen-container");
+    });
+  }
+
+  function blankOption(select) {
+    return Array.from(select.options).find(function (option) { return option.value === ""; }) || null;
+  }
+
+  // A select counts only when it can be cleared: multiple, or with a blank option.
+  function inUse(control) {
+    if (control.tagName !== "SELECT") return control.value.trim() !== "";
+    if (control.multiple) {
+      return Array.from(control.selectedOptions).some(function (option) { return option.value !== ""; });
+    }
+    return Boolean(blankOption(control)) && control.value !== "";
+  }
+
+  function clearControl(control) {
+    if (control.tagName !== "SELECT") {
+      control.value = "";
+      return;
+    }
+    var blank = control.multiple ? null : blankOption(control);
+    Array.from(control.options).forEach(function (option) { option.selected = option === blank; });
+    // Chosen draws a multi-select from its select; ask it to redraw.
+    if (window.jQuery) window.jQuery(control).trigger("chosen:updated");
+  }
+
+  function syncFilterForm(sheet) {
+    var any = false;
+    filterFieldsOf(sheet).forEach(function (field) {
+      var set = filterControls(field).some(inUse);
+      field.toggleAttribute("data-us-iqa-filter-set", set);
+      if (set) any = true;
+    });
+    var clear = sheet.querySelector(":scope > .us-iqa-filter-actions > .us-iqa-filter-clear");
+    if (clear && clear.disabled === any) clear.disabled = !any;
+  }
+
+  function enhanceFilterForm(filter) {
+    var first = filter.querySelector("[id$='_ParametersContainer'] > div > :is(.PanelField, .row)");
+    var sheet = first && first.parentElement;
+    if (!sheet) return;
+    filterFieldsOf(sheet).forEach(function (field) {
+      // iMIS's default prompt names the operator; "Equals" adds nothing.
+      var label = field.querySelector(":scope > label, :scope > .Label");
+      if (label && label.childNodes.length === 1 && label.firstChild.nodeType === 3) {
+        label.textContent = label.textContent.replace(/\s+Equals\s*$/i, "");
+      }
+      filterControls(field).forEach(function (control) {
+        if (control.tagName === "SELECT") {
+          var blank = control.multiple ? null : blankOption(control);
+          if (blank && /^\s*(\(any\))?\s*$/i.test(blank.text)) blank.text = "Any";
+        } else if (!control.placeholder) {
+          control.placeholder = control.classList.contains("StylesDateText") ? "Any date" : "Any";
+        }
+      });
+    });
+    var find = sheet.querySelector(":scope > input.TextButton[id$='_SubmitButton']");
+    if (find) {
+      var row = document.createElement("div");
+      row.className = "us-iqa-filter-actions";
+      var clear = document.createElement("button");
+      clear.type = "button";
+      clear.className = "TextButton us-iqa-filter-clear";
+      clear.textContent = "Clear filters";
+      clear.addEventListener("click", function () {
+        filterControls(sheet).filter(inUse).forEach(clearControl);
+        syncFilterForm(sheet);
+        var submit = sheet.querySelector(":scope > .us-iqa-filter-actions > input.TextButton[id$='_SubmitButton']");
+        if (submit) submit.click();
+      });
+      var note = document.createElement("span");
+      note.className = "us-iqa-filter-note";
+      note.textContent = "Blank filters include everything";
+      sheet.appendChild(row);
+      row.append(find, clear, note);
+    }
+    if (!sheet.hasAttribute("data-us-iqa-filter-form")) {
+      sheet.setAttribute("data-us-iqa-filter-form", "");
+      var update = function () { syncFilterForm(sheet); };
+      sheet.addEventListener("input", update);
+      sheet.addEventListener("change", update);
+      // Chosen reports its changes through jQuery, which skips native listeners.
+      if (window.jQuery) window.jQuery(sheet).on("change", update);
+    }
+    syncFilterForm(sheet);
+  }
+
+  // The Query Menu's optional Email button (owner, 30 October 2026): a send
+  // icon in the heading, as the case and agreement contacts draw theirs. The
+  // native button stays in the page, hidden, and the icon clicks it, so its
+  // handler and the filter values it carries are unchanged. It is looked up
+  // on each click, because a postback replaces it.
+  function nativeEmail(entry) {
+    return Array.from(entry.wrapper.querySelectorAll("[id$='_DivEmail'] > input[id$='_ButtonEmail']"))
+      .find(function (button) { return belongsTo(entry.wrapper, button); }) || null;
+  }
+
+  function syncEmail(entry) {
+    var native = nativeEmail(entry);
+    if (!native) {
+      if (entry.email) entry.email.remove();
+      entry.email = null;
+      return;
+    }
+    if (!entry.email) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "us-iqa-email us-iqa-icon-button";
+      button.appendChild(icon("send"));
+      button.addEventListener("click", function () {
+        var current = nativeEmail(entry);
+        if (current && !current.disabled) current.click();
+      });
+      entry.email = button;
+    }
+    if (entry.utilities.firstChild !== entry.email) entry.utilities.insertBefore(entry.email, entry.utilities.firstChild);
+    var label = native.title || native.value || "Email";
+    if (entry.email.title !== label) {
+      entry.email.setAttribute("aria-label", label);
+      entry.email.title = label;
+    }
+    if (entry.email.disabled !== native.disabled) entry.email.disabled = native.disabled;
+    native.parentElement.toggleAttribute("data-us-iqa-email-relocated", true);
   }
 
   function restoreExport(entry) {
@@ -4329,6 +4473,8 @@ SOFTWARE.
     finishTransition(entry);
     restoreExport(entry);
     entry.utilities.remove();
+    var email = nativeEmail(entry);
+    if (email) email.parentElement.removeAttribute("data-us-iqa-email-relocated");
     if (!preserveActions) entry.actions.remove();
     if (entry.tools) entry.tools.remove();
     if (entry.header && !preserveActions) entry.header.removeAttribute("data-us-iqa-filter-heading");
@@ -4364,7 +4510,7 @@ SOFTWARE.
       wrapper: wrapper, filter: filter, header: header, button: button, grid: grid,
       actions: actions, customActions: customActions, utilities: utilities,
       exportControl: null, expandButton: null, animation: null, originalInert: filter ? filter.inert : false,
-      tools: null, observer: null, key: filter ? storageKey(filter) : null,
+      tools: null, observer: null, email: null, key: filter ? storageKey(filter) : null,
       state: filter ? getState(wrapper, filter) : null
     };
     if (button) button.addEventListener("click", function () {
@@ -4467,6 +4613,9 @@ SOFTWARE.
         syncExport(entry);
         syncExpandable(entry);
       }
+
+      if (entry.filter) enhanceFilterForm(entry.filter);
+      syncEmail(entry);
 
       // Query-only reports can have an empty toolbar without an Export control.
       orderHeaderActions(entry);

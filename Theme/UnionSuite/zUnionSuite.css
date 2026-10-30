@@ -4909,6 +4909,45 @@ table.DataDisplay .DataValue {
   max-width: 100%;
 }
 
+/* The same filter card for these Bootstrap-row filters (the Search tab's
+   directory searches, owner, 30 October 2026). The rows keep their native
+   column count; each field is the div inside a column. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native]) .FilterPanelHorizontal [id$="_ParametersContainer"] > div:has(> .row):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0 0 4px;
+  padding: 16px var(--card-pad-x, 18px);
+  border: 1px solid var(--iqa-border);
+  border-radius: var(--radius, 8px);
+  background: var(--iqa-header);
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native]) .FilterPanelHorizontal [id$="_ParametersContainer"] > div > .row > [class*="col-"] > div:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native]) .FilterPanelHorizontal [id$="_ParametersContainer"] > div > .row > [class*="col-"] > div > :is(label, .Label):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: block;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  color: var(--text-strong);
+  font-family: var(--iqa-font);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: .02em;
+  text-align: left;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native]) .FilterPanelHorizontal [id$="_ParametersContainer"] > div > .row > [class*="col-"] > div > div > span[style*="Red"]:empty:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: none;
+}
+
+/* The filter form: a tinted card inside the report (owner, 30 October 2026,
+   from the Email Invoices concept), its fields in a grid and, once the
+   script has run, a row of Find, Clear filters and a note at the foot. */
 :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel [id$="_ParametersContainer"] > div:has(> .PanelField):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   display: grid;
 
@@ -4917,9 +4956,17 @@ table.DataDisplay .DataValue {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, max(var(--iqa-filter-min), calc((100% - 80px) / 6))), 1fr));
   gap: 12px 16px;
   align-items: start;
+  margin: 0 0 4px;
+  padding: 16px var(--card-pad-x, 18px);
+  border: 1px solid var(--iqa-border);
+  border-radius: var(--radius, 8px);
+  background: var(--iqa-header);
 }
 
 :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel .PanelField:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   float: none;
   clear: none;
   width: auto;
@@ -4929,18 +4976,25 @@ table.DataDisplay .DataValue {
   align-self: start;
 }
 
-:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel .PanelField > label:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+/* A date prompt is a span.Label, not a label; both take the same style. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel .PanelField > :is(label, .Label):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   display: block;
   float: none;
   width: auto;
-  margin: 0 0 5px;
+  margin: 0;
   padding: 0;
-  color: var(--iqa-muted);
+  color: var(--text-strong);
   font-family: var(--iqa-font);
   font-size: 12px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.3;
+  letter-spacing: .02em;
   text-align: left;
+}
+
+/* Each field's empty validator message holder; a message still shows. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel .PanelFieldValue > span[style*="Red"]:empty:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: none;
 }
 
 :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel .PanelFieldValue:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
@@ -4983,6 +5037,80 @@ table.DataDisplay .DataValue {
 
 @media (prefers-reduced-motion: reduce) {
   :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .FilterPanel .PanelFieldValue :is(input[type="text"], select):not(:where(.RadComboBox *, .RadInput *, .RadPicker *, .chosen-container *)):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    transition: none;
+  }
+}
+
+/* A field in use (the script marks it): the selected tint, so the filters
+   applied to the results stand out. Focus keeps its glow. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelField .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div):is([data-us-iqa-filter-set] *) :is(input[type="text"], select, .chosen-choices):not(:where(.RadComboBox *, .RadInput *, .RadPicker *)):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--iqa-link);
+  background-color: color-mix(in srgb, var(--iqa-selected) 50%, var(--iqa-surface));
+}
+
+/* Date fields: full width, with the calendar glyph inside the field. iMIS
+   writes width: 7em inline. The native image button stays the control,
+   transparent over the glyph, so its postback and keyboard access remain. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  position: relative;
+  display: block;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput > input[type="text"]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding-right: 40px;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput > input[type="image"]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  position: absolute;
+  z-index: 1;
+  top: 2px;
+  right: 2px;
+  bottom: 2px;
+  box-sizing: border-box;
+  width: 34px;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  object-fit: none;
+  object-position: -9999px -9999px;
+
+  /* Hides the alt text a missing image would draw. */
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput > input[type="image"]:focus-visible:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  background: var(--iqa-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: background-color 150ms cubic-bezier(.2, 0, 0, 1);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16M8 15h2M14 15h2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16M8 15h2M14 15h2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput:has(> input[type="image"]:is(:hover, :focus-visible)):not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  background: var(--iqa-link);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel .PanelFieldValue, .FilterPanelHorizontal .row > [class*="col-"] > div > div) > .CalendarInput:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
     transition: none;
   }
 }
@@ -5109,6 +5237,80 @@ table.DataDisplay .DataValue {
   justify-self: start;
   align-self: start;
   margin-top: 4px;
+}
+
+/* The script's action row: Find (moved in, handlers intact), Clear filters
+   and a note, across the foot of the filter card under a divider. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-actions:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--iqa-border);
+}
+
+/* One size for Find and Clear filters in either filter layout; the
+   Bootstrap-row layout's Find otherwise takes the native button size. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-actions > .TextButton:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  box-sizing: border-box;
+  min-height: var(--iqa-action-height);
+  margin: 0;
+  padding: 7px 14px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  font: 600 12px/1.5 var(--iqa-font);
+  white-space: nowrap;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-actions > .TextButton.us-iqa-filter-clear:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  --button-bg: transparent;
+  --button-text: var(--text-strong);
+  --button-border: var(--iqa-input-border);
+  --button-hover-bg: var(--iqa-surface);
+  --button-hover-text: var(--text-strong);
+  border-color: var(--iqa-input-border);
+  background: transparent;
+  color: var(--text-strong);
+  transition:
+    background-color 150ms cubic-bezier(.2, 0, 0, 1),
+    border-color 150ms cubic-bezier(.2, 0, 0, 1),
+    opacity 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-actions > .TextButton.us-iqa-filter-clear:hover:not(:disabled):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--iqa-muted);
+  background: var(--iqa-surface);
+  color: var(--text-strong);
+}
+
+/* Disabled while no filter is in use (owner, 30 October 2026). */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-actions > .TextButton.us-iqa-filter-clear:disabled:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-actions > .TextButton.us-iqa-filter-clear:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    transition: none;
+  }
+}
+
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) :is(.FilterPanel, .FilterPanelHorizontal) .us-iqa-filter-note:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin-left: auto;
+  color: var(--text-faint);
+  font: 12px/1.5 var(--iqa-font);
+}
+
+/* The native Email button's footer, once the send icon in the heading
+   stands in for it. The button stays in the page for the icon to click. */
+:is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) [id$="_DivEmail"][data-us-iqa-email-relocated]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: none;
 }
 
 :is(.us-report, .SearchContactsClass, [data-us-iqa-native], [data-us-panel]) .GridTitlePanel .TextButton:not(:where(.us-report-no-styling, .us-report-no-styling *)),
