@@ -136,6 +136,15 @@ Several fail loading the 190 MB guide into the browser.
   planned flow-driven fields), and
   `crm-member-profile/` (component and iPart mapping CSVs). The guide build
   reads four of these as sources; it is configured with their `docs/` paths.
+- **`docs/user-guide/`**: the staff help, in plain words for the people who
+  use the pages (not the usage guide, which is for those who build them).
+  One Markdown topic per job, per area (`cases/` so far), built by
+  `node tools/build-user-guide.cjs` (`--check` for stale): a help page with
+  an Ask a question box, into `Theme/UnionSuite-Guides/` with the other
+  pages hosted in iMIS, and a JSON file in the ignored
+  `docs/user-guide/dist/` for a simple chatbot (`page/match.js` matches questions to
+  topics). Test the matcher with `node tools/test-user-guide.cjs`. Start
+  with its [README](docs/user-guide/README.md).
 - **`legacy/`**: `Orion.css` and `Orion page.html` (captures of stock iMIS),
   `Native CSS/Orion-99.css`, `UT-theme.css` (the abandoned first theme),
   `UTStaff.css` and `zUnionStyling.css` (legacy client files), `Structure/`
@@ -153,6 +162,7 @@ Several fail loading the 190 MB guide into the browser.
 | An approved spec not yet built | `prototypes/approved/<feature>/` |
 | A paste-in build that must run without the theme | `embeds/<name>/` with its own build script and README; ignore its built output |
 | Project documentation | `docs/` |
+| Help for staff using a page | A topic in `docs/user-guide/<area>/`, rebuilt with `node tools/build-user-guide.cjs` |
 | A generated reference page | `references/` (output) from a generator in `tools/` or `usage/build/` |
 | Throwaway captures and probes | `archive/` or `.preview/` (not tracked) |
 

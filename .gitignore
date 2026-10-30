@@ -22,6 +22,7 @@ Theme/**/*.zip
 /Theme/UnionSuite-Guides/Usage-Guide.html
 /Theme/UnionSuite-Guides/Theme-Config.html
 /Theme/UnionSuite-Guides/Theme-Config-*.html
+/Theme/UnionSuite-Guides/Cases-Help.html
 /references/*.html
 !/references/index.html
 # Approved unimplemented designs remain directly reviewable after checkout
@@ -49,3 +50,6 @@ Theme/**/*.zip
 
 # Built BeyondFormz exports; rebuild with the folder's build-form.cjs
 /prototypes/wip/case-create-form/beyondformz/dist/
+
+# Built staff help pages and chatbot JSON; rebuild with tools/build-user-guide.cjs
+/docs/user-guide/dist/

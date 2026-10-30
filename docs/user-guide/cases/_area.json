@@ -1,0 +1,19 @@
+{
+  "id": "cases",
+  "title": "Managing a case",
+  "intro": "How to open, work on and close a case. Each topic is one job, in a few short steps.",
+  "output": "Cases-Help",
+  "examples": [
+    "how do I close a case",
+    "add a note",
+    "who can see this case"
+  ],
+  "sections": [
+    "Getting started",
+    "Working on a case",
+    "People on the case",
+    "Looking back",
+    "Closing a case",
+    "Help"
+  ]
+}
