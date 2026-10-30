@@ -16,7 +16,13 @@ sticky/condensing modes and optional Actions/tabs markup. All banner CSS has mov
 into separate sections of `zUnionSuite.css`; the existing behaviour script remains
 separately included. This does not automatically migrate legacy banner markup or
 retire its old rules. The remaining
-component consolidation below is still outstanding. Current author recipes and
+component consolidation below is still outstanding.
+
+Until it is done, the `US-LEGACY-UTSTAFF` block in `zUnionSuite.css` carries
+every rule of the live `UT_Staff.css` (2,868 lines as of 30 October 2026, more
+than the 2,513 measured below) that the theme does not yet cover, so the theme
+no longer needs that stylesheet loaded. Consolidate from that block: as each
+component below is extracted, delete its legacy rules there. Current author recipes and
 templates are in the [Theme Usage Guide](Theme/UnionSuite-Guides/Usage-Guide.html).
 
 ---

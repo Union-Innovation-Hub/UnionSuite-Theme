@@ -612,6 +612,3093 @@ button.us-iqa-find-busy > *:not(:where(.us-report-no-styling, .us-report-no-styl
 
 /* US-NATIVE-BUTTONS:END */
 
+/* US-LEGACY-UTSTAFF:START */
+
+/* Legacy staff styling, carried from https://cdn.uhub.org.au/EMS/css/UT_Staff.css
+   (copied 30 October 2026) so pages that still rely on it keep working
+   without that stylesheet. Temporary: clean these rules up, or replace them
+   with theme components, as each page is migrated, and delete the block
+   once it is empty.
+
+   Rules only, reformatted to the house style; selectors and values are
+   unchanged except for these:
+   - Left out, because the theme already covers them: the staff nav icons
+     (US-STAFF-NAV-ICONS) and the a.logo image (the client Override.css).
+   - Left out of :root, because the theme defines its own and nothing here
+     reads them: --sidebar-w and --text-muted.
+   - The coming-soon image URLs were root-relative to the CDN; they now name
+     cdn.uhub.org.au so they resolve the same from the theme.
+   - Added: a reset that keeps the legacy record banner (a Query Template)
+     out of the theme's Query Template card styling. It is marked where it
+     sits, under the contact record banner rules.
+
+   It loads after the native button colours and before every other theme
+   component, so the theme wins wherever the specificity is equal. The
+   colours are hard-coded and do not follow dark mode. */
+
+/* ── colors.css ─────────────────────────────────────────── */
+:root {
+  /* Brand (deep iMIS blue) */
+  --uih-brand: #1a4b8c;
+  --uih-brand-light: #2563c4;
+  --uih-brand-pale: #e8f0fb;
+  /* Accent (warm orange) */
+  --uih-accent: #e8720c;
+  /* Neutrals / surfaces */
+  --uih-surface: #ffffff;
+  --uih-bg: #f4f6fa;
+  --uih-bg-hover: #e9eef7;
+  --uih-border: #d0d7e3;
+  /* Text */
+  --uih-text: #1a1f2e;
+  --uih-text-muted: #6b7280;
+  --uih-text-invert: #ffffff;
+  /* Semantic */
+  --uih-danger: #dc2626;
+  --uih-success: #16a34a;
+  --uih-success-bg: #f0fdf4;
+  --uih-success-border: #bbf7d0;
+  --uih-warning: #92400e;
+  --uih-warning-bg: #fef3c7;
+  --uih-warning-border: #fcd34d;
+  --uih-alert: #9a3412;
+  --uih-alert-bg: #ffedd5;
+  --uih-alert-border: #fb923c;
+  --uih-alert-solid: #ea580c;
+  --uih-danger-bg: #fee2e2;
+  /* Datasource accents (product-specific) */
+  --uih-iqa-bg: #fef9c3;
+  --uih-cloudtoolz: #2d8fdd;
+  --uih-cloudtoolz-bg: #eff6ff;
+  --uih-cloudtoolz-border: #bfdbfe;
+  --uih-cloudtoolz-strong: #1d4ed8;
+  --uih-source-badge-bg: #dbeafe;
+  --uih-source-badge-fg: #1e40af;
+  /* Semantic aliases */
+  --text-body: var(--uih-text);
+  --text-on-brand: var(--uih-text-invert);
+  --surface-card: var(--uih-surface);
+  --surface-app: var(--uih-bg);
+  --surface-sunken: var(--uih-bg);
+  --border-default: var(--uih-border);
+  --accent-primary: var(--uih-brand);
+  --accent-interactive: var(--uih-brand-light);
+  --accent-tint: var(--uih-brand-pale);
+}
+
+/* ── platform.css ───────────────────────────────────────── */
+:root {
+  /* Brand navy (record banners, headings) */
+  --uih-navy: #13283f;
+  --uih-navy-top: #1d3c5f;
+  --uih-navy-bot: #15304e;
+  /* Side navigation (dark) */
+  --uih-sidebar: #0f2339;
+  --uih-sidebar-line: rgba(255,255,255,.07);
+  --uih-sidebar-text: #c4d0dd;
+  --uih-sidebar-muted: #7e8ea0;
+  /* HUB orange (brand accent) */
+  --uih-hub-orange: #f47b20;
+  --uih-hub-orange-soft: #fbeada;
+  /* Interactive blue */
+  --uih-hub-blue: #1f63c9;
+  --uih-hub-blue-dark: #19529f;
+  --uih-hub-link: #1763b8;
+  --uih-primary: var(--uih-hub-blue);
+  --uih-primary-hover: var(--uih-hub-blue-dark);
+  /* Status accents (people, alerts, tags) */
+  --uih-hub-red: #df3b3b;
+  --uih-hub-red-bg: #fcebea;
+  --uih-hub-amber: #9a6510;
+  --uih-hub-amber-bg: #fdf4dc;
+  --uih-hub-amber-line: #e6b54a;
+  --uih-hub-green: #2e9d62;
+  --uih-hub-green-bg: #e7f5ee;
+  --uih-hub-purple: #7b46c9;
+  /* Record-page ink & neutrals */
+  --uih-hub-ink: #22303f;
+  --uih-hub-sub: #5c6a79;
+  --uih-hub-label: #8893a2;
+  --uih-hub-border: #e3e8ef;
+  --uih-hub-border-soft: #edf1f6;
+  --uih-hub-card-head: #f5f7fa;
+  --uih-hub-page: #eef1f5;
+  --uih-hub-page-alt: #f3f5f9;
+  --uih-hub-rail-active: #eef4fd;
+  /* Content page header (non-app RiSE pages) */
+  --uih-content-banner: #2c3e50;
+  --uih-content-accent: #3498db;
+  --uih-content-accent-hover: #2980b9;
+  --uih-content-page: #ececec;
+  /* Display / brand font */
+  --uih-font-display: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Fixed platform metrics */
+  --uih-topbar-h: 60px;
+  --uih-sidenav-w: 212px;
+  --uih-rail-w: 226px;
+}
+
+/* ── utilities.css ──────────────────────────────────────── */
+:root {
+  /* Selection / highlight */
+  --uih-select-bg: #eff6ff;
+  --uih-select-border: #93c5fd;
+  /* Status pairs (saturated fg + pale bg of the same hue) */
+  --uih-keep-fg: #15803d;
+  --uih-keep-bg: #dcfce7;
+  --uih-remove-fg: #dc2626;
+  --uih-remove-bg: #fee2e2;
+  --uih-warn-fg: #d97706;
+  --uih-warn-bg: #fffbeb;
+  --uih-info-fg: #2563eb;
+  --uih-info-bg: #eff6ff;
+  --uih-match-fg: #65a30d;
+  --uih-match-bg: #ecfccb;
+  --uih-error-fg: #991b1b;
+  --uih-error-bg: #fff5f5;
+  --uih-error-border: #fca5a5;
+  /* Utility shape & elevation */
+  --uih-util-radius: 10px;
+  --uih-util-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --uih-util-shadow-md: 0 4px 12px rgba(0,0,0,.1);
+  /* Modal */
+  --uih-scrim: rgba(0,0,0,.4);
+  /* Skeleton shimmer */
+  --uih-skeleton-a: #eceff3;
+  --uih-skeleton-b: #f5f7fa;
+}
+
+/* root styling variable */
+:root {
+  /* Blue — banner gradient, nav active states, links, buttons, focus rings, file icon btn, tag chips, search highlights */
+  --blue-900: #0f2744; /* banner bg (dark end) */
+  --blue-800: #1a3a5c; /* banner bg (light end of gradient) */
+  --blue-700: #1e4976; /* banner secondary text, deep accents */
+  --blue-600: #2563a8; /* primary button bg, active link, download btn text, tag suggestion hover text */
+  --blue-500: #3b82c4; /* input focus border, tag editor border */
+  --blue-100: #dbeafe; /* active nav pill bg, selected tag chip bg, file icon btn hover */
+  --blue-50: #eff6ff; /* hover bg on links/buttons, file icon btn default bg, editing row bg */
+  /* Slate — body text, borders, muted labels, backgrounds */
+  --slate-800: #1e293b; /* primary body text, card headings */
+  --slate-700: #334155; /* secondary text, menu items, suggestion text */
+  --slate-600: #475569; /* muted labels, closed status pill text */
+  --slate-500: #64748b; /* meta text (dates, sizes), placeholder-level text */
+  --slate-400: #94a3b8; /* placeholder text, edit-btn icon, sug-prefix labels */
+  --slate-300: #cbd5e1; /* dividers, inactive progress track */
+  --slate-200: #e2e8f0; /* card borders, input borders, dropdown borders */
+  --slate-100: #f1f5f9; /* page background, section dividers, tag default bg */
+  --slate-50: #f8fafc; /* card inner backgrounds, modal preview bg */
+  /* Semantic colours — status pills, badges, alerts */
+  --green-600: #16a34a; /* active/complete status text */
+  --green-100: #dcfce7; /* active/complete status pill bg */
+  --amber-600: #d97706; /* pending status text, warning */
+  --amber-100: #fef3c7; /* pending status pill bg */
+  --red-700: #470000; /* deep error (unused currently) */
+  --red-600: #d60202; /* error text, deleted badge text, tag chip remove hover */
+  --red-400: #ac0f0f; /* error accent */
+  --red-200: #e44a4a; /* error mid-tone */
+  --red-100: #ff9191; /* error/urgent status pill bg */
+  --purple-600: #7c3aed; /* status-change history badge text */
+  --purple-100: #ede9fe; /* status-change history badge bg */
+  --indigo-600: #4f46e5; /* reserved / future use */
+  --banner-h-full: 148px;
+  --banner-h-mini: 56px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.hub-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.TextButton.selected {
+  background-color: #002632;
+  color: white !important;
+}
+
+.TextButton.selected:hover,
+.TextButton.selected:focus {
+  background-color: #02536d;
+}
+
+/* apply standard padding to element */
+.inset-text {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* allow options to be set on same line as headers */
+.with-options {
+  display: inline-block;
+}
+
+/* set up dropdown groups */
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: revert;
+  border-bottom-right-radius: revert;
+  border-right: 1px solid black !important;
+}
+
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group > .dropdown-toggle:not(:first-child) {
+  border-top-left-radius: revert;
+  border-bottom-left-radius: revert;
+  border-left: 1px solid black !important;
+}
+
+/* Font Awesome Icons */
+.IQAicon {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.IQAicon:hover {
+  text-decoration: none;
+}
+
+.IQAicon.red {
+  color: rgb(255, 0, 0) !important;
+}
+
+.IQAicon.red:hover {
+  color: rgb(208, 12, 12) !important;
+}
+
+.IQAicon.green {
+  color: green !important;
+}
+
+.IQAicon.green:hover {
+  color: #1fbb1f !important;
+}
+
+.IQAicon.dark-background.green {
+  color: rgb(0, 255, 0) !important;
+}
+
+.IQAicon.orange {
+  color: orange !important;
+}
+
+.IQAicon.orange:hover {
+  color: #c4830e !important;
+}
+
+.IQAicon.blue {
+  color: #004cff !important;
+}
+
+.IQAicon.blue:hover {
+  color: #3672ff !important;
+}
+
+.error {
+  font-weight: bold;
+  color: red;
+}
+
+/* edit content/popup buttons */
+.btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background .15s;
+}
+
+.btn-sm.primary {
+  background: var(--blue-600);
+  color: #fff;
+}
+
+.btn-sm.primary:hover {
+  background: var(--blue-700);
+}
+
+.btn-sm.secondary {
+  background: var(--slate-100);
+  color: var(--slate-700);
+  border: 1px solid var(--slate-200);
+}
+
+.btn-sm.secondary:hover {
+  background: var(--slate-200);
+}
+
+.btn-sm.danger {
+  background: var(--red-400);
+  color: #fff;
+  border: 1px solid var(--red-200);
+}
+
+.btn-sm.danger:hover {
+  background: var(--red-200);
+}
+
+/* End section buttons */
+/* Section styling */
+/* ── RadMultiPage reset ─────────────────────────────────────────── */
+.tab-content-bg > .panel > .panel-body-container > .panel-body > .cco > .RadMultiPage:has(.section) {
+  background: none;
+  box-shadow: none;
+}
+
+/* ── Section card ───────────────────────────────────────────────── */
+.section {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Section heading ────────────────────────────────────────────── */
+.section .panel-heading.Distinguish {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.section .panel-heading.Distinguish h2.panel-title {
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: none;
+}
+
+/* ── Section description ────────────────────────────────────────── */
+.section .panel-description {
+  padding-bottom: 10px;
+  background: #f8fafc;
+  border-radius: 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ── Section body ───────────────────────────────────────────────── */
+.section .panel-body-container {
+  padding: 25px;
+}
+
+.section-scrollable .panel-body-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #e0e0e0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.section .section-scrollable .panel-body-container {
+  padding: 0;
+}
+
+.section .panel-heading.Distinguish::after {
+  display: none; /* revert pseduo element on .panel-heading for section contrent */
+}
+
+/* Section override for multi panels */
+.section.multi-panel {
+  background: none;
+  box-shadow: none;
+}
+
+.section.multi-panel .ContentItemContainer {
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* End section styling */
+/* Hide Contact Address Phone and email
+   div.PanelField.Left:has(#ctl00_TemplateBody_AddressEdit_LabelPhonePrompt),
+   div.PanelField.Left:has(#ctl00_TemplateBody_AddressEdit_LabelEmailPrompt) {
+   display: none;
+   }*/
+#ctl00_TemplateBody_AddressEdit_RowPostcode > .PanelField.Left {
+  display: none;
+}
+
+.buttonHeader .block {
+  display: block;
+  width: 100%;
+}
+
+/* Revert caret on dropdown button */
+.wrapper.SVG-enabled .dropdown.revertCaret .caret::before {
+  display: none;
+}
+
+.wrapper.SVG-enabled .dropdown.revertCaret .caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+/* Data display */
+table.DataDisplay {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  text-align: left;
+  background-color: #f9f9f9;
+}
+
+table.DataDisplay th,
+table.DataDisplay td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+table.DataDisplay tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table.DataDisplay tr:hover {
+  background-color: #f1f1f1;
+}
+
+table.DataDisplay .DataLabel {
+  font-weight: bold;
+  color: #333;
+  width: 30%; /* Set a fixed width for DataLabel cells */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+table.DataDisplay .DataValue {
+  color: #555;
+  width: 70%; /* Allow DataValue cells to take up the remaining space */
+}
+
+/* ----- Home Page ----- */
+/* Staff Bulletin */
+.BulletinList .panel-body-container {
+  max-height: 345px;
+  overflow: scroll;
+  margin-bottom: 20px;
+  -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,.5)));
+}
+
+.BulletinList .panel-body-container:hover,
+.BulletinList .panel-body-container:focus {
+  -webkit-mask-image: revert;
+}
+
+/* ----- Contact Record ----- */
+/* Info Banner */
+.account-banner-short .banner-info {
+  color: white;
+}
+
+.account-banner-short .banner-info h2 {
+  color: white;
+}
+
+.account-banner-short .banner-info .panel {
+  border: 0px;
+}
+
+.account-banner-short .banner-info .top-banner {
+  padding: 5px 10px 0px 10px;
+  border-radius: 5px 5px 0px 0px;
+}
+
+.account-banner-short .banner-info .top-banner .banner-status-container h3 {
+  margin: 0px;
+  width: 100%;
+}
+
+.account-banner-short .banner-info .ContactDetails > span::after {
+  content: "  -  ";
+}
+
+.account-banner-short .banner-top-bar {
+  background-color: #003a4d;
+  border-radius: 0px;
+  color: white;
+}
+
+.account-banner-short .banner-top-bar .Label {
+  color: white;
+}
+
+.account-banner-short .banner-top-bar .Label::after {
+  color: white;
+  content: ": ";
+}
+
+/* Theme compatibility, not from UT_Staff.css: the record banner is a Query
+   Template iPart, so the theme's automatic Query Template card styling
+   turned it into a white card with grey text. Keep any iPart in the account
+   banner that renders a .top-banner bare, inheriting the banner's white
+   text, as it was before the theme. The card rules outrank any selector
+   that can be written here, hence !important. */
+.account-banner-short .banner-info .ContentItemContainer:has(.top-banner) {
+  color: inherit !important;
+  font-size: inherit !important;
+}
+
+.account-banner-short .banner-info .ContentItemContainer:has(.top-banner) .panel {
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.account-banner-short .banner-info .ContentItemContainer:has(.top-banner) .panel-body {
+  padding: 0 !important;
+}
+
+.account-banner-short .banner-info .ContentItemContainer:has(.top-banner) .QueryTemplateSet > section {
+  margin-bottom: 0 !important;
+}
+
+.account-banner-short .banner-info .ContentItemContainer:has(.top-banner) .QueryTemplateItem {
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Contact Layout */
+.ZidebarFiles .Notes.tabulator,
+.ZidebarFiles .NotesHeader {
+  display: none;
+}
+
+/* Finished Jobs */
+.JobsIQA tr:has(.JobStatus-Finished),
+.JobsIQA tr:has(.JobStatus-Finished) a {
+  color: var(--slate-400) !important;
+}
+
+/* Full screen apps */
+.FullScreenApp .main {
+  padding: 0px 5px 0px 0px;
+}
+
+.FullScreenApp .iMIS-WebPart > .ContentItemContainer > .panel > .panel-body-container > .panel-body {
+  padding: 5px;
+}
+
+.FullScreenApp .row {
+  --bs-gutter-x: 5px;
+}
+
+/* --- Case Module --- */
+/* Case Report - Highlight open cases */
+.rgMasterTable tr:is(.rgRow, .rgAltRow):has(span.CaseStatus-Open) {
+  background-color: #c7ffc8 !important;
+}
+
+.ComingSoon-wrapper::after {
+  content: "";
+  background-image: url("https://cdn.uhub.org.au/images/Hub/coming-soon-white.png");
+  min-width: 30px;
+  min-height: 30px;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* coming soon icon - primary nav */
+.ComingSoon-wrapper::after {
+  content: "";
+  background-image: url("https://cdn.uhub.org.au/EMS/css/icon/coming-soon-white.png");
+  min-width: 30px;
+  min-height: 30px;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* coming soon icon - secondary nav */
+.rtUL > .rtLI > .ComingSoon-wrapper::after {
+  display: inline-block;
+  position: absolute;
+  right: 9px;
+}
+
+/* IQA Styling */
+/* Add seperator between report colleciton and optional filters */
+.ReportCollection .ClearFix.PositionRelative {
+  border-bottom: solid 1px #c2c2c2;
+  margin-bottom: 10px;
+}
+
+/* Set panel / IQA description text to italic */
+.panel-description {
+  font-style: italic;
+}
+
+/* End IQA Styling */
+/* Progress Trackers - custom gradient colours */
+@media only screen {
+  .PurpleNavy.ProgressTrackerNumberGradient .count {
+    background: linear-gradient(50deg, #1a0195 15%, #d600f5 80%);
+    -webkit-background-clip: text;
+  }
+
+  .LightBlue.ProgressTrackerNumberGradient .count {
+    background: linear-gradient(50deg, #003d4f 15%, #00abff 80%);
+    -webkit-background-clip: text;
+  }
+
+  .Green.ProgressTrackerNumberGradient .count {
+    background: linear-gradient(50deg, #003d4f 15%, #00ce20 80%);
+    -webkit-background-clip: text;
+  }
+
+  .Red.ProgressTrackerNumberGradient .count {
+    background: linear-gradient(50deg, #003d4f 15%, #ce0000 80%);
+    -webkit-background-clip: text;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Clean up header */
+  #ctl01_AccountArea_BatchToggleLI {
+    display: none;
+  }
+
+  .app-menu-wrapper {
+    display: none;
+  }
+}
+
+/* ----- Organiser Portal ----- */
+.OrganiserPortal .banner {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px 40px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  gap: 30px;
+}
+
+.OrganiserPortal .banner-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+}
+
+.OrganiserPortal .banner h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.OrganiserPortal .banner h1 .muted {
+  opacity: 0.6;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.OrganiserPortal .banner h1 .banner-link {
+  color: white;
+}
+
+.OrganiserPortal .workbench-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.OrganiserPortal .info-item {
+  font-size: 13px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.OrganiserPortal .nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.OrganiserPortal .nav-button {
+  background-color: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.OrganiserPortal .nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: white;
+}
+
+.OrganiserPortal .nav-button.selected {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .OrganiserPortal .nav-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .OrganiserPortal .nav-button {
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .OrganiserPortal .banner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .OrganiserPortal .banner-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .OrganiserPortal .banner h1 {
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .OrganiserPortal .workbench-details {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+  }
+
+  .OrganiserPortal .nav-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .OrganiserPortal .nav-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .OrganiserPortal input[type="submit"] {
+    width: 100%;
+  }
+
+  .OrganiserPortal .GridTitlePanel .btn-group {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .OrganiserPortal .OrganiserPatchSection.Stats {
+    display: block !important;
+  }
+}
+
+/* ----- END Organiser Portal ----- */
+/* ----- Manage Workbench Page ----- */
+.ManageWorkbench .workbench-banner {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px 40px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  gap: 30px;
+}
+
+.ManageWorkbench .workbench-banner h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.ManageWorkbench .workbench-banner h1 .muted {
+  opacity: 0.6;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.ManageWorkbench .workbench-info {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+}
+
+.ManageWorkbench .workbench-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.ManageWorkbench .workbench-type,
+.ManageWorkbench .workbench-id {
+  font-size: 13px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ManageWorkbench .detail-label {
+  opacity: 0.7;
+}
+
+.ManageWorkbench .allocation-container {
+  padding: 0 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.ManageWorkbench .allocation-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.ManageWorkbench .allocation-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.9;
+  color: white;
+}
+
+.ManageWorkbench .workbench-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ManageWorkbench .workbench-actions .btn-group {
+  display: flex;
+}
+
+.ManageWorkbench .workbench-actions .btn,
+.ManageWorkbench .workbench-actions .btn-primary {
+  background-color: #3498db !important;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.ManageWorkbench .workbench-actions .btn:hover,
+.ManageWorkbench .workbench-actions .btn-primary:hover {
+  background-color: #2980b9 !important;
+  border-color: #2980b9 !important;
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .ManageWorkbench .workbench-info {
+    flex-wrap: wrap;
+  }
+
+  .ManageWorkbench .allocation-container {
+    flex: 1 1 100%;
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ManageWorkbench .workbench-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+
+  .ManageWorkbench .workbench-banner h1 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .ManageWorkbench .workbench-info {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .ManageWorkbench .workbench-details {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+  }
+
+  .ManageWorkbench .allocation-container {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+  }
+
+  .ManageWorkbench .workbench-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ManageWorkbench .workbench-actions .btn-group {
+    width: 100%;
+  }
+
+  .ManageWorkbench .workbench-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ----- END Manage Workbench Page ----- */
+/* ----- Staff Page ----- */
+.StaffPage .banner {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px 40px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  gap: 30px;
+}
+
+.StaffPage .banner-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+}
+
+.StaffPage .banner h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.StaffPage .banner h1 .muted {
+  opacity: 0.6;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.StaffPage .person-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.StaffPage .info-item {
+  font-size: 13px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.StaffPage .info-label {
+  opacity: 0.7;
+}
+
+.StaffPage .nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.StaffPage .nav-button {
+  background-color: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.StaffPage .nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: white;
+}
+
+.StaffPage .nav-button.selected {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.StaffPage .ActionButtons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.StaffPage .ActionButtons .btn-group {
+  display: flex;
+}
+
+.StaffPage .ActionButtons .btn,
+.StaffPage .ActionButtons .btn-primary {
+  background-color: #3498db !important;
+  border-color: #3498db !important;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.StaffPage .ActionButtons .btn:hover,
+.StaffPage .ActionButtons .btn-primary:hover {
+  background-color: #2980b9 !important;
+  border-color: #2980b9 !important;
+}
+
+.StaffPage .content-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.StaffPage .MappingSection {
+  display: none;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  animation: fadeIn 0.3s ease;
+}
+
+.StaffPage .MappingSection.active {
+  display: block;
+}
+
+/* Workbench sub-navigation */
+.StaffPage .sub-nav-buttons {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.StaffPage .sub-nav-buttons.active {
+  display: flex;
+}
+
+.StaffPage .sub-nav-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+.StaffPage .sub-nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.StaffPage .sub-nav-button.selected {
+  background-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+/* Workbench subsections */
+.StaffPage .WorkbenchSubsection {
+  margin-top: 20px;
+}
+
+.StaffPage .WorkbenchSubsection {
+  display: none;
+}
+
+.StaffPage .WorkbenchSubsection.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .StaffPage .nav-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .StaffPage .nav-button {
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .StaffPage .banner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .StaffPage .banner-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .StaffPage .banner h1 {
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .StaffPage .person-details {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+  }
+
+  .StaffPage .nav-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .StaffPage .nav-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .StaffPage .ActionButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .StaffPage .ActionButtons .btn-group {
+    width: 100%;
+  }
+
+  .StaffPage .ActionButtons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .StaffPage .sub-nav-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .StaffPage .sub-nav-button {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+  }
+}
+
+/* ----- END Staff Page ----- */
+/* ==================== Organiser Portal ==================== */
+/* ==================== Simple Org Page ==================== */
+/* ==================== RESET & BASE ==================== */
+@media (max-width: 768px) {
+  .SimpleAccountPageOrg a.logo {
+    max-width: 150px !important;
+  }
+}
+
+.SimpleAccountPageOrg .main {
+  padding-top: 5px;
+}
+
+/* org stats cards */
+.SimpleAccountPageOrg .query-template.stats .panel-body {
+  padding: 0;
+}
+
+/* hide sections intially */
+.SimpleAccountPageOrg .SimpleOrgSection.Details,
+.SimpleAccountPageOrg .SimpleOrgSection.Roster {
+  display: none;
+}
+
+/* ==================== BANNER ==================== */
+.SimpleAccountPageOrg .row.BannerHeader {
+  margin-bottom: 20px;
+}
+
+.SimpleAccountPageOrg .banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  background: linear-gradient(135deg, #0f2744 0%, #1a3a5c 100%);
+}
+
+.SimpleAccountPageOrg .banner-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+}
+
+.SimpleAccountPageOrg .banner h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.SimpleAccountPageOrg .person-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.SimpleAccountPageOrg .info-item {
+  font-size: 13px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.SimpleAccountPageOrg .info-label {
+  opacity: 0.7;
+  text-align: center;
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .SimpleAccountPageOrg .banner-left {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .SimpleAccountPageOrg .banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+
+  .SimpleAccountPageOrg .banner h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .SimpleAccountPageOrg .banner-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .SimpleAccountPageOrg .person-details {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+  }
+}
+
+.SimpleAccountPageOrg .MemberBanner .panel-body {
+  padding: 0;
+}
+
+.SimpleAccountPageOrg .BannerHeader .ContentItemContainer {
+  margin-bottom: 0;
+}
+
+.SimpleAccountPageOrg .banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.SimpleAccountPageOrg .contact-name {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.SimpleAccountPageOrg .contact-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .SimpleAccountPageOrg .BannerHeader .col-sm-12 {
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+}
+
+/* ==================== TOOLBAR ==================== */
+.SimpleAccountPageOrg .toolbar {
+  background: white;
+  padding: 12px 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.SimpleAccountPageOrg .toolbar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Nav buttons */
+.SimpleAccountPageOrg .mobile-nav-buttons {
+  display: none;
+  width: 100%;
+  gap: 8px;
+}
+
+.SimpleAccountPageOrg .mobile-nav-button {
+  flex: 1;
+  padding: 10px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.SimpleAccountPageOrg .mobile-nav-button:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.SimpleAccountPageOrg .mobile-nav-button.selected {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+@media (max-width: 768px) {
+  .SimpleAccountPageOrg .mobile-nav-buttons {
+    display: flex;
+  }
+}
+
+/* Dropdown Styles */
+.SimpleAccountPageOrg .dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.SimpleAccountPageOrg .dropdown-btn {
+  width: 100% !important;
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.SimpleAccountPageOrg .dropdown-btn:hover,
+.SimpleAccountPageOrg .dropdown-btn:active {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.SimpleAccountPageOrg .dropdown-btn::after {
+  content: '▼';
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.SimpleAccountPageOrg .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 1100;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+
+.SimpleAccountPageOrg .dropdown-menu.open {
+  max-height: 600px;
+  opacity: 1;
+  display: revert;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.SimpleAccountPageOrg .dropdown-item {
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.15s;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.SimpleAccountPageOrg .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.SimpleAccountPageOrg .dropdown-item:active {
+  background: #e9ecef;
+}
+
+.SimpleAccountPageOrg .dropdown-item:hover {
+  background: #f8f9ff;
+}
+
+.SimpleAccountPageOrg .dropdown-item .icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  color: #667eea;
+}
+
+.SimpleAccountPageOrg .dropdown-item .text {
+  flex: 1;
+}
+
+.SimpleAccountPageOrg .dropdown-item .title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.SimpleAccountPageOrg .dropdown-item.has-submenu {
+  padding-right: 40px;
+  position: relative;
+}
+
+.SimpleAccountPageOrg .dropdown-item .chevron {
+  position: absolute;
+  right: 16px;
+  font-size: 10px;
+  color: #999;
+}
+
+/* Secondary Menu (Mobile: inline, Desktop: flyout) */
+.SimpleAccountPageOrg .secondary-menu {
+  display: none;
+  background: #f9f9f9;
+  margin: 4px 0;
+  animation: expandDown 0.2s ease;
+}
+
+.SimpleAccountPageOrg .secondary-menu.show {
+  display: block;
+}
+
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+.SimpleAccountPageOrg .secondary-item {
+  padding: 12px 16px 12px 52px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 14px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.SimpleAccountPageOrg .secondary-item:active {
+  background: #e9ecef;
+}
+
+.SimpleAccountPageOrg .secondary-item:hover {
+  background: #e9ecef;
+}
+
+.SimpleAccountPageOrg hr {
+  border: none;
+  border-top: 1px solid #e9ecef;
+  margin: 8px 0;
+}
+
+/* ==================== CONTENT ==================== */
+.SimpleAccountPageOrg .content {
+  padding: 16px;
+}
+
+.SimpleAccountPageOrg .section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.SimpleAccountPageOrg .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.SimpleAccountPageOrg .section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.SimpleAccountPageOrg .section-header .action-btn {
+  padding: 6px 12px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.SimpleAccountPageOrg .section-header .action-btn:active {
+  background: #5568d3;
+  transform: scale(0.95);
+}
+
+.SimpleAccountPageOrg .section-scrollable .panel-body-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #e0e0e0;
+}
+
+.SimpleAccountPageOrg .section-scrollable .panel-body-container::-webkit-scrollbar {
+  width: 14px;
+}
+
+.SimpleAccountPageOrg .section-scrollable .panel-body-container::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  border-radius: 10px;
+  border: 1px solid #d0d0d0;
+}
+
+.SimpleAccountPageOrg .section-scrollable .panel-body-container::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+}
+
+.SimpleAccountPageOrg .section-scrollable .panel-body-container::-webkit-scrollbar-thumb:hover {
+  background: #5568d3;
+  border-color: #d0d0d0;
+}
+
+/* Detail Rows */
+.SimpleAccountPageOrg .detail-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.SimpleAccountPageOrg .detail-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.SimpleAccountPageOrg .detail-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.SimpleAccountPageOrg .detail-value {
+  font-size: 15px;
+  color: #333;
+  word-break: break-word;
+}
+
+.SimpleAccountPageOrg .detail-value a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.SimpleAccountPageOrg .detail-value a:hover {
+  text-decoration: underline;
+}
+
+.SimpleAccountPageOrg .badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #4caf50;
+  color: white;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.SimpleAccountPageOrg .preferred-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #667eea;
+  color: white;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-left: 6px;
+}
+
+/* Contact Methods */
+.SimpleAccountPageOrg .contact-methods {
+  display: grid;
+  gap: 12px;
+}
+
+.SimpleAccountPageOrg .contact-method {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  position: relative;
+}
+
+.SimpleAccountPageOrg .contact-method i {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  color: #667eea;
+  font-size: 14px;
+}
+
+.SimpleAccountPageOrg .contact-method-info {
+  flex: 1;
+}
+
+.SimpleAccountPageOrg .contact-method-type {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.SimpleAccountPageOrg .contact-method-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Timeline Items (Notes, Cases) */
+.SimpleAccountPageOrg .timeline-item {
+  padding: 14px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 3px solid #667eea;
+}
+
+.SimpleAccountPageOrg .timeline-title a,
+.SimpleAccountPageOrg .timeline-title a:visited {
+  color: #667eea;
+}
+
+.SimpleAccountPageOrg .timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+
+.SimpleAccountPageOrg .timeline-date {
+  font-size: 11px;
+  color: #999;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+.SimpleAccountPageOrg .timeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.SimpleAccountPageOrg .timeline-content {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.SimpleAccountPageOrg .timeline-meta {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.SimpleAccountPageOrg .timeline-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.SimpleAccountPageOrg .visit-action-btn {
+  padding: 4px 10px;
+  background: #f0f0f0;
+  color: #667eea;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.SimpleAccountPageOrg .visit-action-btn:hover {
+  background: #667eea;
+  color: white;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.SimpleAccountPageOrg .visit-action-btn:active {
+  transform: scale(0.95);
+}
+
+.SimpleAccountPageOrg .visit-action-btn .btn-text {
+  display: none;
+}
+
+.SimpleAccountPageOrg .visit-action-btn em {
+  font-size: 1.3em;
+}
+
+.SimpleAccountPageContact .section .panel-body-container,
+.SimpleAccountPageOrg .section .panel-body-container {
+  padding: 25px;
+}
+
+.SimpleAccountPageOrg .timeline-item,
+.SimpleAccountPageContact .timeline-item {
+  border-left: 2px solid #667eea;
+  border-top: 1px solid #667eea;
+}
+
+@media (min-width: 576px) {
+  .SimpleAccountPageOrg .visit-action-btn .btn-text {
+    display: inline;
+  }
+}
+
+/* Empty State */
+.SimpleAccountPageOrg .empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.SimpleAccountPageOrg .empty-state i {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.SimpleAccountPageOrg .empty-state p {
+  font-size: 14px;
+}
+
+/* ==================== RESPONSIVE - TABLET ==================== */
+@media (min-width: 576px) {
+  .SimpleAccountPageOrg .banner {
+    padding: 24px;
+  }
+
+  .SimpleAccountPageOrg .banner-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .SimpleAccountPageOrg .banner-details {
+    flex-direction: row;
+    gap: 24px;
+    padding-top: 0;
+    border-top: none;
+    padding-left: 24px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .SimpleAccountPageOrg .avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+  }
+
+  .SimpleAccountPageOrg .banner-title h1 {
+    font-size: 28px;
+  }
+
+  .SimpleAccountPageOrg .toolbar {
+    padding: 16px 24px;
+  }
+
+  .SimpleAccountPageOrg .toolbar-content {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .SimpleAccountPageOrg .dropdown-wrapper {
+    width: auto;
+    min-width: 200px;
+  }
+
+  .SimpleAccountPageOrg .secondary-menu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    margin: 0 0 0 4px;
+    z-index: 1101;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .SimpleAccountPageOrg .secondary-item {
+    padding: 10px 16px;
+    min-height: auto;
+  }
+
+  .SimpleAccountPageOrg .content {
+    padding: 24px;
+  }
+
+  .SimpleAccountPageOrg .section {
+    padding: 0px;
+  }
+
+  .SimpleAccountPageOrg .contact-methods {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ==================== RESPONSIVE - DESKTOP ==================== */
+@media (min-width: 768px) {
+  .SimpleAccountPageOrg .banner-title h1 {
+    font-size: 32px;
+  }
+
+  .SimpleAccountPageOrg .banner-detail {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .SimpleAccountPageOrg .content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .SimpleAccountPageOrg .section.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Smooth Scrolling */
+.SimpleAccountPageOrg .dropdown-menu {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #ced4da #f8f9fa;
+}
+
+.SimpleAccountPageOrg .dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.SimpleAccountPageOrg .dropdown-menu::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.SimpleAccountPageOrg .dropdown-menu::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 4px;
+}
+
+/* Modal Styles */
+.SimpleAccountPageOrg .modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+.SimpleAccountPageOrg .modal-overlay.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.SimpleAccountPageOrg .modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.SimpleAccountPageOrg .modal-header {
+  padding: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.SimpleAccountPageOrg .modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.SimpleAccountPageOrg .modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.SimpleAccountPageOrg .modal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.SimpleAccountPageOrg .modal-body {
+  padding: 24px;
+}
+
+.SimpleAccountPageOrg .modal-detail-row {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.SimpleAccountPageOrg .modal-detail-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.SimpleAccountPageOrg .modal-detail-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.SimpleAccountPageOrg .modal-detail-value {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.SimpleAccountPageOrg .timeline-item .timeline-header {
+  flex-wrap: wrap;
+}
+
+/* Scrollable Recent Visits */
+.SimpleAccountPageOrg .visits-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #ced4da #f8f9fa;
+}
+
+.SimpleAccountPageOrg .visits-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.SimpleAccountPageOrg .visits-container::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.SimpleAccountPageOrg .visits-container::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 4px;
+}
+
+.SimpleAccountPageOrg .visits-container::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+/* tracker cards */
+.SimpleAccountPageOrg .QueryTemplateTrackers .card {
+  border: none;
+  padding: 5px;
+  margin: 10px 0;
+  background: none;
+  box-shadow: none;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .gradient-box-container {
+  background: linear-gradient(50deg, #0f0c71 15%, #aa34ec 80%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .gradient-box {
+  display: block;
+  background: white;
+  position: relative;
+  padding: 5px;
+  box-sizing: border-box;
+  background-clip: padding-box;
+  border-radius: 10px;
+  border: 3px solid transparent;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .count {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(50deg, #0f0c71 15%, #aa34ec 80%);
+  background-clip: border-box;
+  -webkit-background-clip: text;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .count > span {
+  -webkit-text-fill-color: transparent;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .subheader {
+  font-size: 1.2em;
+  margin-top: 10px;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .card-body {
+  padding: 0px;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .container {
+  padding: 0px;
+}
+
+.SimpleAccountPageOrg .QueryTemplateTrackers .card.QueryTemplateItem {
+  padding: 10px;
+  margin: 5px;
+}
+
+.SimpleAccountPageOrg .query-template.no-background .QueryTemplateItem.card {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ==================== NOTES SECTION ==================== */
+.SimpleAccountPageOrg .note-item {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 3px solid #667eea;
+}
+
+.SimpleAccountPageOrg .note-date {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+}
+
+.SimpleAccountPageOrg .note-text {
+  font-size: 14px;
+  color: #333;
+}
+
+/* ==================== END Organiser Portal ==================== */
+/* ============================================================== */
+/* ============================================================== */
+/* ====================== Organiser Portal ====================== */
+/* ======================== Contact Page ======================== */
+/* ==================== BASE STYLES ==================== */
+.SimpleAccountPageContact .icon {
+  font-size: 16px;
+}
+
+.SimpleAccountPageContact .section.visible .panel-body {
+  padding: 0;
+}
+
+.SimpleAccountPageContact .sidebar-fixed .wrapper {
+  height: auto;
+}
+
+.SimpleAccountPageContact .muted {
+  color: #999;
+}
+
+.SimpleAccountPageContact .main {
+  padding-top: 5px;
+}
+
+/* ==================== BANNER ==================== */
+.SimpleAccountPageContact .row.BannerHeader {
+  margin-bottom: 20px;
+}
+
+.SimpleAccountPageContact .banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  background: linear-gradient(135deg, #0f2744 0%, #1a3a5c 100%);
+}
+
+.SimpleAccountPageContact .banner-left {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+}
+
+.SimpleAccountPageContact .banner h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.SimpleAccountPageContact .person-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.SimpleAccountPageContact .info-item {
+  font-size: 13px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.SimpleAccountPageContact .info-label {
+  opacity: 0.7;
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .SimpleAccountPageContact .banner-left {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .SimpleAccountPageContact .banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+
+  .SimpleAccountPageContact .banner h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .SimpleAccountPageContact .banner-left {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .SimpleAccountPageContact .person-details {
+    border-left: none;
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 15px 0 0 0;
+  }
+}
+
+.SimpleAccountPageContact .MemberBanner .panel-body {
+  padding: 0;
+}
+
+.SimpleAccountPageContact .BannerHeader .ContentItemContainer {
+  margin-bottom: 0;
+}
+
+.SimpleAccountPageContact .banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.SimpleAccountPageContact .contact-name {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.SimpleAccountPageContact .contact-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* ==================== TOOLBAR & DROPDOWNS ==================== */
+.SimpleAccountPageContact .toolbarContainer .pagination.simplePaginateNav {
+  display: none;
+}
+
+.SimpleAccountPageContact .toolbar {
+  background: white;
+  padding: 12px 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.SimpleAccountPageContact .toolbar-content {
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.SimpleAccountPageContact .dropdown-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.SimpleAccountPageContact .dropdown-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.SimpleAccountPageContact .dropdown-btn:hover,
+.SimpleAccountPageContact .dropdown-btn.active {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.SimpleAccountPageContact .dropdown-btn::after {
+  content: '▼';
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.SimpleAccountPageContact .dropdown-btn.active::after {
+  content: '▲';
+}
+
+.SimpleAccountPageContact .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 1100;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.SimpleAccountPageContact .dropdown-menu.open {
+  display: block;
+}
+
+.SimpleAccountPageContact .dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.SimpleAccountPageContact .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.SimpleAccountPageContact .dropdown-item:hover,
+.SimpleAccountPageContact .dropdown-item.has-submenu.open {
+  background: #f8f9ff;
+}
+
+.SimpleAccountPageContact .dropdown-item.section-item {
+  font-weight: 500;
+}
+
+.SimpleAccountPageContact .dropdown-item.section-item.active {
+  background: #e8ebff;
+  color: #667eea;
+}
+
+/* Secondary Dropdown */
+.SimpleAccountPageContact .secondary-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.SimpleAccountPageContact .secondary-menu.open {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.SimpleAccountPageContact .dropdown-item.has-submenu .chevron,
+.SimpleAccountPageContact .dropdown-item.has-submenu.open .chevron.open {
+  display: block;
+}
+
+.SimpleAccountPageContact .dropdown-item.has-submenu .chevron.open,
+.SimpleAccountPageContact .dropdown-item.has-submenu.open .chevron {
+  display: none;
+}
+
+/* Custom Scrollbar for Secondary Menu */
+.SimpleAccountPageContact .secondary-menu.open::-webkit-scrollbar {
+  width: 6px;
+}
+
+.SimpleAccountPageContact .secondary-menu.open::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.SimpleAccountPageContact .secondary-menu.open::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.SimpleAccountPageContact .secondary-menu.open::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Custom Scrollbar for Main Dropdown */
+.SimpleAccountPageContact .dropdown-menu.open::-webkit-scrollbar {
+  width: 8px;
+}
+
+.SimpleAccountPageContact .dropdown-menu.open::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.SimpleAccountPageContact .dropdown-menu.open::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.SimpleAccountPageContact .dropdown-menu.open::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.SimpleAccountPageContact .secondary-item {
+  padding: 12px 20px 12px 56px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.SimpleAccountPageContact .secondary-item:active {
+  background-color: #f0f0f0;
+}
+
+.SimpleAccountPageContact .secondary-item .title {
+  font-size: 14px;
+  font-weight: 400;
+  color: #555;
+}
+
+/* ==================== CONTENT AREA ==================== */
+.SimpleAccountPageContact .content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ==================== SECTIONS ==================== */
+.SimpleAccountPageContact .section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: none;
+}
+
+.SimpleAccountPageContact .section.visible {
+  display: block;
+}
+
+.SimpleAccountPageContact .section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Connected sections styling */
+.SimpleAccountPageContact .contact-details {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 8px;
+}
+
+.SimpleAccountPageContact .addresses {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
+}
+
+.SimpleAccountPageContact .section-content {
+  color: #666;
+  line-height: 1.6;
+}
+
+.SimpleAccountPageContact .section-header,
+.SimpleAccountPageContact .panel-heading.Distinguish {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0;
+}
+
+.SimpleAccountPageContact .section-header h2,
+.SimpleAccountPageContact .panel-heading.Distinguish h2.panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+  padding: 0;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.SimpleAccountPageContact .preferred-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #667eea;
+  color: white;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.SimpleAccountPageContact .section {
+  padding: 0px;
+}
+
+.SimpleAccountPageContact .section .panel-body-container {
+  padding: 25px;
+}
+
+.SimpleAccountPageContact .section .panel-heading.Distinguish {
+  border-radius: 10px 10px 0px 0px;
+}
+
+/* Contact Methods */
+.SimpleAccountPageContact .contact-methods {
+  display: grid;
+  gap: 12px;
+}
+
+.SimpleAccountPageContact .contact-method {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.SimpleAccountPageContact .contact-method i {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  color: #667eea;
+  font-size: 14px;
+}
+
+.SimpleAccountPageContact .contact-method-info {
+  flex: 1;
+}
+
+.SimpleAccountPageContact .contact-method-type {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.SimpleAccountPageContact .contact-method-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* ==================== DETAIL ROWS ==================== */
+.SimpleAccountPageContact .detail-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.SimpleAccountPageContact .detail-label {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.SimpleAccountPageContact .detail-value {
+  font-size: 15px;
+  color: #333;
+  word-break: break-word;
+}
+
+.SimpleAccountPageContact .detail-value a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.SimpleAccountPageContact .detail-value a:hover {
+  text-decoration: underline;
+}
+
+/* ==================== ADDRESS SUBSECTION ==================== */
+.SimpleAccountPageContact .address-subsection {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.SimpleAccountPageContact .subsection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.SimpleAccountPageContact .subsection-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.SimpleAccountPageContact .address-item.hidden {
+  display: none;
+}
+
+/* ==================== NOTES SECTION ==================== */
+.SimpleAccountPageContact .note-item {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 3px solid #667eea;
+}
+
+.SimpleAccountPageContact .note-date {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+}
+
+.SimpleAccountPageContact .note-text {
+  font-size: 14px;
+  color: #333;
+}
+
+/* ==================== EMPLOYMENT SECTION ==================== */
+.SimpleAccountPageContact .employment-item {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 3px solid #667eea;
+}
+
+.SimpleAccountPageContact .employment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.SimpleAccountPageContact .employment-position {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.SimpleAccountPageContact .employment-company,
+.SimpleAccountPageContact .employment-company a,
+.SimpleAccountPageContact .employment-company a:visited {
+  font-size: 14px;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.SimpleAccountPageContact .employment-status {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #4caf50;
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.SimpleAccountPageContact .employment-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 300px));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.SimpleAccountPageContact .employment-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.SimpleAccountPageContact .employment-detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.SimpleAccountPageContact .employment-detail-value {
+  font-size: 13px;
+  color: #333;
+}
+
+.SimpleAccountPageContact .section-scrollable .panel-body-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #e0e0e0;
+}
+
+.SimpleAccountPageContact .section-scrollable .panel-body-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.SimpleAccountPageContact .section-scrollable .panel-body-container::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  border-radius: 10px;
+  border: 1px solid #d0d0d0;
+}
+
+.SimpleAccountPageContact .section-scrollable .panel-body-container::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+}
+
+.SimpleAccountPageContact .section-scrollable .panel-body-container::-webkit-scrollbar-thumb:hover {
+  background: #5568d3;
+  border-color: #d0d0d0;
+}
+
+/* ==================== CASES SECTION ==================== */
+.SimpleAccountPageContact .case-item {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 3px solid #667eea;
+  position: relative;
+}
+
+.SimpleAccountPageContact .case-item.hidden {
+  display: none;
+}
+
+.SimpleAccountPageContact .case-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.SimpleAccountPageContact .case-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.SimpleAccountPageContact .case-title {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.SimpleAccountPageContact .case-type {
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.SimpleAccountPageContact .case-status {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #4caf50;
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.SimpleAccountPageContact .case-actions {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+
+.SimpleAccountPageContact .add-note-btn {
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #667eea;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.SimpleAccountPageContact .add-note-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* ==================== FILTER BUTTONS ==================== */
+.SimpleAccountPageContact .filter-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.SimpleAccountPageContact .filter-btn {
+  padding: 6px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.SimpleAccountPageContact .filter-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.SimpleAccountPageContact .filter-btn.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (min-width: 768px) {
+  .SimpleAccountPageContact .banner {
+    padding: 32px 24px;
+  }
+
+  .SimpleAccountPageContact .contact-name {
+    font-size: 36px;
+  }
+
+  .SimpleAccountPageContact .toolbar {
+    padding: 16px 24px;
+  }
+
+  .SimpleAccountPageContact .dropdown-wrapper {
+    flex: initial;
+  }
+
+  .SimpleAccountPageContact .content {
+    padding: 24px;
+  }
+
+  .SimpleAccountPageContact .section {
+    padding: 28px;
+  }
+
+  .SimpleAccountPageContact .employment-header {
+    justify-content: revert;
+  }
+
+  .SimpleAccountPageContact .employment-status {
+    margin-left: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .SimpleAccountPageContact .SimpleLayout .col-sm-12 {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .SimpleAccountPageContact .SimpleLayout .BannerHeader .col-sm-12 {
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+
+  .SimpleAccountPageContact a.logo {
+    max-width: 150px !important;
+  }
+}
+
+/* ==================== END Organiser Portal ==================== */
+/* ============================================================== */
+
+/* US-LEGACY-UTSTAFF:END */
+
 /* US-ACTION-ICONS:START */
 .us-panel-action.us-icon-button > svg:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   flex: none;

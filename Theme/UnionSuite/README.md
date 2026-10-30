@@ -157,6 +157,16 @@ the repository copy remains a legacy reference. Do not reload that whole legacy
 stylesheet just for icons. See the [navigation usage recipe](../UnionSuite-Guides/Usage-Guide.html#navigation-icons)
 for class placement, the complete mapping and troubleshooting.
 
+## Legacy staff styling
+
+The `US-LEGACY-UTSTAFF` block, near the top of `zUnionSuite.css` after the
+native button colours, carries every rule from the live
+`https://cdn.uhub.org.au/EMS/css/UT_Staff.css` that the theme does not yet
+cover (copied 30 October 2026). Pages built on it keep their styling without
+that stylesheet, so do not load `UT_Staff.css` alongside the theme. The block
+is temporary: clean up or replace its rules as each page is migrated, and
+delete it once it is empty. Its header comment lists what was left out and why.
+
 ## Existing native buttons
 
 `TextButton` and `btn` use navy secondary emphasis. `PrimaryButton` and
