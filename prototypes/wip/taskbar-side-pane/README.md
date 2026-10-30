@@ -10,9 +10,11 @@ The owner's decisions for it: the toggle shows only on pages that have a tab
 (the case page for now); support tickets wait, and will be two tabs, an admin
 ticket to the UnionSuite team and a standard ticket to the client's system
 administrator; later tabs include an assistant that sees the page's context
-and a preview. The chat function and the case answers come later (the case
-documentation is being written separately). The help and ticket screens
-below remain the mockup for those later tabs.
+and a preview. Since 30 October 2026 Case help answers from the staff case
+guide hosted at `/App_Themes/UnionSuite-Guide/Cases-Help.html`
+(`docs/user-guide/`), matching questions by words with
+`Scripts/UnionSuiteHelpMatch.js`: no AI. The ticket screens below remain the
+mockup for the later tabs, as does the help screen's Raise a ticket handoff.
 
 ## Problem
 

@@ -44,7 +44,7 @@ Git tracked this folder as `THeme` until 30 October 2026; older commits use that
 | `Theme/UnionSuite/zUnionSuite.js` | Shared behaviour: reports, banners, composers, actions, loaders |
 | `Theme/UnionSuite/zzDarkMode.css` | All dark-mode palette and overrides; loads last |
 | `Theme/UnionSuite/zzClientSpecific.css` | Client overrides in the shared package |
-| `Theme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
+| `Theme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane, with the Case help chat), `UnionSuiteHelpMatch.js` (its staff help matcher), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
 | `Theme/UnionSuite/Forms/` | Theme-built popup forms (task form) |
 | `Theme/UnionSuite/Tabler/`, `Tabler.css`, `images/` | Bundled icon font and images |
 | `Theme/UnionSuite/*.skin`, `ThemeSettings.xml`, `index.js` | iMIS theme package files |
@@ -142,9 +142,11 @@ Several fail loading the 190 MB guide into the browser.
   `node tools/build-user-guide.cjs` (`--check` for stale): a help page with
   an Ask a question box, into `Theme/UnionSuite-Guides/` with the other
   pages hosted in iMIS, and a JSON file in the ignored
-  `docs/user-guide/dist/` for a simple chatbot (`page/match.js` matches questions to
-  topics). Test the matcher with `node tools/test-user-guide.cjs`. Start
-  with its [README](docs/user-guide/README.md).
+  `docs/user-guide/dist/` for a simple chatbot. The side pane's Case help
+  chat reads the hosted page (`/App_Themes/UnionSuite-Guide/Cases-Help.html`)
+  and matches questions with `Theme/UnionSuite/Scripts/UnionSuiteHelpMatch.js`.
+  Test the matcher with `node tools/test-user-guide.cjs`. Start with its
+  [README](docs/user-guide/README.md).
 - **`legacy/`**: `Orion.css` and `Orion page.html` (captures of stock iMIS),
   `Native CSS/Orion-99.css`, `UT-theme.css` (the abandoned first theme),
   `UTStaff.css` and `zUnionStyling.css` (legacy client files), `Structure/`

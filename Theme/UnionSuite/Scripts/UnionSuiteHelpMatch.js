@@ -7,7 +7,11 @@
  * matches one of a topic's sample questions gets a bonus.
  *
  * Works in the browser (window.UnionSuiteHelpMatch) and in Node
- * (require). Feed it the <area>-help.json the build writes:
+ * (require). The staff help pages (docs/user-guide/, built by
+ * tools/build-user-guide.cjs) inline it for their Ask a question box, and
+ * the side pane's Case help chat loads it from the theme, so both answer
+ * alike. Feed it the <area>-help.json the build writes, or the topics a
+ * help page embeds:
  *
  *   const matcher = UnionSuiteHelpMatch.create(helpJson);
  *   matcher.reply('how do i close a case');

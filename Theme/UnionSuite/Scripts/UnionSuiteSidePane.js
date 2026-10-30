@@ -6,8 +6,9 @@
  * on, so the pane shows what helps on the page being viewed. The toggle
  * appears only on a page with at least one tab.
  *
- * First version (owner, 29 October 2026): Case help on the manage case page,
- * a chat placeholder until the case documentation and the chat arrive.
+ * First version (owner, 29 October 2026): Case help on the manage case page.
+ * Since 30 October 2026 its chat answers from the case guide hosted at
+ * /App_Themes/UnionSuite-Guide/Cases-Help.html (CASE_GUIDE_URL below).
  * Planned tabs, registered the same way: an admin support ticket (to the
  * UnionSuite team), a standard support ticket (to the client's system
  * administrator), an assistant that sees the page's context, and a preview.
@@ -307,42 +308,266 @@
     scheduleRefresh();
   }
 
-  /* ---- Case help: a chat placeholder ---------------------------------------- */
+  /* ---- Case help: answers from the case guide ------------------------------ */
 
-  // The chat itself comes later. Until then the tab shows the chat's layout
-  // with an honest note, and the box to type in is disabled.
-  function renderChatPlaceholder(panel, intro) {
-    const chat = element('div', 'us-side-chat');
+  // The staff help page for cases (docs/user-guide/, built by
+  // tools/build-user-guide.cjs into Theme/UnionSuite-Guides/), hosted beside
+  // the theme. The chat reads the page's topics (#help-data) and each topic's
+  // steps (its article), answers with the page's own matcher
+  // (UnionSuiteHelpMatch.js, loaded first by index.js), and links every
+  // answer back to its topic on the page.
+  const CASE_GUIDE_URL = '/App_Themes/UnionSuite-Guide/Cases-Help.html';
 
-    const messages = element('div', 'us-side-chat__messages');
-    messages.setAttribute('role', 'log');
+  const guides = new Map();
+  let stepsCount = 0;
+
+  // baseURI rather than location: previews run in srcdoc frames. A base that
+  // is not a web address (about:blank) leaves the address as given.
+  function absolute(url, base = document.baseURI) {
+    try {
+      return new URL(url, base).href;
+    } catch (error) {
+      return url;
+    }
+  }
+
+  // One request per page view; a failed one is tried again the next time the
+  // tab is built. App_Themes is cached for a week, so the request asks the
+  // server whether the page has changed (a 304 when it has not).
+  function loadGuide(url) {
+    if (!guides.has(url)) {
+      const address = absolute(url);
+      const loading = fetch(address, {cache: 'no-cache', credentials: 'same-origin'})
+        .then(response => {
+          if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+          return response.text();
+        })
+        .then(html => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const help = JSON.parse(doc.getElementById('help-data')?.textContent || 'null');
+          if (!help?.topics?.length) throw new Error('no topics in the page');
+          if (typeof window.UnionSuiteHelpMatch?.create !== 'function') {
+            throw new Error('UnionSuiteHelpMatch.js is not loaded');
+          }
+          const topics = new Map(help.topics.map(topic => [topic.id, Object.assign(topic, {
+            href: absolute(topic.url, address),
+            steps: doc.getElementById(topic.id)?.querySelector('.topic__body') || null
+          })]));
+          return {...help, address, topics, matcher: window.UnionSuiteHelpMatch.create(help)};
+        });
+      loading.catch(() => guides.delete(url));
+      guides.set(url, loading);
+    }
+    return guides.get(url);
+  }
+
+  function assistantMessage(messages) {
     const message = element('div', 'us-side-chat__message us-side-chat__message--assistant');
     const avatar = element('span', 'us-side-chat__avatar');
     avatar.append(icon('sparkles'));
     const bubble = element('div', 'us-side-chat__bubble');
-    bubble.append(...intro.map(text => element('p', '', text)));
     message.append(avatar, bubble);
     messages.append(message);
+    return bubble;
+  }
+
+  function userMessage(messages, text) {
+    const message = element('div', 'us-side-chat__message us-side-chat__message--user');
+    message.append(element('div', 'us-side-chat__bubble', text));
+    messages.append(message);
+    return message;
+  }
+
+  // The guide page an answer came from, in a new tab so the case stays put.
+  function sourceLink(href, title, from) {
+    const link = element('a', 'us-side-chat__source');
+    link.href = href;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.title = 'Opens in a new tab';
+    const text = element('span', '', title);
+    text.append(element('small', '', from));
+    link.append(icon('book'), text, icon('external-link'));
+    return link;
+  }
+
+  function chips(items, onPick) {
+    const list = element('div', 'us-side-chat__suggestions');
+    for (const item of items) {
+      const chip = element('button', 'us-side-chat__chip', item.title);
+      chip.type = 'button';
+      chip.addEventListener('click', () => onPick(item));
+      list.append(chip);
+    }
+    return list;
+  }
+
+  // Shows or hides with the shared fold (US-RECORD-CARDS) when the theme's
+  // core script is on the page, and instantly without it.
+  function fold(node, open) {
+    const shared = window.UnionSuiteRecordCards?.fold;
+    if (shared) return shared(node, open);
+    node.hidden = !open;
+    return Promise.resolve();
+  }
+
+  // Brings the reader's question to the top of the log, so a long answer is
+  // read from its start.
+  function reveal(messages, node) {
+    const top = messages.scrollTop + node.getBoundingClientRect().top - messages.getBoundingClientRect().top - 12;
+    const instant = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    messages.scrollTo({top: Math.max(0, top), behavior: instant ? 'auto' : 'smooth'});
+  }
+
+  function renderCaseHelp(panel) {
+    const chat = element('div', 'us-side-chat');
+    const messages = element('div', 'us-side-chat__messages');
+    messages.setAttribute('role', 'log');
 
     const composer = element('div', 'us-side-chat__composer');
-    composer.setAttribute('aria-disabled', 'true');
     const label = element('label', 'us-side-chat__label', 'Ask a question');
     label.htmlFor = 'us-side-chat-question-' + panel.dataset.tab;
     const input = element('textarea', 'us-side-chat__input');
     input.id = label.htmlFor;
     input.rows = 1;
-    input.disabled = true;
-    input.placeholder = 'Questions are coming soon';
     const send = element('button', 'us-side-chat__send');
     send.type = 'button';
-    send.disabled = true;
     send.setAttribute('aria-label', 'Send question');
     send.append(icon('send'));
     composer.append(label, input, send);
 
-    const note = element('p', 'us-side-chat__note', 'Answers will come from the UnionSuite guide.');
+    const guideHref = absolute(CASE_GUIDE_URL);
+    const note = element('p', 'us-side-chat__note', 'Answers come from the ');
+    const guideLink = element('a', '', 'case guide');
+    guideLink.href = guideHref;
+    guideLink.target = '_blank';
+    guideLink.rel = 'noopener';
+    note.append(guideLink, '.');
+
     chat.append(messages, composer, note);
     panel.append(chat);
+
+    let guide = null;
+
+    function setReady(ready) {
+      input.disabled = !ready;
+      composer.setAttribute('aria-disabled', String(!ready));
+      send.disabled = !ready || !input.value.trim();
+    }
+
+    function fitInput() {
+      input.style.height = 'auto';
+      input.style.height = input.scrollHeight + 'px';
+    }
+
+    // An answer: the guide's short answer, the topic's steps folded away
+    // under Show the steps, and the topic on the guide page.
+    function answer(bubble, topic) {
+      const short = element('p');
+      short.innerHTML = topic.answer_html;
+      bubble.append(short);
+      if (topic.steps) {
+        const steps = element('div', 'us-side-chat__steps');
+        steps.id = 'us-side-chat-steps-' + (++stepsCount);
+        steps.append(...[...topic.steps.childNodes].map(node => document.importNode(node, true)));
+        steps.hidden = true;
+        const toggle = element('button', 'us-side-chat__steps-toggle');
+        toggle.type = 'button';
+        toggle.setAttribute('aria-controls', steps.id);
+        toggle.setAttribute('aria-expanded', 'false');
+        const text = element('span', '', 'Show the steps');
+        toggle.append(icon('chevron-right'), text);
+        toggle.addEventListener('click', () => {
+          const open = toggle.getAttribute('aria-expanded') !== 'true';
+          toggle.setAttribute('aria-expanded', String(open));
+          text.textContent = open ? 'Hide the steps' : 'Show the steps';
+          fold(steps, open);
+        });
+        bubble.append(toggle, steps);
+      }
+      bubble.append(sourceLink(topic.href, topic.title, guide.title || 'Case guide'));
+    }
+
+    function showTopic(topic) {
+      const question = userMessage(messages, topic.title);
+      answer(assistantMessage(messages), topic);
+      reveal(messages, question);
+    }
+
+    function ask(text) {
+      const question = userMessage(messages, text);
+      const bubble = assistantMessage(messages);
+      const reply = guide.matcher.reply(text);
+      const pick = topic => showTopic(guide.topics.get(topic.id));
+      if (reply.sure) {
+        answer(bubble, guide.topics.get(reply.topic.id));
+        if (reply.others.length) {
+          bubble.append(element('p', 'us-side-chat__others', 'Not quite? Try:'), chips(reply.others, pick));
+        }
+      } else {
+        const maybe = [reply.topic, ...reply.others].filter(Boolean);
+        bubble.append(element('p', '', maybe.length
+          ? 'I am not sure what you mean. Is it one of these?'
+          : 'I could not find that in the case guide. Try other words, or look through the guide.'));
+        if (maybe.length) bubble.append(chips(maybe, pick));
+        bubble.append(sourceLink(guide.address, 'All case topics', guide.title || 'Case guide'));
+      }
+      reveal(messages, question);
+    }
+
+    function submit() {
+      const text = input.value.trim();
+      if (!guide || !text) return;
+      input.value = '';
+      fitInput();
+      setReady(true);
+      ask(text);
+    }
+
+    input.addEventListener('input', () => {
+      fitInput();
+      send.disabled = input.disabled || !input.value.trim();
+    });
+    // Enter sends and Shift+Enter starts a new line. The pane holds no form:
+    // an iMIS page is one form already.
+    input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+      event.preventDefault();
+      submit();
+    });
+    send.addEventListener('click', submit);
+
+    // A link to another topic inside the steps answers in the chat.
+    messages.addEventListener('click', event => {
+      const link = event.target.closest('.us-side-chat__steps a[href^="#"]');
+      const topic = link && guide?.topics.get(link.getAttribute('href').slice(1));
+      if (!topic) return;
+      event.preventDefault();
+      showTopic(topic);
+    });
+
+    const greeting = assistantMessage(messages);
+    const typing = element('span', 'us-side-chat__typing');
+    typing.setAttribute('aria-label', 'Loading the case guide');
+    typing.append(element('span'), element('span'), element('span'));
+    greeting.append(typing);
+    input.placeholder = 'Ask how to do something on this page';
+    setReady(false);
+
+    loadGuide(CASE_GUIDE_URL).then(loaded => {
+      guide = loaded;
+      const examples = (guide.examples || []).map(example => ({title: example}));
+      greeting.replaceChildren(element('p', '', 'Ask how to do something on this case page, or try one of these.'));
+      if (examples.length) greeting.append(chips(examples, example => ask(example.title)));
+      setReady(true);
+    }, error => {
+      console.warn('[UnionSuiteSidePane] the case guide did not load from ' + CASE_GUIDE_URL, error);
+      greeting.replaceChildren(
+        element('p', '', 'Case help could not load just now. The case guide still opens in a new tab.'),
+        sourceLink(guideHref, 'Open the case guide', 'UnionSuite help')
+      );
+      input.placeholder = 'Case help is unavailable';
+    });
   }
 
   register({
@@ -352,12 +577,7 @@
     description: 'How to use this case page.',
     pages: ['case'],
     order: 10,
-    render(panel) {
-      renderChatPlaceholder(panel, [
-        'Case help is on its way.',
-        'Soon you can ask how to do things on this page, and get the steps from the UnionSuite guide.'
-      ]);
-    }
+    render: renderCaseHelp
   });
 
   /* ---- start ---------------------------------------------------------------- */
@@ -375,7 +595,7 @@
   }
 
   window.UnionSuiteSidePane = Object.freeze({
-    version: '1.0',
+    version: '1.1',
     register,
     open,
     close,

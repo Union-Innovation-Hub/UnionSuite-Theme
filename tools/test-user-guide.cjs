@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Checks the staff help's matcher (docs/user-guide/page/match.js) answers
+ * Checks the staff help's matcher (Theme/UnionSuite/Scripts/UnionSuiteHelpMatch.js) answers
  * questions worded the way staff ask them, not the way the topics say
  * them. Builds the help JSON in memory, so no build is needed first.
  *
@@ -12,8 +12,8 @@
 'use strict';
 
 const path = require('path');
-const {loadArea, helpJson, GUIDE} = require('./build-user-guide.cjs');
-const Match = require(path.join(GUIDE, 'page', 'match.js'));
+const {loadArea, helpJson, GUIDE, MATCHER} = require('./build-user-guide.cjs');
+const Match = require(MATCHER);
 
 const loaded = loadArea(path.join(GUIDE, 'cases'));
 if (loaded.problems.length) {

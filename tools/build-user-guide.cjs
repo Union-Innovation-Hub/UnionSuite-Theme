@@ -28,6 +28,8 @@ const GUIDE = path.join(__dirname, '..', 'docs', 'user-guide');
 const DIST = path.join(GUIDE, 'dist');
 const GUIDES = path.join(__dirname, '..', 'Theme', 'UnionSuite-Guides');
 const PAGE = path.join(GUIDE, 'page');
+// The matcher is a theme script: the side pane's Case help chat uses it too.
+const MATCHER = path.join(__dirname, '..', 'Theme', 'UnionSuite', 'Scripts', 'UnionSuiteHelpMatch.js');
 
 const TOPIC_KEYS = ['id', 'title', 'section', 'answer', 'asks', 'keywords', 'related', 'verify'];
 const LIST_KEYS = new Set(['asks', 'keywords', 'related', 'verify']);
@@ -290,7 +292,7 @@ function helpJson({area, topics}) {
 
 function pageHtml(help) {
   const css = fs.readFileSync(path.join(PAGE, 'help.css'), 'utf8');
-  const matcher = fs.readFileSync(path.join(PAGE, 'match.js'), 'utf8');
+  const matcher = fs.readFileSync(MATCHER, 'utf8');
   const script = fs.readFileSync(path.join(PAGE, 'help.js'), 'utf8');
   const byId = new Map(help.topics.map(topic => [topic.id, topic]));
   const sections = help.sections
@@ -319,7 +321,10 @@ function pageHtml(help) {
   const examples = help.examples.map(example =>
     '<button type="button" class="ask__example">' + escapeHtml(example) + '</button>').join(' ');
 
+  // Read by help.js, and by the side pane's chat, which fetches the hosted
+  // page and takes each topic's steps from its article.
   const data = JSON.stringify({
+    title: help.title,
     examples: help.examples,
     synonyms: help.synonyms,
     topics: help.topics.map(({id, title, url, answer_text, answer_html, asks, keywords}) => ({id, title, url, answer_text, answer_html, asks, keywords}))
@@ -364,7 +369,7 @@ ${toc}
 ${articles}
 </main>
 </div>
-<script>window.UnionSuiteHelp = ${data};</script>
+<script type="application/json" id="help-data">${data}</script>
 <script>
 ${matcher}
 </script>
@@ -417,6 +422,6 @@ function build({check = false} = {}) {
   if (verify.length) console.log('\nTo confirm before staff use it (' + verify.length + '):\n  ' + verify.join('\n  '));
 }
 
-module.exports = {build, loadArea, helpJson, parseBlocks, GUIDE, DIST, GUIDES};
+module.exports = {build, loadArea, helpJson, pageHtml, parseBlocks, GUIDE, DIST, GUIDES, MATCHER};
 
 if (require.main === module) build({check: process.argv.includes('--check')});

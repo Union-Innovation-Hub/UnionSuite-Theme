@@ -119,9 +119,14 @@ updates on iMIS after deployment. Offline guide fixtures use fictional responses
 (after the bookmarks star) on pages that have a side pane tab, and opens a pane
 from the right, below the header. Features add tabs with
 `UnionSuiteSidePane.register({id, label, icon, pages, render})`. The first tab,
-Case help on the manage case page, is a chat placeholder. The loader loads the
-script on the case page only; widen its gate in `index.js` when tabs for other
-pages arrive. Styles are US-SIDE-PANE in `zUnionSuite.css`, with dark details
+Case help on the manage case page, is a chat that answers from the staff case
+guide hosted at `/App_Themes/UnionSuite-Guide/Cases-Help.html`
+(`CASE_GUIDE_URL`; built by `node tools/build-user-guide.cjs` into
+`Theme/UnionSuite-Guides/`). It matches questions with
+`UnionSuiteHelpMatch.js`, the same matcher the guide page inlines; the
+matcher's source is here, and the guide build reads it from here. The loader
+loads the matcher and then the side pane on the case page only; widen both
+gates in `index.js` when tabs for other pages arrive. Styles are US-SIDE-PANE in `zUnionSuite.css`, with dark details
 in `zzDarkMode.css`. Test: `node tools/test-side-pane.cjs`. Guide:
 [side pane section](../../UnionSuite-Guides/Usage-Guide.html#side-pane).
 

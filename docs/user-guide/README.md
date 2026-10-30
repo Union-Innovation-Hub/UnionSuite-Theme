@@ -13,7 +13,7 @@ simple chatbot.
 | Path | What |
 | --- | --- |
 | `cases/` | Managing a case: `_area.json` (title, sections in order, example questions) and one Markdown file per topic |
-| `page/` | The help page's `help.css` and `help.js`, and `match.js`, the chatbot's matcher |
+| `page/` | The help page's `help.css` and `help.js`. The matcher both the page and the side pane chat use is a theme script, `Theme/UnionSuite/Scripts/UnionSuiteHelpMatch.js`, which the build inlines |
 | `synonyms.json` | Words and short phrases people type, mapped to the words the topics use. Shared by every area |
 | `dist/` | Built chatbot data, ignored by Git: `cases-help.json`. The help page itself, `Cases-Help.html`, is built into `Theme/UnionSuite-Guides/` with the other pages hosted in iMIS |
 
@@ -120,8 +120,8 @@ subheading.
 }
 ```
 
-`page/match.js` matches a question to a topic by words, with no AI. It
-works in a browser or in Node:
+`Theme/UnionSuite/Scripts/UnionSuiteHelpMatch.js` matches a question to a
+topic by words, with no AI. It works in a browser or in Node:
 
 ```js
 const matcher = UnionSuiteHelpMatch.create(helpJson);
@@ -138,46 +138,41 @@ matcher, so trying questions there shows what the bot would answer.
 
 ### In the taskbar side pane
 
-The chatbot's home is the taskbar side pane, in the theme since 30 October
-2026 (commit 174b7ce): `Theme/UnionSuite/Scripts/UnionSuiteSidePane.js`
-(`window.UnionSuiteSidePane`), loaded on the manage case page only, with
-its styles in `US-SIDE-PANE` in `zUnionSuite.css` and the usage guide's
-`#side-pane`. Its **Case help** tab (`case-help`) is a chat placeholder: a
-greeting and a disabled question box. The chat is not wired yet. The design
-record and its open decisions are in `prototypes/wip/taskbar-side-pane/`.
+Since 30 October 2026 the side pane's **Case help** tab (`case-help` in
+`Theme/UnionSuite/Scripts/UnionSuiteSidePane.js`, on the manage case page)
+is this chatbot. It reads the hosted help page itself, not the JSON:
 
-Tabs register with `UnionSuiteSidePane.register({id, label, icon,
-description, pages, order, render(panel, {close})})`. A second
-registration of an id is ignored with a warning, so the real chat replaces
-the placeholder's `register` block in `UnionSuiteSidePane.js` (or its own
-script registers `case-help` and the placeholder goes).
+- **Where:** `CASE_GUIDE_URL`, `/App_Themes/UnionSuite-Guide/Cases-Help.html`
+  (the server folder is singular; the repo folder is
+  `Theme/UnionSuite-Guides/`). Upload the built `Cases-Help.html` there.
+- **What it reads:** the page's `#help-data` block (examples, synonyms,
+  topics) and each topic's `article#<id> .topic__body` for its steps. Keep
+  both when changing the page build.
+- **When:** fetched once per page view, the first time the tab opens, with
+  `cache: 'no-cache'` so an uploaded update is seen despite the week-long
+  `App_Themes` cache. If it fails, the tab says so and links the guide.
+- **Matcher:** the theme's `UnionSuiteHelpMatch.js`, which `index.js` loads
+  before the side pane on the case page; the page build inlines the same
+  file.
 
-A reply maps onto the side pane's chat classes (`us-side-chat`):
+How a reply shows (`us-side-chat` classes):
 
-| Side pane | From the reply |
+| Side pane | From the guide |
 | --- | --- |
-| Greeting's suggested questions (`__suggestions`, `__chip`) | `help.examples` |
+| Greeting's suggested questions (`__suggestions`, `__chip`) | `examples` |
 | Assistant bubble (`__message--assistant`, `__bubble`) | `topic.answer_html` |
-| Source link (`__source`: title, small line, link) | `topic.title`, `help.title`, `topic.url` (new tab) |
-| Did you mean (`__chip`) | `reply.others` |
-| Escalate (offer Raise a ticket, when that tab exists) | `!reply.sure` |
-| Ticket subject from the chat | `topic.title` |
+| Show the steps (`__steps-toggle`, `__steps`) | the topic's `.topic__body`, folded into the bubble |
+| Source link (`__source`: title, small line, link) | `topic.title`, the guide's `title`, `topic.url` on the hosted page (new tab) |
+| Not quite? Try (`__others`, `__chip`) | `reply.others` |
+| Not sure | the nearest topics as chips, and a link to the whole guide |
 
-- **Steps stay in the pane.** "Show me the steps" expands `topic.body_html`
-  in the bubble rather than leaving the page; links inside it are to other
-  topics (`#id`), so answer them by showing that topic in the chat.
-- **Did you mean:** offer `reply.others` as chips that ask that topic.
-- **Not sure:** say so plainly and offer Raise a ticket, as the mockup's
-  fallback does.
+Links between topics inside the steps (`#id`) answer in the chat, so the
+reader never leaves the case. Still to come: offering Raise a ticket when
+the answer is not sure (once the support tabs exist), help areas for other
+pages, and choosing the area by page.
 
-- **The placeholder's note** says answers come from "the UnionSuite guide";
-  once wired, they come from this staff help.
-
-Still open: where `match.js` and the help JSON are installed (proposed:
-under `Theme/UnionSuite/`, as the loader resolves paths from `index.js`,
-with the tab fetching the JSON when first opened); one JSON per area chosen
-by page, or one for all (per area keeps the case page's download small);
-and favouring the area of the page the user is on.
+Test the side pane chat with `node tools/test-side-pane.cjs`: it serves the
+guide built in memory from these topics on a stand-in origin.
 
 **When it answers wrongly,** add the question to the right topic's `asks`,
 a word to its `keywords`, or a word or phrase to `synonyms.json`, then add

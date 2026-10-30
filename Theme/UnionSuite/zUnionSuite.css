@@ -14848,90 +14848,6 @@ a[data-us-comms-log-held] {
 }
 /* US-WHERE-USED:END */
 
-/* US-IQA-FINDER:START — IQA browser: search every query, favourites and
-   recent items from the native Quick find box (Scripts/IQA-Finder.js).
-   Drawn as the taskbar's contact quick search (US-TASKBAR-COMPONENT): banded
-   section headings, ruled rows and the same spinning circles while searching. */
-.us-iqa-finder-host {
-  position: relative;
-}
-
-/* The Quick find box, wide enough for its placeholder and a pasted path,
-   drawn and focused as the theme's other fields. */
-.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"] {
-  box-sizing: border-box;
-  width: 360px;
-  max-width: 100%;
-  height: 36px;
-  margin: 0;
-  padding: 7px 10px;
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
-  background: var(--bg-surface);
-  color: var(--text-base);
-  font: 13px/1.5 var(--font-ui);
-  box-shadow: none;
-  transition:
-    border-color 150ms,
-    box-shadow 150ms;
-}
-
-.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"]:hover {
-  border-color: var(--brand-600);
-}
-
-.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"]:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  border-color: var(--field-focus-colour);
-  box-shadow: var(--field-focus-glow);
-}
-
-.us-iqa-finder {
-  --us-finder-hover: var(--accent-100);
-  --us-finder-icon: var(--brand-600);
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 3000;
-  box-sizing: border-box;
-  width: min(560px, 90vw);
-  max-height: min(70vh, 560px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-surface);
-  color: var(--text-base);
-  box-shadow: var(--shadow-md);
-  font-family: var(--font-ui);
-  text-align: left;
-}
-
-.us-iqa-finder[hidden] {
-  display: none;
-}
-
-.us-iqa-finder__heading {
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  min-height: 34px;
-  margin: 0;
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-subtle);
-  color: var(--text-muted);
-  font: 700 11px/1.4 var(--font-ui);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-.us-iqa-finder__list {
-  margin: 0;
-  padding: 0;
 /* US-SIDE-PANE:START — the taskbar's side pane (Scripts/UnionSuiteSidePane.js).
    A toggle at the far right of the taskbar opens a pane from the right, below
    the header, with tabs for the page being viewed. Like the Where-used
@@ -15295,6 +15211,103 @@ a[data-us-comms-log-held] {
   font-size: 11px;
 }
 
+/* "Not quite? Try:" above the other topics an answer could be. */
+.us-side-chat__others {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.us-side-chat__others + .us-side-chat__suggestions {
+  margin-top: 6px;
+}
+
+/* Show the steps: the guide topic's full steps, folded into the answer.
+   The steps are the help page's own markup: lists, subheadings (h4), tips
+   (.callout), tables (.table-wrap) and keys (kbd). */
+.us-side-chat__steps-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--text-link);
+  font: 500 12px var(--font-ui);
+  cursor: pointer;
+}
+
+.us-side-chat__steps-toggle:hover {
+  text-decoration: underline;
+}
+
+.us-side-chat__steps-toggle > .ti {
+  font-size: 14px;
+  transition: transform 180ms var(--us-side-pane-ease);
+}
+
+.us-side-chat__steps-toggle[aria-expanded="true"] > .ti {
+  transform: rotate(90deg);
+}
+
+.us-side-chat__steps {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+}
+
+.us-side-chat__steps li + li {
+  margin-top: 3px;
+}
+
+.us-side-chat__steps ul ul {
+  margin: 3px 0 0;
+}
+
+.us-side-chat__steps h4 {
+  margin: 10px 0 4px;
+  color: var(--text-strong);
+  font: 600 12px var(--font-ui);
+  text-transform: none;
+}
+
+.us-side-chat__steps .callout {
+  padding: 6px 10px;
+  border-left: 3px solid var(--warning);
+  border-radius: var(--radius-sm);
+  background: var(--warning-bg);
+}
+
+.us-side-chat__steps .table-wrap {
+  margin: 0 0 8px;
+  overflow-x: auto;
+}
+
+.us-side-chat__steps table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.us-side-chat__steps th,
+.us-side-chat__steps td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.us-side-chat__bubble kbd {
+  padding: 0 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-strong);
+  font: 11px/1.6 var(--font-ui);
+}
+
 /* Three dots while an answer is on its way. */
 .us-side-chat__typing {
   display: inline-flex;
@@ -15433,6 +15446,10 @@ a[data-us-comms-log-held] {
   text-align: center;
 }
 
+.us-side-chat__note a {
+  color: var(--text-link);
+}
+
 /* Touch-sized controls follow the window width (AGENTS.md). */
 @media (max-width: 950px) {
   #injected-taskbar > .us-side-pane-toggle,
@@ -15462,7 +15479,8 @@ a[data-us-comms-log-held] {
   .us-side-pane__tab,
   .us-side-pane__panel,
   .us-side-chat__message,
-  .us-side-chat__composer {
+  .us-side-chat__composer,
+  .us-side-chat__steps-toggle > .ti {
     animation: none;
     transition: none;
   }
@@ -15484,6 +15502,90 @@ a[data-us-comms-log-held] {
 }
 /* US-SIDE-PANE:END */
 
+/* US-IQA-FINDER:START — IQA browser: search every query, favourites and
+   recent items from the native Quick find box (Scripts/IQA-Finder.js).
+   Drawn as the taskbar's contact quick search (US-TASKBAR-COMPONENT): banded
+   section headings, ruled rows and the same spinning circles while searching. */
+.us-iqa-finder-host {
+  position: relative;
+}
+
+/* The Quick find box, wide enough for its placeholder and a pasted path,
+   drawn and focused as the theme's other fields. */
+.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"] {
+  box-sizing: border-box;
+  width: 360px;
+  max-width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-base);
+  font: 13px/1.5 var(--font-ui);
+  box-shadow: none;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"]:hover {
+  border-color: var(--brand-600);
+}
+
+.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"]:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  border-color: var(--field-focus-colour);
+  box-shadow: var(--field-focus-glow);
+}
+
+.us-iqa-finder {
+  --us-finder-hover: var(--accent-100);
+  --us-finder-icon: var(--brand-600);
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 3000;
+  box-sizing: border-box;
+  width: min(560px, 90vw);
+  max-height: min(70vh, 560px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-base);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-ui);
+  text-align: left;
+}
+
+.us-iqa-finder[hidden] {
+  display: none;
+}
+
+.us-iqa-finder__heading {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 34px;
+  margin: 0;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font: 700 11px/1.4 var(--font-ui);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.us-iqa-finder__list {
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 

@@ -1,12 +1,12 @@
 /*
- * The help page's Ask a question box and topic list. Uses the matcher in
- * match.js on the topics the build embeds (window.UnionSuiteHelp), so it
- * answers the way the chatbot will.
+ * The help page's Ask a question box and topic list. Uses the theme's
+ * matcher (UnionSuiteHelpMatch.js) on the topics the build embeds in
+ * #help-data, so it answers the way the side pane's chat does.
  */
 (function () {
   'use strict';
 
-  const help = window.UnionSuiteHelp;
+  const help = JSON.parse(document.getElementById('help-data').textContent);
   const matcher = window.UnionSuiteHelpMatch.create(help);
   const input = document.getElementById('ask-input');
   const result = document.getElementById('ask-result');

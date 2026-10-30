@@ -40,7 +40,7 @@
   // stable URLs, so this is what invalidates them. Bump it when a child file
   // changes; changing this loader alone does not need it, because the entry
   // URL refreshes itself. Bumping needlessly re-downloads every child.
-  const RELEASE = '1.0.10';
+  const RELEASE = '1.0.12';
   const LOAD_TIMEOUT_MS = 20000;
 
   /* Load graph.
@@ -89,14 +89,24 @@
       ready: () => typeof window.UnionSuiteTaskbarBookmarks?.initialise === 'function'
     },
     {
+      id: 'help-match',
+      path: 'Scripts/UnionSuiteHelpMatch.js',
+      // Matches a question to a staff help topic, for the side pane's Case
+      // help chat. The help pages inline the same file. Gated like the pane.
+      when: () => /\/Cases_ManageCase(\.aspx)?$/i.test(location.pathname) || whenElement('.us-case-page'),
+      critical: false,
+      ready: () => typeof window.UnionSuiteHelpMatch?.create === 'function'
+    },
+    {
       id: 'side-pane',
       path: 'Scripts/UnionSuiteSidePane.js',
       // The taskbar's side pane. Its only tab so far is Case help, so it is
       // loaded on the manage case page alone: its path, or the us-case-page
       // page class (the case access check's test in ActionDefinitions.js).
-      // Widen the gate when a tab for other pages arrives. No 'after' edge:
-      // the script waits for the taskbar itself and puts its toggle back
-      // whenever the taskbar is replaced.
+      // Widen the gate when a tab for other pages arrives. After the matcher,
+      // which Case help answers with; the script waits for the taskbar itself
+      // and puts its toggle back whenever the taskbar is replaced.
+      after: ['help-match'],
       when: () => /\/Cases_ManageCase(\.aspx)?$/i.test(location.pathname) || whenElement('.us-case-page'),
       critical: false,
       ready: () => typeof window.UnionSuiteSidePane?.register === 'function'
