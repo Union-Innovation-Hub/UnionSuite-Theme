@@ -81,8 +81,18 @@ IQA path or key, with counts.
   check's; `sources.IQD.builtAt` is the IQA read's, which the business
   object drawer shows. With nothing stored, the index holds only IQAs and
   the IQA designer shows the other places as "Not checked".
-- **Target:** the designer's `iUniformKey` (DocumentVersionKey), named by
-  DocumentSummary `Name`. Matching is case-insensitive.
+- **Target:** the name in the designer's title (`[id$="_BOAMain1_ObjectTitle"]`,
+  the saved name; the Name box may hold an edit), and its `DocumentKeyField`.
+  DocumentSummary was dropped: on dev its `DocumentVersionId` filter returned
+  another business object (30 October 2026). Matching is case-insensitive.
+- **Export CSV** (owner, 30 October 2026): in the status line beside Check
+  again. Downloads the IQAs listed (so following the ASI option) as
+  `<business object> - IQA usage.csv`: Business object, IQA, Path, ASI system
+  content. A `data:` URL as in `ActionDefinitions.js`, with a byte order mark
+  for Excel; cells starting `= + - @` get a leading apostrophe.
+- **Header placement:** the designer's `#BOATitlePanel` is a flex row that
+  spreads its children, so `US-WHERE-USED` gives the button the free space
+  on its left; it sits beside Enhance and Publish.
 - **Not covered:** other places that name a business object (iParts,
   Flowz).
 

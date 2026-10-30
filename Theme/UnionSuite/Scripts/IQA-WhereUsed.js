@@ -478,6 +478,20 @@
     }));
   }
 
+  // The business object drawer's results as CSV (RFC 4180, CRLF), one row
+  // per IQA. A cell starting with = + - or @ gets a leading apostrophe, so a
+  // spreadsheet shows it as text rather than running it as a formula.
+  function usageCsv(target, results) {
+    const cell = value => {
+      let text = String(value ?? '');
+      if (/^[=+\-@]/.test(text)) text = "'" + text;
+      return /[",\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+    };
+    const rows = [['Business object', 'IQA', 'Path', 'ASI system content']]
+      .concat(results.map(result => [target.name, result.item.n, result.item.p, result.item.y ? 'Yes' : 'No']));
+    return rows.map(row => row.map(cell).join(',')).join('\r\n') + '\r\n';
+  }
+
   // Puts the places in `fresh` (an index of only those places) into the
   // stored index, keeping every other place's items and references. With
   // nothing stored, `fresh` stands alone: its sources say what it covers.
@@ -512,7 +526,7 @@
     FORMAT, VERSION, SOURCES, BO_SOURCES, BO_PREFIX, SYSTEM_FOLDERS,
     normalPath, isSystemPath, parentFolder, embeddedPaths, visitValue,
     xmlReferences, jsonReferences, nrbfReferences, scriptReferences, businessObjectSources,
-    createIndex, lookup, lookupBusinessObject, mergeIndex, describe
+    createIndex, lookup, lookupBusinessObject, mergeIndex, usageCsv, describe
   });
 
   if (typeof module === 'object' && module.exports) module.exports = core;
@@ -950,8 +964,10 @@
     const { key, path: shown } = hints();
     let path = shown;
     if (!path && key) {
+      // Only a row that has this key: on dev the DocumentVersionId filter
+      // returned another business object's row (30 October 2026).
       const summary = await api('GET', 'DocumentSummary?DocumentVersionId=' + encodeURIComponent(key) + '&Limit=5');
-      const row = summary?.Items?.$values?.[0];
+      const row = (summary?.Items?.$values || []).find(each => versionKeyOf(each) === key);
       path = row ? pathOf(row) : '';
     }
     if (!path) throw unsaved();
@@ -964,24 +980,29 @@
     };
   }
 
-  // The business object designer opens with the object's DocumentVersionKey
-  // as iUniformKey. Its document Name is the name IQAs store for a source
-  // (mBusinessControllerName), so Name comes before AlternateName here.
+  // The business object designer's own DocumentKey, held in a hidden field;
+  // an unsaved object holds the empty GUID there (as its BOATask() checks).
+  // Without the field, the iUniformKey it opened with.
   function boKey() {
     const params = urlParams();
     if (isNew(params)) return '';
-    const key = String(params.get('iuniformkey') || '').toLowerCase();
+    const held = document.getElementById('DocumentKeyField');
+    const key = String(held ? held.value : params.get('iuniformkey') || '').trim().toLowerCase();
     return GUID.test(key) && key !== NULL_GUID ? key : '';
   }
+
+  // The saved name, from the designer's title: the name IQAs store for a
+  // source (mBusinessControllerName). Not the Name box, which may hold an
+  // unsaved edit, and not DocumentSummary, whose DocumentVersionId filter
+  // returned another business object on dev (30 October 2026).
+  const boTitle = () => (document.querySelector('[id$="_BOAMain1_ObjectTitle"], #BOATitlePanel .PanelTitle')?.textContent || '').trim();
 
   async function resolveBusinessObject() {
     const key = boKey();
     if (!key) throw unsaved();
-    const summary = await api('GET', 'DocumentSummary?DocumentVersionId=' + encodeURIComponent(key) + '&Limit=5');
-    const row = summary?.Items?.$values?.[0];
-    const name = String(field(row, 'Name', 'DocumentName', 'AlternateName')).trim();
-    if (!name) throw new Error('No business object has the key ' + key + '.');
-    return { name, versionKey: key, documentKey: documentKeyOf(row) };
+    const name = boTitle();
+    if (!name) throw new Error('The designer shows no business object name.');
+    return { name, documentKey: key };
   }
 
   // The business object designer's Publish button, as BO-Enhancements.js
@@ -1383,6 +1404,28 @@
     else summary.textContent = total ? 'Used in ' + total + (total === 1 ? ' place' : ' places') : 'Not used in any of the places checked';
     meta.append(document.createTextNode(built));
     if (canRebuild()) meta.append(rebuildButton('Check again'));
+    if (ON_BO && total) meta.append(exportButton(groups));
+  }
+
+  // Business object drawer: the IQAs listed (so following Include ASI
+  // system content), downloaded as a CSV file.
+  function exportButton(groups) {
+    const control = element('button', 'TextButton us-outline-button us-where-used__export');
+    control.type = 'button';
+    control.title = 'Download the IQAs listed here as a CSV file';
+    control.append(icon('ti-file-export'), document.createTextNode('Export CSV'));
+    control.addEventListener('click', () => {
+      const results = groups.flatMap(group => group.results).filter(result => visible(result.item));
+      // A data: URL, not a blob: URL: Firefox ignores download on blob: URLs
+      // (as ActionDefinitions.js does). The byte order mark makes Excel read UTF-8.
+      const link = element('a');
+      link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('﻿' + usageCsv(state.target, results));
+      link.download = (state.target.name.replace(/[\\/:*?"<>|]+/g, '_') || 'Business object') + ' - IQA usage.csv';
+      document.body.append(link);
+      link.click();
+      link.remove();
+    });
+    return control;
   }
 
   function render() {

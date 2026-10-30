@@ -18111,6 +18111,29 @@ a[data-us-comms-log-held] {
   font-size: 17px;
 }
 
+/* Export CSV in the business object drawer's status line. */
+.us-where-used__export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.us-where-used__export > .ti {
+  font-size: 16px;
+}
+
+/* Business object designer header (#BOATitlePanel): a flex row that spreads
+   the title and Publish apart. The button takes the free space on its left,
+   so it sits at the right beside the Enhance switch and Publish, as in the
+   IQA designer, with or without the switch. */
+#BOATitlePanel > .us-where-used-button {
+  margin: 0 var(--space-2, 8px) 0 auto;
+}
+
+#BOATitlePanel > .us-where-used-button + .bo-editor-actions {
+  margin-left: 0;
+}
+
 @media (max-width: 600px) {
   .us-where-used {
     width: 100vw;

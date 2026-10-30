@@ -185,6 +185,19 @@ test('merge: a check of IQAs alone replaces the stored IQAs and keeps every othe
   assert.deepEqual(Object.keys(alone.sources), ['IQD']);
 });
 
+test('business object CSV: header, quoting, formula guard and ASI column', () => {
+  const results = [
+    { item: { n: 'Profile', p: '$/_i4u_/SandBox/Profile', y: 0 } },
+    { item: { n: 'Staff, "managers"', p: '$/_i4u_/Core/Staff', y: 0 } },
+    { item: { n: '=HYPERLINK("x")', p: '$/Common/Queries/Staff', y: 1 } }
+  ];
+  assert.equal(core.usageCsv({ name: '_I4u_UT_StaffUsers' }, results),
+    'Business object,IQA,Path,ASI system content\r\n' +
+    '_I4u_UT_StaffUsers,Profile,$/_i4u_/SandBox/Profile,No\r\n' +
+    '_I4u_UT_StaffUsers,"Staff, ""managers""",$/_i4u_/Core/Staff,No\r\n' +
+    '_I4u_UT_StaffUsers,"\'=HYPERLINK(""x"")",$/Common/Queries/Staff,Yes\r\n');
+});
+
 test('theme scripts: named by section marker or action key; shorthand skipped', () => {
   const source = "/* US-COMMS-LOG:START — x */\nconst a = '$/_i4u_/Core/CA/v2/API - Agreement Email Logs';\n" +
     "define('home.add-task', { href: '$/_i4u_/Core/Home/Tasks' });\n// $/…/Contact_Page/Alerts\nconst b = \"$/…/Contact_Page/Alerts\";";

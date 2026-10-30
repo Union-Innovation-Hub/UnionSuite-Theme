@@ -139,8 +139,9 @@ returns focus; dark mode.
 
 ### Business object designer (added 30 October 2026)
 
-- [ ] The loader runs in the designer's RadWindow frame and the button sits before the Enhance switch (or Publish); disabled for a new business object.
-- [ ] The designer's `iUniformKey` is the DocumentVersionKey, and its DocumentSummary `Name` is the name IQAs store (`CsContact`, `_I4u_UT_ContactBasic`). If not, change `resolveBusinessObject`.
+- [x] The loader runs in the designer's RadWindow frame (dev, 30 October 2026). The button first sat beside the title, because the header `#BOATitlePanel` spreads its children; `US-WHERE-USED` now gives it the free space on its left, so it sits at the right beside Enhance and Publish (release 1.0.14).
+- [ ] Disabled for a new business object (mock checked; not yet on dev).
+- [x] DocumentSummary by `DocumentVersionId` returned another business object on dev (`i4u_UT_StaffUsers_Simple` for `_I4u_UT_StaffUsers`). The name now comes from the designer's title (`[id$="_BOAMain1_ObjectTitle"]`) and the key from its `DocumentKeyField`; no request. The IQA designer's DocumentSummary fallback now keeps only a row with the same key.
 - [ ] With a version 1 index, the drawer says Check again; Check again reads only IQAs, merges, and the IQA designer still shows every other place.
 - [ ] `_I4u_UT_ContactBasic` and `NetContactData` list the IQAs known to use them; Include ASI system content adds `$/Common` and `$/Samples` IQAs for `CsContact`.
 - [ ] Escape closes the drawer, not the RadWindow; Open opens the IQA designer in a new tab.
