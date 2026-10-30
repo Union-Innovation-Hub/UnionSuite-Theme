@@ -55,6 +55,37 @@ IQA path or key, with counts.
   banner should change: no; the guide now says to write IQA paths whole in
   templates and Content HTML.
 
+## Business object designer (30 October 2026)
+
+**Built, live checks pending** (TODO "Enhanced BO — usage panel"; checks in
+[BUILD-PLAN.md](BUILD-PLAN.md#live-checks-on-dev)).
+
+- **Same script, same stored row** (owner, 30 October 2026: reuse the stored
+  where-used value; only IQAs need checking). `IQA-WhereUsed.js` also loads
+  in the business object designer frame, gated like `BO-Enhancements.js`,
+  and lists the IQAs that use the open business object as a source.
+- **How an IQA names a business object source:** each source in the blob is
+  its slot string (`SR1`) followed at once by `mBusinessControllerName`, the
+  business object name (`_I4u_UT_ContactBasic`, `NetContactData`): a string
+  record (`0x06`, a 4-byte id, the string) or a reference (`0x09`, the id)
+  to the same string written earlier. An IQA used as a source has no name
+  there. `mAlias` (`vBo…`) is empty in a quarter of sources, so it is not
+  used. The byte reader matched the full parser (`Claude/iqa-blob-parser`)
+  on all 149 sample IQAs and 231 distinct sources.
+- **Index version 2** adds `bo:` + lowercased name refs from each IQA
+  (property `Source`). The IQA designer still reads a version 1 index; the
+  business object designer asks for Check again until the IQAs are read.
+- **Check again there reads only the IQAs** (about 5–10 s) and merges them
+  into the latest stored index: the IQA items are replaced, every other
+  place's items and references are kept. `builtAt` stays the oldest
+  check's; `sources.IQD.builtAt` is the IQA read's, which the business
+  object drawer shows. With nothing stored, the index holds only IQAs and
+  the IQA designer shows the other places as "Not checked".
+- **Target:** the designer's `iUniformKey` (DocumentVersionKey), named by
+  DocumentSummary `Name`. Matching is case-insensitive.
+- **Not covered:** other places that name a business object (iParts,
+  Flowz).
+
 ## UI decisions (owner, 12 October 2026)
 
 - **A "Where used" button** in the IQA designer header, beside Copy Path and

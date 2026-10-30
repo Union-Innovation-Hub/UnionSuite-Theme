@@ -106,6 +106,85 @@ test('IQA definitions: a path inside the display template (agreement banner)', (
     [['Query Template - Manage Agreement - Banner', 'Its display template uses this query']]);
 });
 
+// An NRBF string record: 0x06, a 4-byte object id, then the string.
+const stringRecord = (id, text) => Buffer.concat([Buffer.from([0x06, id, 0, 0, 0]), nrbfString(text)]);
+const reference = id => Buffer.from([0x09, id, 0, 0, 0]);
+
+// Two sources laid out as real IQA blobs hold them (slot, then name), the
+// second naming its business object by reference to an earlier string,
+// and an IQA used as a source, which has no name.
+const sourcesBlob = Buffer.concat([
+  Buffer.from([0, 1, 0, 0, 0, 0xff, 0xff, 0xff, 0xff]),
+  stringRecord(0x10, 'NetContactData'),
+  stringRecord(0xf4, 'SR1'), stringRecord(0xf5, '_I4u_UT_ContactBasic'), reference(0xf6),
+  stringRecord(0xf7, 'vBo_I4u_UT_ContactBasic'), stringRecord(0xf8, 'Person'),
+  stringRecord(0x20, 'SR2'), reference(0x10), stringRecord(0x21, 'vBoNetContactData'),
+  stringRecord(0x30, 'SR3'), Buffer.from([0x0a]),
+  nrbfString('source:' + TARGET.documentKey + '.SR3')
+]).toString('latin1');
+
+test('IQA definitions: business object sources by name, written or referenced', () => {
+  assert.deepEqual(core.businessObjectSources(sourcesBlob), ['_I4u_UT_ContactBasic', 'NetContactData']);
+  const found = collect(emit => core.nrbfReferences(sourcesBlob, emit));
+  assert.deepEqual(found.filter(ref => ref[0].startsWith(core.BO_PREFIX)).map(ref => [ref[0], ref[2]]), [
+    ['bo:_i4u_ut_contactbasic', 'Source'],
+    ['bo:netcontactdata', 'Source']
+  ]);
+  // The slot inside a qualified name ("<key>.SR3") is not a source.
+  assert.ok(found.some(ref => ref[0] === TARGET.documentKey && ref[1]), 'IQA source key still found');
+});
+
+test('business object lookup: the IQAs using it, by name in any case', () => {
+  const index = core.createIndex();
+  const contacts = index.item({ s: 'IQD', n: 'ContactRecords', p: TARGET.path, k: 'q1' }, ['q1']);
+  core.nrbfReferences(sourcesBlob, (identifier, isKey, property) => index.ref(contacts, identifier, isKey, property, '', ''));
+  const sample = index.item({ s: 'IQD', n: 'Samples contact', p: '$/Samples/Contacts', k: 'q2', y: true }, ['q2']);
+  index.ref(sample, 'bo:netcontactdata', false, 'Source', '', '');
+  const finished = index.finish({ sources: { IQD: { items: 2 } } });
+
+  const groups = core.lookupBusinessObject(finished, { name: 'netContactData' });
+  assert.deepEqual(groups.map(group => group.source.id), ['IQD']);
+  assert.deepEqual(groups[0].results.map(result => [result.item.n, result.item.y, result.how]), [
+    ['ContactRecords', 0, 'Uses this business object as a source'],
+    ['Samples contact', 1, 'Uses this business object as a source']
+  ]);
+  assert.equal(core.lookupBusinessObject(finished, { name: 'CsContact' })[0].results.length, 0);
+  // Business object sources never show in an IQA's own lookup.
+  assert.ok(core.lookup(finished, { path: '$/x/y', documentKey: 'd', versionKey: 'v' }).every(group => !group.results.length));
+});
+
+test('merge: a check of IQAs alone replaces the stored IQAs and keeps every other place', () => {
+  const stored = core.createIndex();
+  const page = stored.item({ s: 'CON', n: 'List Of Contacts', p: '@/a', k: 'p1' });
+  stored.ref(page, TARGET.path.toLowerCase(), false, 'SourceFolderPathControl', 'Menu', 'QueryMenu');
+  const oldQuery = stored.item({ s: 'IQD', n: 'Old wrapper', p: '$/old', k: 'w0' });
+  stored.ref(oldQuery, TARGET.path.toLowerCase(), false, 'Query', '', '');
+  const task = stored.item({ s: 'TASK', n: 'Nightly', k: 't1' });
+  stored.ref(task, OTHER.path.toLowerCase(), false, 'DataSources.Query.Criteria.Values', '', '');
+  const before = Object.assign(stored.finish({ builtAt: '2026-10-01T00:00:00.000Z', durationMs: 12000, sources: { CON: { items: 1 }, IQD: { items: 1 }, TASK: { items: 1 } } }), { version: 1 });
+
+  const fresh = core.createIndex();
+  const wrapper = fresh.item({ s: 'IQD', n: 'New wrapper', p: '$/new', k: 'w1' });
+  fresh.ref(wrapper, 'bo:netcontactdata', false, 'Source', '', '');
+  const merged = core.mergeIndex(before, fresh.finish({ builtAt: '2026-10-30T00:00:00.000Z', durationMs: 5000, iqas: 9, sources: { IQD: { items: 9 } } }));
+
+  assert.equal(merged.version, core.VERSION);
+  assert.equal(merged.builtAt, '2026-10-01T00:00:00.000Z');
+  assert.deepEqual(merged.sources.IQD, { items: 9, builtAt: '2026-10-30T00:00:00.000Z' });
+  assert.deepEqual(merged.sources.CON, { items: 1 });
+  assert.deepEqual(merged.items.map(item => item.n), ['List Of Contacts', 'Nightly', 'New wrapper']);
+  assert.deepEqual(merged.refs.map(ref => [merged.items[ref[0]].n, ref[1]]), [
+    ['List Of Contacts', TARGET.path.toLowerCase()],
+    ['Nightly', OTHER.path.toLowerCase()],
+    ['New wrapper', 'bo:netcontactdata']
+  ]);
+  assert.equal(core.lookupBusinessObject(merged, { name: 'NetContactData' })[0].results[0].item.n, 'New wrapper');
+
+  // With nothing stored, the IQAs stand alone and say what they cover.
+  const alone = core.mergeIndex(null, fresh.finish({ builtAt: '2026-10-30T00:00:00.000Z', durationMs: 5000, sources: { IQD: { items: 9 } } }));
+  assert.deepEqual(Object.keys(alone.sources), ['IQD']);
+});
+
 test('theme scripts: named by section marker or action key; shorthand skipped', () => {
   const source = "/* US-COMMS-LOG:START — x */\nconst a = '$/_i4u_/Core/CA/v2/API - Agreement Email Logs';\n" +
     "define('home.add-task', { href: '$/_i4u_/Core/Home/Tasks' });\n// $/…/Contact_Page/Alerts\nconst b = \"$/…/Contact_Page/Alerts\";";

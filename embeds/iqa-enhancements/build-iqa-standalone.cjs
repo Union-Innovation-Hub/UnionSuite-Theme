@@ -129,7 +129,7 @@ function swap(source, from, to, label) {
 //     the drawer until the page is reloaded (state.pageOnly). A check whose
 //     save fails also keeps its results on the page, with the warning.
 function whereUsedWithoutTheme(source) {
-  const guard = "if (!/\\/QueryBuilder\\/Design\\.aspx$/i.test(location.pathname)) return;";
+  const guard = "if (!ON_BO && !/\\/QueryBuilder\\/Design\\.aspx$/i.test(location.pathname)) return;";
   const at = source.indexOf(guard);
   if (at < 0) fail('IQA-WhereUsed.js: the page guard has moved; update whereUsedWithoutTheme()');
   const split = at + guard.length;
@@ -146,9 +146,9 @@ function whereUsedWithoutTheme(source) {
     'loading the stored results');
 
   page = swap(page,
-    "    if (index) {\n      try {\n        const ordinal = state.stored?.ordinal ?? null;",
+    "    if (index) {\n      try {\n        // A check of some places",
     "    if (index && state.pageOnly) {\n      state.stored = { ordinal: null, index };\n      index = null;\n    }\n"
-    + "    if (index) {\n      try {\n        const ordinal = state.stored?.ordinal ?? null;",
+    + "    if (index) {\n      try {\n        // A check of some places",
     'saving a check');
 
   page = swap(page,
@@ -156,10 +156,10 @@ function whereUsedWithoutTheme(source) {
     "        state.saveError = error.message;\n        state.stored = { ordinal: state.stored?.ordinal ?? null, index };\n",
     'a failed save');
 
-  const everyone = "'Run a check once and everyone can see where their queries are used. It looks through every page, value list, template, task and query, and takes about 15 seconds.'";
-  page = swap(page, everyone,
-    "(state.pageOnly\n          ? 'Run a check to see where this query is used. It looks through every page, value list, template, task and query, and takes about 15 seconds. "
-    + "This site has nowhere to save the results, so they stay here until the page is reloaded.'\n          : " + everyone + ')',
+  page = swap(page,
+    "stale ? PAGE.staleText : PAGE.emptyText",
+    "stale ? PAGE.staleText : state.pageOnly\n        ? 'Run a check to see where this query is used. It looks through every page, value list, template, task and query, and takes about 15 seconds. "
+    + "This site has nowhere to save the results, so they stay here until the page is reloaded.'\n        : PAGE.emptyText",
     'the first-check text');
 
   page = swap(page,

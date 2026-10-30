@@ -136,3 +136,12 @@ returns focus; dark mode.
 - [ ] Each Open link opens the right editor in a new tab, including the communication template key and the task dialog as a full page.
 - [ ] Rebuild hidden for a user without Save; a failed rebuild keeps the previous index.
 - [ ] Light and dark, keyboard (Escape, focus return), reduced motion.
+
+### Business object designer (added 30 October 2026)
+
+- [ ] The loader runs in the designer's RadWindow frame and the button sits before the Enhance switch (or Publish); disabled for a new business object.
+- [ ] The designer's `iUniformKey` is the DocumentVersionKey, and its DocumentSummary `Name` is the name IQAs store (`CsContact`, `_I4u_UT_ContactBasic`). If not, change `resolveBusinessObject`.
+- [ ] With a version 1 index, the drawer says Check again; Check again reads only IQAs, merges, and the IQA designer still shows every other place.
+- [ ] `_I4u_UT_ContactBasic` and `NetContactData` list the IQAs known to use them; Include ASI system content adds `$/Common` and `$/Samples` IQAs for `CsContact`.
+- [ ] Escape closes the drawer, not the RadWindow; Open opens the IQA designer in a new tab.
+- [ ] The stored size after business object sources are added.

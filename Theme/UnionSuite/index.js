@@ -40,7 +40,7 @@
   // stable URLs, so this is what invalidates them. Bump it when a child file
   // changes; changing this loader alone does not need it, because the entry
   // URL refreshes itself. Bumping needlessly re-downloads every child.
-  const RELEASE = '1.0.12';
+  const RELEASE = '1.0.13';
   const LOAD_TIMEOUT_MS = 20000;
 
   /* Load graph.
@@ -134,11 +134,14 @@
     {
       id: 'where-used',
       path: 'Scripts/IQA-WhereUsed.js',
-      // "Where used" in the IQA designer. Uses the theme's fold and shared
-      // copy button, so it follows core. It mounts its own header button,
-      // beside the IQA enhancements' copy buttons when they are present.
+      // "Show Usage" in the IQA designer, and in the business object
+      // designer (the IQAs that use the object as a source). Uses the
+      // theme's fold and shared copy button, so it follows core. It mounts
+      // its own header button: beside the IQA enhancements' copy buttons,
+      // or before the business object designer's Enhance switch. The
+      // business object designer is a RadWindow iframe, matched like 'bo'.
       after: ['core'],
-      when: () => /\/QueryBuilder\/Design\.aspx$/i.test(location.pathname),
+      when: () => /\/QueryBuilder\/Design\.aspx$|\/AsiCommon\/Controls\/BOA\/Design\.aspx$/i.test(location.pathname),
       critical: false,
       ready: () => typeof window.UnionSuiteWhereUsed?.open === 'function'
     },

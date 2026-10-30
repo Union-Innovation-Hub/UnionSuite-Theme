@@ -68,7 +68,7 @@
   }
   if (window.UnionSuiteIqaStandalone) return;
   if (!/\/QueryBuilder\/Design\.aspx$|\/AsiCommon\/Controls\/IQA\/Default\.aspx$/i.test(location.pathname)) return;
-  window.UnionSuiteIqaStandalone = Object.freeze({ version: "7608d233ab" });
+  window.UnionSuiteIqaStandalone = Object.freeze({ version: "e2dbb41c26" });
 
   const style = document.createElement('style');
   style.id = 'iqa-standalone-css';
@@ -6179,6 +6179,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
  * an IQA can rebuild it. A lookup reads the stored index and matches the
  * open IQA's path, its two keys and its folder.
  *
+ * The same index answers the business object designer: reading the IQAs
+ * also records the business objects each one uses as a source, and there
+ * the button lists those IQAs. A check from the business object designer
+ * reads only the IQAs and merges them into the stored index, keeping every
+ * other place's results.
+ *
  * Research, decisions and the build plan:
  * prototypes/wip/iqa-where-used/README.md and BUILD-PLAN.md.
  *
@@ -6192,7 +6198,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
    * Core: extraction, index and lookup (no page needed)
    * ======================================================================== */
   const FORMAT = 'unionsuite-where-used';
-  const VERSION = 1;
+  // 2 adds business object sources (bo: refs from IQAs). A version 1 index
+  // still answers the IQA designer; the business object designer needs 2.
+  const VERSION = 2;
   const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const NULL_GUID = '00000000-0000-0000-0000-000000000000';
 
@@ -6206,6 +6214,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     { id: 'IQD', name: 'Other IQAs', icon: 'ti-file-search' },
     { id: 'THEME', name: 'UnionSuite theme', icon: 'ti-palette' }
   ];
+
+  // The places the business object designer shows: only IQAs use a
+  // business object as a source.
+  const BO_SOURCES = [
+    { id: 'IQD', name: 'IQAs', icon: 'ti-file-search' }
+  ];
+
+  // A business object source is indexed as 'bo:' and its lowercased name,
+  // which can never be mistaken for an IQA path or key.
+  const BO_PREFIX = 'bo:';
 
   // Top-level folders supplied by ASI. Their contents are in the index and
   // shown only when the user includes ASI system content.
@@ -6395,7 +6413,49 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     return new TextDecoder('utf-8', { ignoreBOM: true }).decode(bytes);
   }
 
+  // A length-prefixed string starting at a position: its text and end.
+  function nrbfString(binary, at) {
+    let length = 0;
+    for (let shift = 0; ; shift += 7) {
+      if (shift > 21 || at >= binary.length) return null;
+      const byte = binary.charCodeAt(at++);
+      length |= (byte & 0x7f) << shift;
+      if (!(byte & 0x80)) break;
+    }
+    if (at + length > binary.length) return null;
+    return utf8(binary.slice(at, at + length));
+  }
+
+  // The business objects an IQA uses as sources. Each source is written as
+  // its slot string ("SR1") followed at once by its business object name
+  // (mBusinessControllerName): a string record (0x06, a 4-byte id, then the
+  // text), or a reference (0x09, the id) to the same string written earlier.
+  // An IQA used as a source has no name there. Matched the full parser
+  // (Claude/iqa-blob-parser) on 149 sample IQAs and 235 sources.
+  const SOURCE_SLOT = /\x06[\s\S]{4}([\x03-\x06])(SR\d{1,4})/g;
+  const BO_NAME = /^[A-Za-z_][\w.-]{0,127}$/;
+
+  function businessObjectSources(binary) {
+    const names = [];
+    let match;
+    SOURCE_SLOT.lastIndex = 0;
+    while ((match = SOURCE_SLOT.exec(binary))) {
+      if (match[1].charCodeAt(0) !== match[2].length) continue;
+      const after = match.index + match[0].length;
+      let name = null;
+      if (binary.charCodeAt(after) === 0x06) {
+        name = nrbfString(binary, after + 5);
+      } else if (binary.charCodeAt(after) === 0x09) {
+        const written = binary.lastIndexOf('\x06' + binary.slice(after + 1, after + 5), match.index);
+        if (written !== -1) name = nrbfString(binary, written + 5);
+      }
+      if (name && BO_NAME.test(name) && !names.includes(name)) names.push(name);
+    }
+    return names;
+  }
+
   function nrbfReferences(binary, emit) {
+    businessObjectSources(binary).forEach(name => emit(BO_PREFIX + name.toLowerCase(), false, 'Source', name, ''));
     let at = binary.indexOf('$/');
     while (at !== -1) {
       // The byte before is a one-byte length, or the second byte of a
@@ -6565,19 +6625,71 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     }));
   }
 
+  // target: { name } of a business object. Returns the IQAs that use it as
+  // a source, grouped as lookup's results are.
+  function lookupBusinessObject(index, target) {
+    const identifier = BO_PREFIX + String(target.name || '').trim().toLowerCase();
+    const found = new Map();
+    for (const ref of index.refs) {
+      if (ref[1] !== identifier) continue;
+      const item = index.items[ref[0]];
+      if (item && !found.has(ref[0])) found.set(ref[0], item);
+    }
+    return BO_SOURCES.map(source => ({
+      source,
+      results: [...found.values()].filter(item => item.s === source.id).map(item => ({
+        item,
+        how: 'Uses this business object as a source',
+        viaFolder: false
+      }))
+    }));
+  }
+
+  // Puts the places in `fresh` (an index of only those places) into the
+  // stored index, keeping every other place's items and references. With
+  // nothing stored, `fresh` stands alone: its sources say what it covers.
+  // builtAt stays the stored index's, the oldest place's check; each
+  // merged place carries its own builtAt in sources.
+  function mergeIndex(stored, fresh) {
+    const replaced = new Set(Object.keys(fresh.sources || {}));
+    Object.keys(fresh.sources || {}).forEach(id => { fresh.sources[id].builtAt = fresh.builtAt; });
+    if (!stored) return fresh;
+    const kept = [];
+    const renumber = new Map();
+    stored.items.forEach((item, at) => {
+      if (replaced.has(item.s)) return;
+      renumber.set(at, kept.length);
+      kept.push(item);
+    });
+    const refs = stored.refs.filter(ref => renumber.has(ref[0])).map(ref => [renumber.get(ref[0])].concat(ref.slice(1)));
+    fresh.refs.forEach(ref => refs.push([ref[0] + kept.length].concat(ref.slice(1))));
+    const sources = Object.assign({}, stored.sources);
+    replaced.forEach(id => { sources[id] = fresh.sources[id]; });
+    return Object.assign({}, stored, {
+      format: FORMAT,
+      version: VERSION,
+      iqas: replaced.has('IQD') ? fresh.iqas : stored.iqas,
+      items: kept.concat(fresh.items),
+      refs,
+      sources
+    });
+  }
+
   const core = Object.freeze({
-    FORMAT, VERSION, SOURCES, SYSTEM_FOLDERS,
+    FORMAT, VERSION, SOURCES, BO_SOURCES, BO_PREFIX, SYSTEM_FOLDERS,
     normalPath, isSystemPath, parentFolder, embeddedPaths, visitValue,
-    xmlReferences, jsonReferences, nrbfReferences, scriptReferences,
-    createIndex, lookup, describe
+    xmlReferences, jsonReferences, nrbfReferences, scriptReferences, businessObjectSources,
+    createIndex, lookup, lookupBusinessObject, mergeIndex, describe
   });
 
   if (typeof module === 'object' && module.exports) module.exports = core;
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   if (window.UnionSuiteWhereUsed) return;
 
-  // Runs only in the IQA designer, as its loader gate does.
-  if (!/\/QueryBuilder\/Design\.aspx$/i.test(location.pathname)) return;
+  // Runs only in the IQA designer and the business object designer (inside
+  // its RadWindow iframe), as its loader gate does.
+  const ON_BO = /\/AsiCommon\/Controls\/BOA\/Design\.aspx$/i.test(location.pathname);
+  if (!ON_BO && !/\/QueryBuilder\/Design\.aspx$/i.test(location.pathname)) return;
 
   // Standalone bundle: no theme loader, so the theme's own scripts are not a place to check.
   const PLACES = SOURCES.filter(source => source.id !== 'THEME');
@@ -6854,15 +6966,17 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     }
   };
 
-  // Reads every place, three at a time. onProgress(sourceId, state) reports
-  // 'reading', 'done' or 'failed'. Resolves with the finished index, or
-  // rejects with the failed places listed on the error.
-  async function build({ onProgress, signal } = {}) {
+  // Reads every place, or the ids in `only`, three at a time.
+  // onProgress(sourceId, state) reports 'reading', 'done' or 'failed'.
+  // Resolves with the finished index, or rejects with the failed places
+  // listed on the error.
+  async function build({ onProgress, signal, only } = {}) {
     const started = Date.now();
     const index = createIndex();
     const counts = {};
     const failed = [];
-    await pool(PLACES, PARALLEL_SOURCES, async source => {
+    const sources = only ? PLACES.filter(source => only.includes(source.id)) : PLACES;
+    await pool(sources, PARALLEL_SOURCES, async source => {
       onProgress?.(source.id, 'reading', index);
       try {
         counts[source.id] = { items: await READERS[source.id](index, signal) };
@@ -6935,20 +7049,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     const payload = scalar(readProperty(row, 'Payload'));
     if (typeof payload !== 'string' || !payload) return { ordinal, index: null };
     const index = JSON.parse(await gunzip(payload));
-    if (index?.format !== FORMAT || index.version !== VERSION) return { ordinal, index: null };
+    if (index?.format !== FORMAT || !(index.version >= 1 && index.version <= VERSION)) return { ordinal, index: null };
     return { ordinal, index, updatedBy: String(scalar(readProperty(row, 'UpdatedBy')) || '') };
   }
 
   async function save(index, ordinal) {
     const bytes = await gzip(JSON.stringify(index));
-    const summary = index.refs.length + ' references to IQAs from ' + Object.keys(index.sources).length +
+    const summary = index.refs.length + ' references to IQAs and business objects from ' + Object.keys(index.sources).length +
       ' places, built in ' + (Math.round(index.durationMs / 100) / 10) + ' s';
     const values = [
       property('Module', STORE.module),
       property('Category', STORE.category),
       property('Code', STORE.code),
       property('Entity', ''),
-      property('Description', 'Where each IQA is used: content pages, business object and panel source value lists, communication templates, alerts and Process Automation, other IQAs and the UnionSuite theme. Rebuilt from the IQA designer.'),
+      property('Description', 'Where each IQA is used: content pages, business object and panel source value lists, communication templates, alerts and Process Automation, other IQAs and the UnionSuite theme; and which IQAs use each business object as a source. Rebuilt from the IQA designer, or for IQAs alone from the business object designer.'),
       property('Value', summary),
       property('ValueType', 'String'),
       property('LastUpdated', { $type: 'System.DateTime', $value: localTimestamp() }),
@@ -6971,12 +7085,23 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
   }
 
   /* ===========================================================================
-   * The open IQA
+   * The open IQA or business object
    * ======================================================================== */
+  function urlParams() {
+    return new Map([...new URLSearchParams(location.search)].map(([name, value]) => [name.toLowerCase(), value]));
+  }
+
+  const isNew = params => /^(new|add|create)$/i.test(params.get('imode') || '') || /^(new|add|create)$/i.test(params.get('ioperation') || '');
+
+  function unsaved() {
+    const error = new Error('Not saved');
+    error.unsaved = true;
+    return error;
+  }
+
   function hints() {
-    const params = new Map([...new URLSearchParams(location.search)].map(([name, value]) => [name.toLowerCase(), value]));
-    const newQuery = /^(new|add|create)$/i.test(params.get('imode') || '') || /^(new|add|create)$/i.test(params.get('ioperation') || '');
-    if (newQuery) return {};
+    const params = urlParams();
+    if (isNew(params)) return {};
     let key = params.get('iuniformkey') || '';
     // IQA-Enhancements keeps the key across postbacks that drop it from the URL.
     if (!GUID.test(key)) {
@@ -6991,28 +7116,93 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     return { key: GUID.test(key) && key.toLowerCase() !== NULL_GUID ? key.toLowerCase() : '', path: shown.startsWith('$/') ? shown : '' };
   }
 
-  const saved = () => Boolean(hints().key || hints().path);
+  async function resolveIqa() {
+    const { key, path: shown } = hints();
+    let path = shown;
+    if (!path && key) {
+      const summary = await api('GET', 'DocumentSummary?DocumentVersionId=' + encodeURIComponent(key) + '&Limit=5');
+      const row = summary?.Items?.$values?.[0];
+      path = row ? pathOf(row) : '';
+    }
+    if (!path) throw unsaved();
+    const doc = unwrap(await execute('FindByPath', [path], ['System.String']));
+    return {
+      path: pathOf(doc) || path,
+      name: nameOf(doc) || path.split('/').pop(),
+      documentKey: documentKeyOf(doc),
+      versionKey: versionKeyOf(doc) || key
+    };
+  }
+
+  // The business object designer opens with the object's DocumentVersionKey
+  // as iUniformKey. Its document Name is the name IQAs store for a source
+  // (mBusinessControllerName), so Name comes before AlternateName here.
+  function boKey() {
+    const params = urlParams();
+    if (isNew(params)) return '';
+    const key = String(params.get('iuniformkey') || '').toLowerCase();
+    return GUID.test(key) && key !== NULL_GUID ? key : '';
+  }
+
+  async function resolveBusinessObject() {
+    const key = boKey();
+    if (!key) throw unsaved();
+    const summary = await api('GET', 'DocumentSummary?DocumentVersionId=' + encodeURIComponent(key) + '&Limit=5');
+    const row = summary?.Items?.$values?.[0];
+    const name = String(field(row, 'Name', 'DocumentName', 'AlternateName')).trim();
+    if (!name) throw new Error('No business object has the key ' + key + '.');
+    return { name, versionKey: key, documentKey: documentKeyOf(row) };
+  }
+
+  // The business object designer's Publish button, as BO-Enhancements.js
+  // finds it: there is no stable id.
+  function publishButton() {
+    return [...document.querySelectorAll('input[type="submit"], input[type="button"], button, a')]
+      .find(control => !control.closest('.us-where-used, .bo-enh') && (control.value || control.textContent || '').trim().toLowerCase() === 'publish');
+  }
+
+  const shownOn = control => Boolean(control && !control.disabled && control.getClientRects().length);
+
+  // What differs between the two designers.
+  const PAGE = ON_BO ? {
+    noun: 'business object',
+    sources: BO_SOURCES,
+    // Only the IQAs are read from here, and merged into the stored index.
+    reads: ['IQD'],
+    usable: index => index.version >= 2 && Boolean(index.sources?.IQD),
+    lookup: lookupBusinessObject,
+    saved: () => Boolean(boKey()),
+    resolve: resolveBusinessObject,
+    canRebuild: () => shownOn(publishButton()),
+    builtAt: index => index.sources?.IQD?.builtAt || index.builtAt,
+    emptyText: 'Run a check to see which IQAs use this business object as a source. It reads every IQA and takes about 5–10 seconds.',
+    staleText: 'The last check was made before business object sources were recorded. Check again to see which IQAs use this business object.',
+    note: 'Only IQA sources are checked here. The IQA designer’s Show Usage covers pages, value lists, templates and tasks.',
+    systemHelp: 'Also shows ASI’s own queries in the Samples, Common, ContactManagement and Fundraising folders. Many of them use ASI’s business objects, such as CsContact, so they are hidden by default.'
+  } : {
+    noun: 'query',
+    sources: PLACES,
+    reads: null,
+    usable: () => true,
+    lookup,
+    saved: () => Boolean(hints().key || hints().path),
+    resolve: resolveIqa,
+    canRebuild: () => shownOn(document.querySelector('[id$="_DesignShell1_SaveButton"]')),
+    builtAt: index => index.builtAt,
+    emptyText: 'Run a check once and everyone can see where their queries are used. It looks through every page, value list, template, task and query, and takes about 15 seconds.',
+    staleText: '',
+    note: 'Not checked: Flowz workflows, and pages outside the page tree such as ASI’s admin pages.',
+    systemHelp: 'Also shows matches in content and queries supplied by ASI: the iCore and iSamples page folders, the Samples, Common, ContactManagement and Fundraising query folders, and ASI\'s own alerts and tasks. ASI\'s stock pages and queries rarely use your own IQAs, so these are hidden by default.'
+  };
+
+  // The places a check reads from this designer.
+  const readSources = () => PAGE.reads ? PLACES.filter(source => PAGE.reads.includes(source.id)) : PLACES;
+  const saved = () => PAGE.saved();
 
   let targetPromise = null;
   function resolveTarget() {
     if (targetPromise) return targetPromise;
-    targetPromise = (async () => {
-      const { key, path: shown } = hints();
-      let path = shown;
-      if (!path && key) {
-        const summary = await api('GET', 'DocumentSummary?DocumentVersionId=' + encodeURIComponent(key) + '&Limit=5');
-        const row = summary?.Items?.$values?.[0];
-        path = row ? pathOf(row) : '';
-      }
-      if (!path) throw new Error('Save the query first');
-      const doc = unwrap(await execute('FindByPath', [path], ['System.String']));
-      return {
-        path: pathOf(doc) || path,
-        name: nameOf(doc) || path.split('/').pop(),
-        documentKey: documentKeyOf(doc),
-        versionKey: versionKeyOf(doc) || key
-      };
-    })();
+    targetPromise = PAGE.resolve();
     targetPromise.catch(() => { targetPromise = null; });
     return targetPromise;
   }
@@ -7132,8 +7322,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
       fold(help, open);
     });
     option.append(label, helpToggle);
-    help = element('p', 'us-where-used__help',
-      'Also shows matches in content and queries supplied by ASI: the iCore and iSamples page folders, the Samples, Common, ContactManagement and Fundraising query folders, and ASI\'s own alerts and tasks. ASI\'s stock pages and queries rarely use your own IQAs, so these are hidden by default.');
+    help = element('p', 'us-where-used__help', PAGE.systemHelp);
     help.id = 'us-where-used-help';
     help.hidden = true;
     foot.append(option, help);
@@ -7144,17 +7333,17 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
 
   /* ---- rendering ------------------------------------------------------------ */
   const visible = item => state.includeSystem || !item.y;
-  const canRebuild = () => {
-    const native = document.querySelector('[id$="_DesignShell1_SaveButton"]');
-    return Boolean(native && !native.disabled && native.getClientRects().length);
-  };
+  const canRebuild = () => PAGE.canRebuild();
+
+  // The stored index, when it can answer this designer.
+  const storedIndex = () => state.stored?.index && PAGE.usable(state.stored.index) ? state.stored.index : null;
 
   // The index results shown: the stored index, or, during a rebuild, each
   // place read so far.
   function currentGroups() {
     if (!state.target) return null;
-    if (state.rebuilding && state.building) return lookup(state.building.partial(), state.target);
-    if (state.stored?.index) return lookup(state.stored.index, state.target);
+    if (state.rebuilding && state.building) return PAGE.lookup(state.building.partial(), state.target);
+    if (storedIndex()) return PAGE.lookup(storedIndex(), state.target);
     return null;
   }
 
@@ -7246,6 +7435,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
       count.textContent = 'Couldn’t check';
       return;
     }
+    // A stored index made from the business object designer holds only
+    // the IQAs until a full check.
+    if (!state.rebuilding && storedIndex()?.sources && !storedIndex().sources[sourceId]) {
+      count.dataset.state = 'none';
+      count.textContent = 'Not checked';
+      return;
+    }
     const group = groups?.find(each => each.source.id === sourceId);
     const found = group ? group.results.filter(result => visible(result.item)).length : 0;
     count.dataset.state = found ? 'found' : 'none';
@@ -7262,37 +7458,36 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
   function renderBody() {
     const groups = currentGroups();
     body.replaceChildren();
-    if (!state.rebuilding && !state.stored?.index) {
+    if (!state.rebuilding && !storedIndex()) {
       renderEmpty();
       return;
     }
-    PLACES.forEach(source => {
+    PAGE.sources.forEach(source => {
       const group = groups?.find(each => each.source.id === source.id) || { source, results: [] };
       // During a rebuild only places already read show their results.
       const showItems = !state.rebuilding || state.progress[source.id] === 'done';
       body.append(renderSection(group, showItems));
     });
-    const note = element('p', 'us-where-used__note',
-      'Not checked: Flowz workflows, and pages outside the page tree such as ASI’s admin pages.');
-    body.append(note);
-    PLACES.forEach(source => renderCount(source.id, groups));
-    if (state.rebuilding) PLACES.forEach(source => paintProgress(source.id));
+    body.append(element('p', 'us-where-used__note', PAGE.note));
+    PAGE.sources.forEach(source => renderCount(source.id, groups));
+    if (state.rebuilding) PAGE.sources.forEach(source => paintProgress(source.id));
   }
 
   function renderEmpty() {
+    // A stored index that cannot answer this designer is an older one.
+    const stale = Boolean(state.stored?.index && PAGE.staleText);
     const empty = element('div', 'us-where-used__empty');
-    empty.append(icon('ti-sitemap'), element('p', 'us-where-used__empty-title', 'Not checked yet'));
+    empty.append(icon('ti-sitemap'), element('p', 'us-where-used__empty-title', stale ? 'Check again' : 'Not checked yet'));
     if (canRebuild()) {
-      empty.append(element('p', 'us-where-used__empty-text',
-        (state.pageOnly
-          ? 'Run a check to see where this query is used. It looks through every page, value list, template, task and query, and takes about 15 seconds. This site has nowhere to save the results, so they stay here until the page is reloaded.'
-          : 'Run a check once and everyone can see where their queries are used. It looks through every page, value list, template, task and query, and takes about 15 seconds.')));
+      empty.append(element('p', 'us-where-used__empty-text', stale ? PAGE.staleText : state.pageOnly
+        ? 'Run a check to see where this query is used. It looks through every page, value list, template, task and query, and takes about 15 seconds. This site has nowhere to save the results, so they stay here until the page is reloaded.'
+        : PAGE.emptyText));
       const start = element('button', 'TextButton PrimaryButton', 'Check now');
       start.type = 'button';
       start.addEventListener('click', rebuild);
       empty.append(start);
     } else {
-      empty.append(element('p', 'us-where-used__empty-text', 'Someone who can edit queries needs to run the first check.'));
+      empty.append(element('p', 'us-where-used__empty-text', 'Someone who can edit ' + (ON_BO ? 'business objects' : 'queries') + ' needs to run the first check.'));
     }
     body.append(empty);
   }
@@ -7307,22 +7502,27 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
   function renderStatus() {
     summary.removeAttribute('data-tone');
     meta.replaceChildren();
-    const stored = state.stored?.index;
-    const built = stored ? 'Last checked ' + relativeTime(stored.builtAt) + (state.stored.updatedBy ? ' by ' + state.stored.updatedBy : '') : '';
+    const stored = storedIndex();
+    const built = stored ? 'Last checked ' + relativeTime(PAGE.builtAt(stored)) + (state.stored.updatedBy ? ' by ' + state.stored.updatedBy : '') : '';
 
     if (state.targetError) {
       summary.textContent = state.targetError;
       return;
     }
     if (state.rebuilding) {
-      const read = PLACES.filter(source => ['done', 'failed'].includes(state.progress[source.id])).length;
-      summary.textContent = 'Checking · ' + read + ' of ' + PLACES.length + ' places done';
+      const reading = readSources();
+      if (reading.length === 1) {
+        summary.textContent = 'Checking every IQA';
+        return;
+      }
+      const read = reading.filter(source => ['done', 'failed'].includes(state.progress[source.id])).length;
+      summary.textContent = 'Checking · ' + read + ' of ' + reading.length + ' places done';
       meta.append(document.createTextNode('Results appear as each place is checked.'));
       return;
     }
     if (state.failedSources.length) {
       summary.dataset.tone = 'warning';
-      const names = state.failedSources.map(id => PLACES.find(source => source.id === id).name.toLowerCase()).join(', ');
+      const names = state.failedSources.map(id => PAGE.sources.concat(PLACES).find(source => source.id === id).name.replace(/^(?!IQA|UnionSuite)\w/, letter => letter.toLowerCase())).join(', ');
       summary.textContent = stored
         ? 'The check didn’t finish: ' + names + ' couldn’t be checked. Showing the results of the last check.'
         : 'The check didn’t finish: ' + names + ' couldn’t be checked.';
@@ -7346,12 +7546,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
       return;
     }
     if (!stored) {
-      summary.textContent = 'Not checked yet';
+      summary.textContent = state.stored?.index && PAGE.staleText ? 'Not checked for business objects yet' : 'Not checked yet';
       return;
     }
     const groups = currentGroups() || [];
     const total = groups.reduce((sum, group) => sum + group.results.filter(result => visible(result.item)).length, 0);
-    summary.textContent = total ? 'Used in ' + total + (total === 1 ? ' place' : ' places') : 'Not used in any of the places checked';
+    if (ON_BO) summary.textContent = total ? 'Used as a source by ' + total + (total === 1 ? ' IQA' : ' IQAs') : 'No IQA uses this business object as a source';
+    else summary.textContent = total ? 'Used in ' + total + (total === 1 ? ' place' : ' places') : 'Not used in any of the places checked';
     meta.append(document.createTextNode(built + (state.pageOnly ? ' · kept on this page only' : '')));
     if (canRebuild()) meta.append(rebuildButton('Check again'));
   }
@@ -7372,9 +7573,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
       try {
         state.target = await resolveTarget();
       } catch (error) {
-        state.targetError = error.message === 'Save the query first'
-          ? 'Save the query first to see its usage.'
-          : 'This query couldn’t be identified. ' + error.message;
+        state.targetError = error.unsaved
+          ? 'Save the ' + PAGE.noun + ' first to see its usage.'
+          : 'This ' + PAGE.noun + ' couldn’t be identified. ' + error.message;
       }
       try {
         if (!state.rebuilding && !state.pageOnly) state.stored = await readStored();
@@ -7396,18 +7597,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     state.failedSources = [];
     state.saveError = null;
     state.progress = {};
-    PLACES.forEach(source => { state.progress[source.id] = 'reading'; });
+    const reading = readSources();
+    reading.forEach(source => { state.progress[source.id] = 'reading'; });
     state.building = createIndex();
     // The old results go at once; each place refills as it is read.
     body.querySelectorAll('.us-where-used__source > .us-where-used__items, .us-where-used__source > .us-where-used__folder-group')
       .forEach(group => { if (!group.hidden) fold(group, false); });
-    if (!state.stored?.index) renderBody();
-    PLACES.forEach(source => { renderCount(source.id, null); paintProgress(source.id); });
+    if (!storedIndex()) renderBody();
+    reading.forEach(source => { renderCount(source.id, null); paintProgress(source.id); });
     renderStatus();
 
     let index = null;
     try {
       index = await build({
+        only: PAGE.reads,
         onProgress(sourceId, progress, building) {
           state.building = building;
           state.progress[sourceId] = progress;
@@ -7419,7 +7622,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
         }
       });
     } catch (error) {
-      state.failedSources = error.failedSources || PLACES.map(source => source.id);
+      state.failedSources = error.failedSources || reading.map(source => source.id);
     }
 
     if (index && state.pageOnly) {
@@ -7428,7 +7631,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     }
     if (index) {
       try {
+        // A check of some places goes into the latest stored index, so a
+        // full check saved meanwhile keeps its other places.
+        if (PAGE.reads) state.stored = await readStored();
         const ordinal = state.stored?.ordinal ?? null;
+        if (PAGE.reads) index = mergeIndex(state.stored?.index, index);
         await save(index, ordinal);
         // Read back what everyone else will now see, including iMIS's UpdatedBy.
         state.stored = await readStored().catch(() => ({ ordinal, index }));
@@ -7509,37 +7716,59 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
   }
 
   /* ---- the header button ---------------------------------------------------- */
+  function createButton() {
+    button = element('button', 'TextButton us-outline-button us-where-used-button' + (ON_BO ? '' : ' iqa-header-copy-button'));
+    button.type = 'button';
+    button.id = 'us-where-used-button';
+    button.setAttribute('aria-controls', 'us-where-used');
+    button.setAttribute('aria-expanded', 'false');
+    // Icon only: the designer header has no room for another label
+    // (owner, 12 October 2026). The name is in aria-label and the tooltip.
+    button.setAttribute('aria-label', 'Show Usage');
+    button.append(icon('ti-sitemap'));
+    button.addEventListener('click', () => (drawer && !drawer.hasAttribute('data-closed') ? closeDrawer() : openDrawer()));
+  }
+
+  function titleButton() {
+    if (saved()) {
+      button.removeAttribute('aria-disabled');
+      button.title = ON_BO ? 'Show Usage: see which IQAs use this business object' : 'Show Usage: see where this query is used';
+    } else {
+      button.setAttribute('aria-disabled', 'true');
+      button.title = 'Show Usage: save the ' + PAGE.noun + ' first to see its usage.';
+    }
+  }
+
+  // Business object designer: before the Enhance switch (BO-Enhancements.js),
+  // which sits just before Publish; without it, just before Publish.
+  function mountBoButton() {
+    const enhance = document.getElementById('boEnhanceActions');
+    const publish = publishButton();
+    const anchor = enhance && (!publish || enhance.nextElementSibling === publish) ? enhance : publish;
+    if (!anchor) return;
+    if (!button) createButton();
+    if (button.nextElementSibling !== anchor) anchor.before(button);
+    titleButton();
+  }
+
   function mountButton() {
+    if (ON_BO) {
+      mountBoButton();
+      return;
+    }
     // After the Copy Path and Copy Key buttons, before the Enhance switch;
     // without them, at the start of the designer's action group.
     const save = document.querySelector('[id$="_DesignShell1_SaveButton"], [id$="_DesignShell1_SaveAsButton"], [id$="_DesignShell1_CancelButton"], [id$="_DesignShell1_CloseButton"]');
     const group = save?.parentElement;
     if (!group) return;
-    if (!button) {
-      button = element('button', 'TextButton us-outline-button iqa-header-copy-button us-where-used-button');
-      button.type = 'button';
-      button.id = 'us-where-used-button';
-      button.setAttribute('aria-controls', 'us-where-used');
-      button.setAttribute('aria-expanded', 'false');
-      // Icon only: the designer header has no room for another label
-      // (owner, 12 October 2026). The name is in aria-label and the tooltip.
-      button.setAttribute('aria-label', 'Show Usage');
-      button.append(icon('ti-sitemap'));
-      button.addEventListener('click', () => (drawer && !drawer.hasAttribute('data-closed') ? closeDrawer() : openDrawer()));
-    }
+    if (!button) createButton();
     const anchor = document.getElementById('iqaEnhanceToggle');
     if (anchor && anchor.parentElement === group) {
       if (button.nextElementSibling !== anchor) anchor.before(button);
     } else if (button.parentElement !== group) {
       group.prepend(button);
     }
-    if (saved()) {
-      button.removeAttribute('aria-disabled');
-      button.title = 'Show Usage: see where this query is used';
-    } else {
-      button.setAttribute('aria-disabled', 'true');
-      button.title = 'Show Usage: save the query first to see its usage.';
-    }
+    titleButton();
   }
 
   function boot() {
@@ -7550,12 +7779,26 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     } catch (_) {
       /* No partial postbacks on this page. */
     }
-    document.addEventListener('keydown', event => {
+    // The business object designer is a RadWindow iframe: Escape is caught
+    // first and kept from the window, so it closes the drawer, not the dialog.
+    (ON_BO ? window : document).addEventListener('keydown', event => {
       if (event.key === 'Escape' && drawer && !drawer.hasAttribute('data-closed')) {
         event.preventDefault();
+        if (ON_BO) event.stopPropagation();
         closeDrawer();
       }
-    });
+    }, ON_BO);
+    // The Enhance switch may arrive after this script: place the button
+    // again when it does.
+    if (ON_BO && !document.getElementById('boEnhanceActions')) {
+      const watch = new MutationObserver(() => {
+        if (!document.getElementById('boEnhanceActions')) return;
+        watch.disconnect();
+        mountButton();
+      });
+      watch.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => watch.disconnect(), 10000);
+    }
     // Fetch the index quietly, so the drawer opens on results.
     const idle = window.requestIdleCallback || (callback => setTimeout(callback, 1500));
     if (saved()) idle(() => load().catch(() => {}));
@@ -7566,7 +7809,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
   }
 
   window.UnionSuiteWhereUsed = Object.freeze(Object.assign({
-    version: '1.0',
+    version: '1.1',
     open: () => openDrawer(),
     close: closeDrawer,
     rebuild,
