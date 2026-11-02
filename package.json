@@ -1,0 +1,8 @@
+{
+  "name": "unionsuite-theme",
+  "private": true,
+  "description": "Build tooling for the UnionSuite theme. Terser minifies the theme scripts for the upload copy (tools/build-theme-dist.cjs).",
+  "devDependencies": {
+    "terser": "5.51.2"
+  }
+}

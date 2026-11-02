@@ -27,6 +27,8 @@ Repo: `Union-Innovation-Hub/UnionSuite-Theme` on GitHub, branch `main` (commit s
 | `archive/` | Superseded research kept locally only | ignored |
 | `_onedrive-broken/` | OneDrive conflict copies set aside, kept until confirmed redundant | untracked |
 | `.tmp-iqa-integration/` | Local Node install of Playwright that the browser tests load | ignored |
+| `package.json`, `package-lock.json` | Build tooling: Terser, for the theme upload copy. `npm install` once | yes |
+| `node_modules/` | Installed by `npm install` | ignored |
 | [`AGENTS.md`](AGENTS.md) | Working rules: commits, stylesheet ownership, touch sizes, motion, iPart wrappers, guide workflow, lifecycle | yes |
 | [`CLAUDE.md`](CLAUDE.md) | Points Claude sessions at AGENTS.md and this index | yes |
 | [`README.md`](README.md) | Project overview and current feature status | yes |
@@ -65,6 +67,24 @@ The guide (`Usage-Guide.html`, ~190 MB) and `Theme-Config.html` are written
 (`build/guide-output.cjs`; override with `UNIONSUITE_GUIDE_DIR`). A stale copy
 may still sit in `Theme/UnionSuite-Guides/`; it is ignored and not current.
 Every build also rewrites the companion pages in `references/`.
+
+**Build the theme upload copy** (from the repo root; `npm install` once
+first, for Terser):
+
+```
+node tools/build-theme-dist.cjs
+node tools/build-theme-dist.cjs --check
+node tools/test-theme-dist.cjs
+```
+
+The build writes `Theme/UnionSuite` with its CSS and JS minified to
+`C:\Dev\UHUB\Theme\dist\UnionSuite`, outside the repo and OneDrive
+(`UNIONSUITE_DIST_DIR` overrides it). Upload that folder's contents to the
+tenant's theme folder (`App_Themes/UnionSuite2` on the dev tenant). Raise
+`RELEASE` in `index.js` before building when a script changed. `--check` fails
+when the copy is stale. The test compares the copy with the sources in a
+browser. Minifying keeps the markers IQA Where-Used reads. See the theme
+[README](Theme/UnionSuite/README.md#upload-copy).
 
 ## Embeds — `embeds/`
 
@@ -112,6 +132,7 @@ and the guide links several. Check what reads a file before moving it.
 |---|---|
 | `build-theme-usage.cjs`, `build-theme-config.cjs`, `check-usage-sources.cjs`, `build-banner-preview.cjs` and other forwarders | Compatibility entry points; the implementations live in `Theme/UnionSuite-Guides/usage/build/` |
 | `build-*-comparison.cjs`, `build-*-preview.cjs`, `build-*-reference.cjs` | Generate the `references/*.html` pages from `prototypes/legacy/` and theme sources |
+| `build-theme-dist.cjs`, `test-theme-dist.cjs` | Build and check the minified theme upload copy (see above) |
 | `test-*.cjs` | Headless browser and unit tests. They load Playwright from `.tmp-iqa-integration/node_modules`; see `tools/README-actions.md` for the action suites |
 | `probe-*.js` | Console probes to paste into a live iMIS page |
 | `package-*.ps1` | Package a feature for upload |
@@ -171,6 +192,7 @@ Several fail loading the 190 MB guide into the browser.
 ## Outside this repo
 
 - Built guide: `C:\Dev\UHUB\Theme\Usage-Guide`.
+- Theme upload copy (minified): `C:\Dev\UHUB\Theme\dist\UnionSuite`.
 - Sibling projects in the OneDrive `Claude` folder: `API Reference` (iMIS REST
   and CloudToolz notes), `ReportBuilder`, `Data Template display`. The
   `Finance Dashboard` folder there is superseded by `embeds/finance-dashboard/`.

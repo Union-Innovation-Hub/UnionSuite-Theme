@@ -92,7 +92,8 @@ alongside the affected shared assets.
 | `../UnionSuite-Client/Config.js` | Client taskbar settings, including Biscuit's on/off switch; load before the taskbar script |
 
 1. Upload `zUnionSuite.css` and `zUnionSuite.js` to the deployed Union Suite theme
-   folder. Keep the existing native styles, skins, icons and client stylesheet.
+   folder, from the minified [upload copy](#upload-copy). Keep the existing
+   native styles, skins, icons and client stylesheet.
 2. Confirm stylesheet order: native Orion, `zUnionSuite.css`, then
    client Branding/Override (or `zzClientSpecific.css`), then `zzDarkMode.css` last. Supported native Query Menu iParts automatically get
    the full report styling and available Filters/Export icons; no report class
@@ -132,6 +133,51 @@ alongside the affected shared assets.
    sorting, query selection, filters, Export, page size, paging and Easy Edit.
    Test the first page with no standalone embed so the actual theme cascade is
    exercised. Adding these local files does not publish the theme or site.
+
+### Upload copy
+
+Upload the minified copy of this folder, not the folder itself. From the repo
+root (`npm install` once first, for Terser):
+
+```
+node tools/build-theme-dist.cjs
+```
+
+It writes `C:\Dev\UHUB\Theme\dist\UnionSuite`, outside OneDrive and Git
+(`UNIONSUITE_DIST_DIR` overrides it). The folders and file names are the same
+as here, so the loader and the forms runtime find their files. The project CSS
+and JS are minified (about 3.6 MB down to 2.4 MB). Images, fonts, skins,
+`ThemeSettings.xml` and the supplied `Tabler/tabler-icons.min.css` are copied
+as they are. README files are left out.
+
+1. If a script changed since the last upload, raise `RELEASE` in `index.js`
+   first, then build. Returning browsers keep the old scripts for up to a week
+   otherwise. The build warns when scripts changed since its last run but
+   `RELEASE` did not.
+2. Upload the folder's contents, keeping its subfolders, to the tenant's theme
+   folder: `App_Themes/UnionSuite2` on the dev tenant.
+3. Hard-reload to check the result. The CSS is not versioned.
+
+`node tools/build-theme-dist.cjs --check` fails if the copy does not match the
+current sources. `node tools/test-theme-dist.cjs` compares the copy with the
+sources in a browser: the parsed CSS rules, each script run on its own, and a
+captured iMIS page with the whole theme, element by element in light and dark.
+
+Edit the readable files here, never the copy. Minifying keeps what the tenant
+reads from these files:
+
+- **CSS:** only comments and whitespace go, so rules and their order are
+  unchanged.
+- **Scripts:** Terser removes whitespace and comments and renames local
+  variables, without rewriting code. IQA Where-Used reads the uploaded scripts
+  for IQA paths, and names each one by the nearest `/* US-…:START` marker or
+  `define('…')` call. Terser keeps those markers and the name `define`, and the
+  build stops if Where-Used would read anything differently. IQA paths that
+  appear only in comments are no longer counted; the build lists them.
+
+Error stack traces on the tenant point into minified lines. Reproduce the error
+locally against these files, or upload the readable file of the same name
+until it is fixed.
 
 ## Staff navigation icons
 
