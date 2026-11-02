@@ -143,7 +143,7 @@ root (`npm install` once first, for Terser):
 node tools/build-theme-dist.cjs
 ```
 
-It writes `C:\Dev\UHUB\Theme\dist\UnionSuite`, outside OneDrive and Git
+It writes `dist/UnionSuite` in the project root, ignored by Git
 (`UNIONSUITE_DIST_DIR` overrides it). The folders and file names are the same
 as here, so the loader and the forms runtime find their files. The project CSS
 and JS are minified (about 3.6 MB down to 2.4 MB). Images, fonts, skins,

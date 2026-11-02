@@ -45,6 +45,9 @@ Theme/**/*.zip
 !/.preview/*.py
 !/.preview/README.md
 
+# Minified upload copy of the theme; rebuild with tools/build-theme-dist.cjs
+/dist/
+
 # Built paste-in embeds; rebuild with each embed's build script
 /embeds/finance-dashboard/dist/
 

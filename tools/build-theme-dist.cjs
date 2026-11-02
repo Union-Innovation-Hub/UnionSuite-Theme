@@ -6,10 +6,11 @@
  *   node tools/build-theme-dist.cjs           build
  *   node tools/build-theme-dist.cjs --check   fail if the dist folder is stale
  *
- * The output goes outside OneDrive and Git, beside the built usage guide:
- * C:\Dev\UHUB\Theme\dist\UnionSuite (UNIONSUITE_DIST_DIR overrides it). Upload
- * the folder's contents to the tenant's theme folder (App_Themes/UnionSuite2
- * on the dev tenant). Run `npm install` once first, for Terser.
+ * The output goes to dist/UnionSuite in the project, ignored by Git (owner,
+ * 2 November 2026; at about 2.4 MB it is small enough for OneDrive), and
+ * UNIONSUITE_DIST_DIR overrides it. Upload the folder's contents to the
+ * tenant's theme folder (App_Themes/UnionSuite2 on the dev tenant). Run
+ * `npm install` once first, for Terser.
  *
  * What the tenant depends on, and how the build keeps it:
  *   • File names and folders are unchanged. The loader (index.js) and the
@@ -38,7 +39,7 @@ const vm = require('node:vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const SOURCE = path.join(ROOT, 'Theme', 'UnionSuite');
-const DIST = path.resolve(process.env.UNIONSUITE_DIST_DIR || 'C:\\Dev\\UHUB\\Theme\\dist\\UnionSuite');
+const DIST = path.resolve(process.env.UNIONSUITE_DIST_DIR || path.join(ROOT, 'dist', 'UnionSuite'));
 
 // Documentation and OS files stay out of the upload.
 const SKIP = [/\.md$/i, /(^|\/)desktop\.ini$/i, /(^|\/)Thumbs\.db$/i, /(^|\/)\.DS_Store$/];

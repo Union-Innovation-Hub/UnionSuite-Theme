@@ -24,6 +24,7 @@ Repo: `Union-Innovation-Hub/UnionSuite-Theme` on GitHub, branch `main` (commit s
 | [`experiments/`](experiments/) | Side explorations: Easter eggs, mascots, token tests, roster sample data | yes |
 | [`.preview/`](.preview/README.md) | Local preview harness and captures. Its `.cjs`/`.js`/`.py` helpers are tracked; output is not | partly |
 | `.impeccable/` | Config for the design-lint tool | yes |
+| `dist/` | The minified theme upload copy (`dist/UnionSuite`), from `node tools/build-theme-dist.cjs` | ignored |
 | `archive/` | Superseded research kept locally only | ignored |
 | `_onedrive-broken/` | OneDrive conflict copies set aside, kept until confirmed redundant | untracked |
 | `.tmp-iqa-integration/` | Local Node install of Playwright that the browser tests load | ignored |
@@ -78,8 +79,8 @@ node tools/test-theme-dist.cjs
 ```
 
 The build writes `Theme/UnionSuite` with its CSS and JS minified to
-`C:\Dev\UHUB\Theme\dist\UnionSuite`, outside the repo and OneDrive
-(`UNIONSUITE_DIST_DIR` overrides it). Upload that folder's contents to the
+`dist/UnionSuite` in the project, ignored by Git (`UNIONSUITE_DIST_DIR`
+overrides it). Upload that folder's contents to the
 tenant's theme folder (`App_Themes/UnionSuite2` on the dev tenant). Raise
 `RELEASE` in `index.js` before building when a script changed. `--check` fails
 when the copy is stale. The test compares the copy with the sources in a
@@ -192,7 +193,6 @@ Several fail loading the 190 MB guide into the browser.
 ## Outside this repo
 
 - Built guide: `C:\Dev\UHUB\Theme\Usage-Guide`.
-- Theme upload copy (minified): `C:\Dev\UHUB\Theme\dist\UnionSuite`.
 - Sibling projects in the OneDrive `Claude` folder: `API Reference` (iMIS REST
   and CloudToolz notes), `ReportBuilder`, `Data Template display`. The
   `Finance Dashboard` folder there is superseded by `embeds/finance-dashboard/`.

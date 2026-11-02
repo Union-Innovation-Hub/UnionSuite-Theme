@@ -198,10 +198,23 @@ async function themedPage(browser, origin, variant) {
     return element.tagName + (element.id ? '#' + element.id : '') + ' ' + properties.sort().join(';');
   }));
 
-  const light = await snapshot();
+  // Settled: two snapshots 300ms apart that match. A late fade or timer
+  // otherwise caught one copy mid-change now and then (opacity 0 against 1,
+  // 2 November 2026).
+  const settled = async () => {
+    let previous = await snapshot();
+    for (let tries = 0; tries < 10; tries++) {
+      await page.waitForTimeout(300);
+      const next = await snapshot();
+      if (next.join('\n') === previous.join('\n')) return next;
+      previous = next;
+    }
+    return previous;
+  };
+
+  const light = await settled();
   await page.evaluate(() => { document.documentElement.dataset.usColorScheme = 'dark'; });
-  await page.waitForTimeout(300);
-  const dark = await snapshot();
+  const dark = await settled();
   await page.close();
   // Requests finish in no fixed order, and a retried one may repeat.
   return {errors: [...new Set(neutral(errors, variant))].sort(), loader, light, dark};
@@ -219,7 +232,8 @@ function firstDifference(a, b) {
       while (at < left.length && left[at] === right[at]) at++;
       const from = Math.max(0, at - 120);
       const excerpt = text => (from ? '…' : '') + text.slice(from, at + 180);
-      return `entry ${index} of ${a.length}/${b.length}, character ${at}\n  source: ${excerpt(left)}\n  dist:   ${excerpt(right)}`;
+      const element = left.slice(0, left.indexOf(' '));
+      return `entry ${index} (${element}) of ${a.length}/${b.length}, character ${at}\n  source: ${excerpt(left)}\n  dist:   ${excerpt(right)}`;
     }
   }
   return null;
