@@ -96,6 +96,41 @@
       return '';
     }
   }
+  /* The current website's path, e.g. "/UTTemplate", from gWebSiteRoot or
+     the __ClientContext websiteRoot. When several websites share a domain,
+     a bare shortcut such as /Cases_ManageCase opens the default website,
+     not this one (owner, 4 November 2026). */
+  function websiteRoot() {
+    let site = window.gWebSiteRoot || '';
+    if (!site) {
+      try {
+        site = JSON.parse(document.getElementById('__ClientContext').value).websiteRoot || '';
+      } catch (error) {
+        site = '';
+      }
+    }
+    try {
+      return site ? new URL(String(site), location.origin).pathname.replace(/\/+$/, '') : '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  // A root-relative path, moved under the current website. Other links,
+  // and paths already under it, are left as they are.
+  function websitePath(path) {
+    const root = websiteRoot();
+    const value = String(path || '');
+    if (!root || !/^\/(?!\/)/.test(value)) {
+      return value;
+    }
+    const lower = value.toLowerCase();
+    const rootLower = root.toLowerCase();
+    if (lower === rootLower || lower.startsWith(rootLower + '/')) {
+      return value;
+    }
+    return root + value;
+  }
 
   function hasValue(el) {
     const value = $(el).val();
@@ -189,6 +224,22 @@
   }
 
   const message = form.querySelector('.Message');
+
+  // The flow's messages link the case root-relative. Whenever BeyondFormz
+  // writes one in, move its links under the current website.
+  function fixMessageLinks() {
+    message.querySelectorAll('a[href]').forEach(link => {
+      const href = link.getAttribute('href');
+      const fixed = websitePath(href);
+      if (fixed !== href) {
+        link.setAttribute('href', fixed);
+      }
+    });
+  }
+
+  if (message) {
+    new MutationObserver(fixMessageLinks).observe(message, {childList: true, subtree: true});
+  }
 
   function setMessage(text, tone) {
     if (!message) {
@@ -773,6 +824,7 @@
       return;
     }
 
+    url = websitePath(url);
     busy(true, 'Opening case…');
     clearTimeout(saveTimer);
     setMessage((caseId ? 'Case ' + caseId + ' created.' : 'Case created.') + ' Opening it…');

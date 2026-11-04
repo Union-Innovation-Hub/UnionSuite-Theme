@@ -18,7 +18,7 @@ const context=vm.createContext({window,URL,location:{origin:'https://theme.test'
  }
  const createCase=defs.get('member.create-case');assert.equal(createCase.className,'us-action-member-create-case');assert.equal(createCase.presentation.label,'Create case');
  assert.equal(createCase.action.type,'navigate');assert.equal(createCase.action.requires,undefined);assert.equal(createCase.action.target,undefined);assert.equal(createCase.context.partyId.parameter,'ID');
- let url=new URL(createCase.action.href({context:{partyId:'00123'}}));assert.equal(url.pathname,'/_i4u_/Core/Cases/Create-Case-Staff.aspx');assert.equal(url.search,'?ID=00123');
+ let url=new URL(createCase.action.href({context:{partyId:'00123'}}));assert.equal(url.pathname,'/Cases_CreateCase');assert.equal(url.search,'?ID=00123');
  const job=defs.get('member.add-job');assert.equal(job.action.requires,undefined);
  url=new URL(job.action.href({context:{partyId:'00123'}}));assert.equal(url.pathname,'/_i4u_/Core/Staff-Site-Layouts/Contact-Layouts/Individual/Popups/Jobs/Select-Workplace.aspx');assert.equal(url.searchParams.get('ID'),'00123');
  const address=defs.get('member.add-address');url=new URL(address.action.href({context:{partyId:'00123'}}));assert.equal(url.searchParams.get('ID'),'00123');assert.equal(url.searchParams.get('CloseWindowOnCommit'),'true');

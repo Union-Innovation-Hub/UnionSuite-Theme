@@ -52,6 +52,14 @@
     try { return JSON.parse(document.getElementById('__ClientContext')?.value || '{}'); }
     catch (_) { return {}; }
   }
+  // A path under the current website (/UTNewTheme). Several websites can
+  // share a domain, and a bare shortcut opens the default one (owner,
+  // 4 November 2026).
+  function websitePath(path) {
+    const site = window.gWebSiteRoot || clientContext().websiteRoot || '';
+    const root = site ? new URL(String(site), location.origin).pathname.replace(/\/+$/, '') : '';
+    return new URL(root + path, location.origin);
+  }
   async function refreshReport(env, selector) {
     if (env.origin.report || env.origin.ambiguous) return env.refresh.originReport();
     return env.refresh.iqa(selector,{scope:'page',match:'one'});
@@ -73,13 +81,16 @@
   }));
   // The staff Create Case page for the selected member, in the same window,
   // as the retired CreateCasePopupFn did. The contact page's Cases report
-  // carries it in its heading (owner, 27 October 2026).
+  // carries it in its heading (owner, 27 October 2026). The page's shortcut,
+  // /Cases_CreateCase (owner, 29 October 2026; was
+  // /_i4u_/Core/Cases/Create-Case-Staff.aspx), under the current website
+  // (4 November 2026).
   define('member.create-case',{
     presentation:{label:'Create case',icon:'plus',default:'button',menu:'menu-item'},
     context:{partyId:{...party,validate:recordId}},
     action:{type:'navigate',
       href:({context}) => {
-        const url = new URL('/_i4u_/Core/Cases/Create-Case-Staff.aspx',location.origin);
+        const url = websitePath('/Cases_CreateCase');
         url.searchParams.set('ID',context.partyId);
         return url.href;
       }
@@ -1266,13 +1277,27 @@
     action: {type: 'navigate', href: ({context}) => context.memberUrl}
   });
 
-  // Back to member on the case no-access page (owner, 27 October 2026). The
+  // A page under the current website (/UTNewTheme), with its values on the
+  // address. A bare shortcut opens the domain's default website.
+  function websitePage(path, values) {
+    const url = websitePath(path);
+    Object.entries(values).forEach(([name, value]) => url.searchParams.set(name, String(value)));
+    return url.href;
+  }
+
+  // Back to member and Back to home on the case no-access page (owner,
+  // 27 October 2026), both in the current website (4 November 2026). The
   // access check sends the case's member there as ID on the address.
   define('cases.back-to-member', {
     presentation: {label: 'Back to member', icon: 'ti-arrow-left', default: 'button'},
     context: {memberId: {from: 'query', parameter: 'ID', required: true,
       validate: value => /^[A-Za-z0-9_-]+$/.test(String(value)) || 'Invalid member ID.'}},
-    action: {type: 'navigate', href: ({context}) => page('/UTNewTheme/Party.aspx', {ID: context.memberId})}
+    action: {type: 'navigate', href: ({context}) => websitePage('/Party.aspx', {ID: context.memberId})}
+  });
+  define('cases.back-to-home', {
+    presentation: {label: 'Back to home', icon: 'ti-home', default: 'button'},
+    context: {},
+    action: {type: 'navigate', href: () => websitePage('/', {})}
   });
 
   popup('cases.edit', 'Update case details', 'pencil',
@@ -1695,11 +1720,12 @@
   // or any other answer stays on the page and logs: only an explicit
   // Restricted redirects. The manage case page only (its path, or the
   // us-case-page page class), not its popups. The no-access page is the
-  // UTNewTheme site's (owner, 27 October 2026).
+  // current website's /Cases_NoAccess (was always UTNewTheme's, owner,
+  // 27 October 2026; per website since 4 November 2026).
   // US-CASE-ACCESS in zUnionSuite.css keeps the page hidden until the root
   // carries data-us-case-access: granted or failed shows it, restricted
   // keeps it hidden while the browser leaves.
-  const noAccessPage = '/UTNewTheme/Cases_NoAccess';
+  const noAccessPage = '/Cases_NoAccess';
 
   function markCaseAccess(state) {
     document.documentElement.setAttribute('data-us-case-access', state);
@@ -1720,7 +1746,7 @@
       // as ID for the no-access page's Back to member.
       const memberId = String(data?.MemberID ?? '').trim();
       markCaseAccess('restricted');
-      location.replace(page(noAccessPage, memberId ? {...values, ID: memberId} : values));
+      location.replace(websitePage(noAccessPage, memberId ? {...values, ID: memberId} : values));
       return;
     }
     throw new Error('The case access check gave no answer (Access was "' + access + '").');

@@ -3,10 +3,15 @@
      POST /cases/case-access answers Restricted (ActionDefinitions.js,
      noAccessPage), with the case's CaseID and CaseNum on the address, and
      its member as ID when the flow returns MemberID.
-     Page: /UTNewTheme/Cases_NoAccess (noAccessPage).
+     Page: /Cases_NoAccess in the current website, e.g.
+     /UTNewTheme/Cases_NoAccess (noAccessPage). Each website that shows
+     cases needs the page and its shortcut.
      iPart Title: [[lock]] No access. No iPart CSS class is needed.
      Back to member is the cases.back-to-member action: the theme fills the
-     empty button's label and opens /UTNewTheme/Party.aspx?ID=<ID from the address>.
+     empty button's label and opens <website>/Party.aspx?ID=<ID from the address>.
+     Back to home is the cases.back-to-home action: the theme points the
+     link at the current website's home (a bare "/" opens the domain's
+     default website when several share it).
      Requires zUnionSuite.js and ActionDefinitions.js (the theme loader).
      The redirect replaces the case page in the history, so the browser's
      Back returns to the page before the case. -->
@@ -16,6 +21,6 @@
   <p>Its access is limited to the staff working on it. Ask the lead staff member or a manager to add you if you need it.</p>
   <p>
     <button type="button" class="us-action-cases-back-to-member"></button>
-    <a class="TextButton" href="/">Back to home</a>
+    <a class="TextButton us-action-cases-back-to-home" href="/">Back to home</a>
   </p>
 </div>

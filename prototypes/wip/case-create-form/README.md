@@ -89,7 +89,12 @@ reached `Cases/Create-Case-Staff` in the form-encoded body
 (`DynText_…=…`, `DynHidden_…=…`, and the multi-select as a repeated
 `DynMulti_…[]` with `alpha` and `beta`, as `CaseTypes[]` arrives). The flow
 answered its usual success message, and the form opened
-`/Cases_ManageCase?CaseID=C221&CaseNum=220` from the link in it. The
+`/Cases_ManageCase?CaseID=C221&CaseNum=220` from the link in it. (Since
+4 November 2026 the form puts that link under the current website's path
+from `gWebSiteRoot`, e.g. `/UTNewTheme/Cases_ManageCase?…`, in both the
+redirect and the flow's message links. Several websites share the domain,
+and a bare shortcut opens the default website: on the dev tenant, UTTemplate's
+Orion case page.) The
 CloudToolz request log shows the flow's `Body` as strings by name, the
 multi-select joined (`"DynMulti_…[]": "alpha,beta"`), so a value that
 contains a comma cannot be told apart from two values. BeyondFormz also

@@ -5,7 +5,7 @@ const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:a
 const source = fs.readFileSync('Theme/UnionSuite/Scripts/ActionDefinitions.js', 'utf8');
 const cloudToolz = 'https://cloudtoolz.test';
 
-async function load({pathname = '/Cases_ManageCase', search = '?CaseID=C202&CaseNum=198', pageClass = false, access, memberId, status = 200}) {
+async function load({pathname = '/Cases_ManageCase', search = '?CaseID=C202&CaseNum=198', pageClass = false, access, memberId, status = 200, site = 'https://theme.test/UTNewTheme'}) {
   const calls = [], replaced = [], warnings = [], root = {}, defs = new Map();
   const json = (body, ok = true, code = 200) => ({ok, status: code, json: async () => body});
   const fetch = async (url, init = {}) => {
@@ -25,7 +25,7 @@ async function load({pathname = '/Cases_ManageCase', search = '?CaseID=C202&Case
     querySelectorAll: () => [],
     addEventListener() {}
   };
-  const window = {UnionSuiteActions: {define: (key, value) => defs.set(key, value)}, gWebsiteKey: 'site'};
+  const window = {UnionSuiteActions: {define: (key, value) => defs.set(key, value)}, gWebsiteKey: 'site', gWebSiteRoot: site};
   const MutationObserver = class { observe() {} };
   const context = vm.createContext({window, document, fetch, location, URL, URLSearchParams, MutationObserver,
     console: {warn: (...args) => warnings.push(args.join(' ')), log() {}, error() {}}});
@@ -90,5 +90,20 @@ async function load({pathname = '/Cases_ManageCase', search = '?CaseID=C202&Case
   assert.equal(back.action.href({context: {memberId: '12345'}}), 'https://theme.test/UTNewTheme/Party.aspx?ID=12345');
   assert.equal(noAccess.calls.length, 0);
 
-  console.log('Case access check: 10 cases pass.');
+  // Back to home opens the current website's home, not the domain's default website.
+  const home = noAccess.defs.get('cases.back-to-home');
+  assert.equal(home.className, 'us-action-cases-back-to-home');
+  assert.equal(home.action.href({context: {}}), 'https://theme.test/UTNewTheme/');
+
+  // The no-access page and its links follow the current website (4 November 2026).
+  const otherSite = await load({access: 'Restricted', memberId: '12345', site: 'https://theme.test/UTTemplate/'});
+  assert.deepEqual(otherSite.replaced, ['https://theme.test/UTTemplate/Cases_NoAccess?CaseID=C202&CaseNum=198&ID=12345']);
+  assert.equal(otherSite.defs.get('cases.back-to-member').action.href({context: {memberId: '12345'}}), 'https://theme.test/UTTemplate/Party.aspx?ID=12345');
+  assert.equal(otherSite.defs.get('cases.back-to-home').action.href({context: {}}), 'https://theme.test/UTTemplate/');
+
+  // Without a website root, the paths stay at the domain root.
+  const noSite = await load({access: 'Restricted', site: ''});
+  assert.deepEqual(noSite.replaced, ['https://theme.test/Cases_NoAccess?CaseID=C202&CaseNum=198']);
+
+  console.log('Case access check: 13 cases pass.');
 })().catch(error => { console.error(error); process.exit(1); });
