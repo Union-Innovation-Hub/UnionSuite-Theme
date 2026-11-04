@@ -28,7 +28,11 @@ way.
   email composer, the access check on page load, Create case opening its
   staff page, quick adds into empty lists and one-at-a-time uploads.
 - **The live page** is on the dev tenant at
-  `@/_i4u_/Core/Cases/Layouts-v2/Manage Case`, with its five tabs. What its
+  `@/_i4u_/Core/Cases/UnionSuite/Manage-Case` (moved from `Layouts-v2` on
+  5 November 2026), with its five tabs. Every new-theme case page now lives
+  in the one content folder `@/_i4u_/Core/Cases/UnionSuite` (owner,
+  5 November 2026): `Manage-Case` (the page, its tabs and `Popups/`) and
+  `Forms/` (Create case); it supersedes the earlier case content folders. What its
   flows and IQAs already do, and what they still need, is under
   [Live build](#live-build-from-the-owners-exports-28-october-2026).
 - **Approved, not built:** `prototypes/approved/list-search-and-paging/`, the
@@ -114,7 +118,8 @@ The owner's brief, in order (all 10 October 2026):
 
 Checked against three exports from the dev tenant: the Flowz Cases folder (47
 flows), the `$/_i4u_/Core/Cases/Layouts v2` IQA folder (27 IQAs) and the
-`@/_i4u_/Core/Cases/Layouts-v2` pages. Read from the exports only; nothing
+`@/_i4u_/Core/Cases/Layouts-v2` pages (now
+`@/_i4u_/Core/Cases/UnionSuite/Manage-Case`). Read from the exports only; nothing
 was run.
 
 **Built:**

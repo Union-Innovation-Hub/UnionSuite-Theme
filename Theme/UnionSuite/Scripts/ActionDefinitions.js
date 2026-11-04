@@ -1529,7 +1529,7 @@
   // CommunicationId; TODO.md: make it configurable). Open lists that
   // folder (US-COMMS-TEMPLATES).
   const emailParties = {
-    page: '/_i4u_/Core/Cases/Layouts-v2/Popups/Send-Email-Parties.aspx',
+    page: '/_i4u_/Core/Cases/UnionSuite/Manage-Case/Popups/Send-Email-Parties.aspx',
     communicationId: '9ae4a05c-4f8a-4103-bd23-db28a3faf8fc',
     query: '$/_i4u_/Core/Cases/Layouts v2/API - Communication Recipient List - Parties',
     ordinalFilter: 'Ordinal',

@@ -40,7 +40,8 @@ Other things seen in the same renderer and probe:
 ## The test (29 October 2026)
 
 Two checks on the dev tenant's Create case page
-(`@/_i4u_/Core/Cases/UnionSuite/Create-Case-Staff-Form.aspx?ID=100020`),
+(`@/_i4u_/Core/Cases/UnionSuite/Create-Case-Staff-Form.aspx?ID=100020`, since
+moved to `@/_i4u_/Core/Cases/UnionSuite/Forms/` on 5 November 2026),
 on the form built in
 [`prototypes/wip/case-create-form/`](../prototypes/wip/case-create-form/README.md):
 

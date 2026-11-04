@@ -3,7 +3,8 @@
 Status: WIP, started 8 October 2026. Not yet approved as a whole. Adding in
 place (US-INLINE-COMPOSER, C40) is approved and in the shared theme, with
 most of the page since. The live page is on the dev tenant
-(`@/_i4u_/Core/Cases/Layouts-v2/Manage Case`); what it still needs is in
+(`@/_i4u_/Core/Cases/UnionSuite/Manage-Case`, moved from `Layouts-v2` on
+5 November 2026); what it still needs is in
 HANDOVER.md (status updated 28 October 2026).
 **New session? Start with [HANDOVER.md](HANDOVER.md).** List search and paging
 is specified in `prototypes/approved/list-search-and-paging/`.
