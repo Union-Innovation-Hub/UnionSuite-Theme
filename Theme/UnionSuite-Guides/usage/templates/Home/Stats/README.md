@@ -26,8 +26,10 @@ The included `class="us-membership"` and `data-us-membership="summary|financial|
 Every data card includes this literal folder (underscores, not asterisks):
 
 ```text
-$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats
+$/_i4u_/Client/Home Page - UnionSuite/Stats
 ```
+
+The six IQAs live in the client folder because they decide who counts as a current member and what the group, category and financial status are; each client can change them. Until 4 November 2026 they were in `$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats`. The installed page is `@/_i4u_/Client/Staff-Site-Layouts/US-Home-Dashboard/Stats/Membership-Stats`. Both are in the deployment list (`DEPLOY.md`).
 
 | Attribute | Default / meaning |
 | --- | --- |
@@ -53,7 +55,9 @@ Use aggregated counts, not member-detail rows. Each static breakdown must cover 
 
 No AsAtDate column is required. Joins and resignations use two requests each: month to date and the same elapsed days of the previous month, capped at that month's end. Start dates are inclusive; end dates are exclusive. On 13 September, that is 1–13 September vs 1–13 August. This is not a comparison with all of August. A zero prior count shows “previously 0”, without an undefined percentage. Increases in joins/decreases in resignations are favourable; zero change is neutral.
 
-Null, omitted, empty or whitespace-only codes display as **(empty)** and retain their counts. Blank-code rows are combined. Duplicate nonblank codes, negative/invalid counts, incomplete paging and mismatching static totals produce unavailable/retry states. They never silently become zero. The group table retains event-only groups with zero current members, and its net change means joined minus resigned, not historical change in the member population.
+Null, omitted, empty or whitespace-only codes display as **(empty)** and retain their counts. Blank-code rows are combined. Duplicate nonblank codes, negative/invalid counts, incomplete paging and mismatching static totals produce unavailable/retry states. They never silently become zero.
+
+Staff only see "Membership figures are unavailable", so the browser console says why, each line starting `Membership stats:`. A failed IQA is logged once however many cards share it (HTTP status, 30-second timeout, or the reason such as an invalid or duplicate count, with the dates for the joined and resigned queries). A breakdown that doesn't add up to `Total Member Count` is logged by each card that needs it, with both totals. The usual cause is an Equals join that drops members without a row in the joined object; a Left Join keeps them as **(empty)**. Nothing is logged when every figure shows. The group table retains event-only groups with zero current members, and its net change means joined minus resigned, not historical change in the member population.
 
 ## Loading and lifecycle
 
@@ -73,7 +77,7 @@ UnionSuiteMembership.reload(document.querySelector('[data-us-membership="summary
 
 ## Preview and validation
 
-`references/Membership-Stats.html` and the Stats tab of `references/Home-Preview.html` embed the verified probe captured on 13 September 2026. The preview date and API fixture are added by the generator only; production uses the current business date and live iMIS responses.
+`references/Membership-Stats.html` and the Stats tab of `references/Home-Preview.html` embed the verified probe captured on 13 September 2026 (from the earlier SandBox folder; `captured-data.json` names the current folder so the preview answers the templates' queries). The preview date and API fixture are added by the generator only; production uses the current business date and live iMIS responses.
 
 Captured totals: **83,084** members; **7,227** financial (8.7%); **8** joined vs **1** (+7, +700%); **1** resigned vs **1** (0, 0.0%). Financial status includes **20,616 (empty)** and the member category table includes **80,699 (empty)**. All three current-member breakdowns reconcile to 83,084.
 

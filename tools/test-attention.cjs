@@ -6,7 +6,7 @@ const themeJs=read('Theme/UnionSuite/zUnionSuite.js');
 const script=themeJs.match(/\/\* US-ATTENTION:START[\s\S]*?US-ATTENTION:END \*\//)[0];
 const template=read('Theme/UnionSuite-Guides/usage/templates/Home/Needs-Attention-Content.html');
 const css=['Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css','Theme/UnionSuite/99-Orion.css','Theme/UnionSuite/zUnionSuite.css','Theme/UnionSuite-Client/Branding.css'].map(read).join('\n').replace(/@import\s+[^;]+;/g,'');
-const folder='$/_i4u_/SandBox/CRM Layouts/Home_Page/Trackers';
+const folder='$/_i4u_/Client/Home Page - UnionSuite/Trackers';
 const folderId='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0'));
 (async()=>{
@@ -132,8 +132,14 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
   await page.waitForTimeout(50);assert.equal(await page.locator('#optout .us-attention__card').count(),0);assert.equal(calls.length,before);
   // Replace the inner Content HTML while requests are pending: old responses cannot fill new slots.
   mode='delayed';await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));
+  // While loading, the shared spinner sits before the text, hidden from assistive tech.
+  const loadingSpinner=status.locator('.us-button-spinner.us-attention__spinner');
+  assert.equal(await status.textContent(),'Loading counts…');assert(await loadingSpinner.isVisible());
+  assert.equal(await loadingSpinner.getAttribute('aria-hidden'),'true');
+  assert.equal(await status.evaluate(n=>getComputedStyle(n).display),'flex');
   await page.locator('#mount').evaluate((node,html)=>node.innerHTML=html,template.replace('data-us-iqa-folder="'+folder+'"','data-us-iqa-folder="'+folder+'/Replacement"'));
   await settled();assert.equal(await cards.count(),4);
+  assert.equal(await loadingSpinner.count(),0,'the spinner goes when the counts load');
   assert.deepEqual(errors,[]);
   // The standalone guide uses the same component without network or external assets.
   const guide=await browser.newPage({viewport:{width:1100,height:900}});
@@ -147,6 +153,6 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
   assert.match(await frame.locator('#attention-example-status').textContent(),/Sample destination/);
   assert((await guide.locator('#code-attention').textContent()).includes(folder));
   assert.deepEqual(guideErrors,[]);
-  console.log('Needs Attention passed: folder contract, four-query cap/order, field validation, safe links, errors/retry in Easy Edit only, console logging, trackers with no rows, wrappers/replacement, responsive cards and offline guide.');
+  console.log('Needs Attention passed: folder contract, four-query cap/order, field validation, safe links, errors/retry in Easy Edit only, console logging, trackers with no rows, loading spinner, wrappers/replacement, responsive cards and offline guide.');
  } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

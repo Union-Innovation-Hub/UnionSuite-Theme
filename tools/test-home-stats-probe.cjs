@@ -30,7 +30,7 @@ async function run(mode='good') {
       assert.equal(options.method,'GET');
       if (u.pathname.endsWith('/QueryParameterDefinition')) {
         const queryPath=u.searchParams.get('QueryPath');
-        assert.ok(queryPath.startsWith('$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats/'));
+        assert.ok(queryPath.startsWith('$/_i4u_/Client/Home Page - UnionSuite/Stats/'));
         if (mode==='metadata-failure') return {ok:false,status:503};
         const dated=/\/Members (Joined|Resigned)$/.test(queryPath);
         let definitions=dated?[

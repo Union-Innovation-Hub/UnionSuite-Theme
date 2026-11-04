@@ -100,8 +100,9 @@ whether the live page still uses them.
 
 ### Also in the sandbox (outside these three layouts)
 
-- Home: `$/_i4u_/SandBox/CRM Layouts/Home_Page/Trackers` (Needs attention,
-  see above) and `$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats` (the
-  membership stats templates under `usage/templates/Home/Stats/`).
+- Home: the Needs attention trackers and the membership stats IQAs
+  (templates under `usage/templates/Home/`) moved to the client folders
+  `$/_i4u_/Client/Home Page - UnionSuite/Trackers` and `.../Stats` on
+  4 November 2026. Nothing is deployed from the sandbox.
 - Taskbar bookmarks: `$/_i4u_/SandBox/CRM Layouts/Jobs List` in
   `Scripts/UnionSuiteTaskbar-Bookmarks.js`.

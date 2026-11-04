@@ -36,8 +36,11 @@ function fixture(revision = 0, shape = 'wrapped', id = 'ste_container_ciTasks') 
       hidePaginationNumbers: hidePageNumbers.toLowerCase().trim(), uniqueId: '${setId}', pagerLocation: 'justify-content-center'
     });
   </script><script>window.unrelatedScriptRuns = (window.unrelatedScriptRuns || 0) + 1;</script>`;
+  // no-results: iMIS's shape with no records, as on the live home page (4 November
+  // 2026): its No results HTML straight in the panel body, no QueryTemplateSet.
+  const results = shape === 'no-results' ? '<p class="us-home-tasks-empty">No outstanding tasks assigned to you.</p>' : '<div id="' + setId + '" class="QueryTemplateSet">' + rows + '</div>' + footer;
   const content = shape === 'no-panel' ? '<div id="' + setId + '" class="QueryTemplateSet">' + rows + '</div>' + startup : '<div class="panel"><div class="panel-heading"><h2 class="panel-title">My Tasks</h2></div>' +
-    '<div class="panel-body-container"><div class="panel-body"><div id="' + setId + '" class="QueryTemplateSet">' + rows + '</div>' + footer + startup + '</div></div></div>';
+    '<div class="panel-body-container"><div class="panel-body">' + results + startup + '</div></div></div>';
   const classes = 'us-query-search us-task-completed-filter us-action-home-add-task';
   const inner = shape === 'direct' || shape === 'no-panel' ? content : '<div class="' + (shape === 'empty' ? '' : classes) + (shape === 'unstyled' ? ' us-report-no-styling' : '') + '">' + content + '</div>';
   // Real iPart author classes only go on the inserted class div. The direct and
@@ -202,6 +205,21 @@ function fixture(revision = 0, shape = 'wrapped', id = 'ste_container_ciTasks') 
     await refresh();
     assert.equal(requests.at(-1), 'https://theme.test/home?ID=002');
     await assert.rejects(page.evaluate(() => UnionSuiteRefresh.queryTemplate('#ste_container_ciTasks', {url:'https://other.test/home'})), /same-origin/);
+    // Adding the first task: the empty list is the Add task popup's origin, so
+    // closing the popup refreshes it and the new rows replace the No results text.
+    shape = 'wrapped';
+    await page.evaluate(html => { document.getElementById('ste_container_ciTasks').outerHTML = html; }, fixture(0, 'no-results'));
+    await page.waitForFunction(() => document.querySelector('#ste_container_ciTasks .us-action-home-add-task[data-us-command-state="ready"]'));
+    assert.equal(await container.locator('.QueryTemplateSet').count(), 0);
+    const opened = await page.evaluate(() => popups.length), paged = await page.evaluate(() => paginationCalls.length);
+    await add.click();
+    await page.waitForFunction(count => popups.length === count + 1, opened);
+    await page.evaluate(() => popups.at(-1)[11]({}, {}));
+    await page.waitForFunction(count => paginationCalls.length === count + 1, paged);
+    await page.waitForFunction(() => document.querySelectorAll('#ste_container_ciTasks .QueryTemplateSet > section').length === 3);
+    assert.equal(await container.locator('.us-home-tasks-empty').count(), 0);
+    // Only the earlier Retry step's success message may still be showing.
+    assert.deepEqual((await page.locator('.us-command-notice').allTextContents()).filter(text => text !== 'View refreshed.'), [], 'no refresh error notice');
     // Direct, empty-wrapper, no-styling and no-panel forms remain refreshable.
     for (shape of ['no-panel', 'direct', 'empty', 'unstyled']) {
       await page.evaluate(html => { document.getElementById('ste_container_ciTasks').outerHTML = html; }, fixture(0, shape));
@@ -243,7 +261,7 @@ function fixture(revision = 0, shape = 'wrapped', id = 'ste_container_ciTasks') 
     await page.setViewportSize({width:390, height:844});
     assert.equal(await demo.locator('body').evaluate(node => node.scrollWidth <= innerWidth), true);
     assert.deepEqual(errors, []);
-    console.log('PASS Query Template popup refresh: header controls, filters/count, native pagination, script isolation, focus, wrappers, nested rejection and failed/stale requests.');
+    console.log('PASS Query Template popup refresh: header controls, filters/count, first record into an empty list, native pagination, script isolation, focus, wrappers, nested rejection and failed/stale requests.');
   } finally {
     await browser.close();
   }

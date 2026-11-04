@@ -19,7 +19,7 @@ const {guidePath}=require('../build/guide-output.cjs');
   const details=page.locator('details').filter({has:page.locator('#code-stats-summary')});
   await details.locator('summary').click();
   const code=await page.locator('#code-stats-summary').innerText();
-  assert(code.includes('$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats'));assert(!code.includes('ContentItemContainer'));assert(!code.includes('<script'));
+  assert(code.includes('$/_i4u_/Client/Home Page - UnionSuite/Stats'));assert(!code.includes('ContentItemContainer'));assert(!code.includes('<script'));
   const download=page.waitForEvent('download');await page.locator('[data-download="code-stats-summary"]').click();
   assert.equal((await download).suggestedFilename(),'Tracker-Bar-Content.html');
   await page.locator('#membership-stats').evaluate(n=>n.scrollIntoView({block:'start',behavior:'instant'}));

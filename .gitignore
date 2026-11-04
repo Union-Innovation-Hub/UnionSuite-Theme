@@ -53,6 +53,7 @@ Theme/**/*.zip
 
 # Built BeyondFormz and Flowz exports; rebuild with the folder build scripts
 /prototypes/wip/case-create-form/*/dist/
+/prototypes/wip/add-edit-task-form/dist/
 
 # Built staff help pages and chatbot JSON; rebuild with tools/build-user-guide.cjs
 /docs/user-guide/dist/

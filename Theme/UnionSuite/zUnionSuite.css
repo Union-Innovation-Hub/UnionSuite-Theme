@@ -631,6 +631,9 @@ button.us-iqa-find-busy > *:not(:where(.us-report-no-styling, .us-report-no-styl
    - Added: a reset that keeps the legacy record banner (a Query Template)
      out of the theme's Query Template card styling. It is marked where it
      sits, under the contact record banner rules.
+   - Added: the theme's Query Template card for an empty Query Template in a
+     section-scrollable panel (the original contact layout's Workplace
+     Delegates and Organisers with no results), at the end of the block.
 
    It loads after the native button colours and before every other theme
    component, so the theme wins wherever the specificity is equal. The
@@ -3765,6 +3768,101 @@ table.DataDisplay .DataValue {
 
 /* ==================== END Organiser Portal ==================== */
 /* ============================================================== */
+
+/* ── Added: empty Query Templates in section-scrollable panels ──
+   The original contact layout's Workplace Delegates and Workplace
+   Organisers are Query Templates with the section-scrollable CSS class.
+   With no results iMIS leaves out QueryTemplateSet, leaving only the
+   no-results text and the pager script, so the theme's Query Template card
+   (US-IQA panel rules) doesn't match and the legacy .section heading above
+   applies instead. These rules give that empty panel the same card as one
+   with results. Temporary: delete with the rest of this block when the new
+   contact layout replaces the page. */
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0 0 18px;
+  padding: 0 0 11px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-surface);
+  box-shadow: none;
+  color: var(--text-base);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-heading:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  box-sizing: border-box;
+  min-height: var(--panel-header-min-height);
+  margin: 0;
+  padding: var(--panel-header-padding-block) 18px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 11px 11px 0 0;
+  background: var(--bg-surface);
+  color: var(--text-strong);
+  box-shadow: none;
+}
+
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-heading:not(:where(.us-report-no-styling, .us-report-no-styling *))::before,
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-heading:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  display: none;
+}
+
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-heading .panel-title:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--text-strong);
+  font-family: var(--font-ui);
+  font-size: var(--panel-header-font-size);
+  font-weight: var(--panel-header-font-weight);
+  line-height: var(--panel-header-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-description:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+  padding: 8px 18px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--bg-sunken);
+  border-radius: 0;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.6;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-description > :is(div, p):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+}
+
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-body-container:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/* The no-results text: inset and muted like the theme's empty Query Template. */
+.ContentItemContainer > .section-scrollable:has(> .panel > .panel-body-container > .panel-body > script:only-child) > .panel > .panel-body-container > .panel-body:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+  padding: var(--space-3) 18px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+}
 
 /* US-LEGACY-UTSTAFF:END */
 
@@ -29116,6 +29214,13 @@ body:not(.EasyEdit) .ContentItemContainer:has(> .us-activity-detail:not(.is-open
   padding: 16px 20px;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+/* Loading counts…: the spinner sits before the text, centred on it. */
+.us-attention:not(:where(.us-report-no-styling, .us-report-no-styling *)) > .us-attention__status:has(> .us-attention__spinner) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .us-attention:not(:where(.us-report-no-styling, .us-report-no-styling *)) > .us-attention__status:empty {

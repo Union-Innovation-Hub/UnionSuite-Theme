@@ -12,8 +12,9 @@ const wait=async(page,type='summary',state='ready')=>page.waitForFunction(({type
  const browser=await chromium.launch({channel:'msedge',headless:true});let passed=0;
  try{
   async function setup(markup=all,data=clone(),mode={}){
-   const page=await browser.newPage({viewport:{width:1440,height:2700}}),calls=[],errors=[];
+   const page=await browser.newPage({viewport:{width:1440,height:2700}}),calls=[],errors=[],logs=[];
    page.on('pageerror',e=>errors.push(e.message));
+   page.on('console',m=>{if(m.text().startsWith('Membership stats: '))logs.push({type:m.type(),text:m.text()});});
    const documentHtml=body=>`<!doctype html><html><head><meta charset="utf-8"><style>${css}body{margin:0;padding:10px}.us-membership{margin-bottom:8px}</style></head><body><input name="__RequestVerificationToken" value="test-only-token" type="hidden">${body}<script>${runtime}</script></body></html>`;
    await page.route('https://imis.test/**',async route=>{
     const req=route.request(),u=new URL(req.url());
@@ -33,9 +34,10 @@ const wait=async(page,type='summary',state='ready')=>page.waitForFunction(({type
     if(mode.incomplete)result.HasNext=false;
     await route.fulfill({json:result});
    });
-   await page.goto('https://imis.test/');return {page,calls,errors,data,mode};
+   await page.goto('https://imis.test/');return {page,calls,errors,logs,data,mode};
   }
-  async function finish(t,label){assert.deepEqual(t.errors,[]);await t.page.close();console.log('PASS '+label);passed++;}
+  // Every scenario logs nothing unless it lists the console lines it expects (in any order: cards finish independently).
+  async function finish(t,label,logs=[]){assert.deepEqual(t.errors,[]);const lines=list=>list.map(l=>l.type+' '+l.text).sort();assert.deepEqual(lines(t.logs),lines(logs.map(text=>({type:'error',text:'Membership stats: '+text}))));await t.page.close();console.log('PASS '+label);passed++;}
   {
    const t=await setup('<div id="host" hidden>'+all+'</div>');await t.page.waitForTimeout(220);assert.equal(t.calls.length,0);
    await t.page.locator('#host').evaluate(n=>n.hidden=false);await wait(t.page,'categories');await wait(t.page,'groups');await wait(t.page);
@@ -58,7 +60,7 @@ const wait=async(page,type='summary',state='ready')=>page.waitForFunction(({type
   {
    const data=clone();data.queries.category.current=Array.from({length:101},(_,i)=>({CategoryCode:'Type '+i,MemberCount:i===0?82984:1}));
    const t=await setup(card('categories'),data,{incomplete:true});await wait(t.page,'categories','error');assert.equal(await t.page.locator('.us-membership__bars').count(),0);
-   await finish(t,'incomplete pagination does not display partial totals');
+   await finish(t,'incomplete pagination does not display partial totals',['IQA '+snapshot.folder+'/Member Counts by Category failed: Incomplete membership results.']);
   }
   for(const invalid of ['negative','duplicate','mismatch']){
    const data=clone();if(invalid==='negative')data.queries.financial.current[0].MemberCount=-1;
@@ -66,7 +68,10 @@ const wait=async(page,type='summary',state='ready')=>page.waitForFunction(({type
    if(invalid==='mismatch')data.queries.financial.current[0].MemberCount++;
    const t=await setup(card('summary')+card('financial'),data);await wait(t.page,'financial','error');await wait(t.page,'summary','error');
    assert.deepEqual(await t.page.locator('.us-membership__metric > strong').allTextContents(),['83,084','—','8','1']);
-   await finish(t,invalid+' counts show unavailable while valid trackers remain');
+   const iqa=name=>snapshot.folder+'/'+name;
+   const expected=invalid==='mismatch'?['Membership summary','Financial status'].map(card=>card+': '+iqa('Member Counts by Financial Status')+' adds up to 83085, but '+iqa('Total Member Count')+' returns 83084. The breakdown must count every current member exactly once.')
+     :['IQA '+iqa('Member Counts by Financial Status')+' failed: '+(invalid==='negative'?'Invalid member count.':'Duplicate category code.')];
+   await finish(t,invalid+' counts show unavailable while valid trackers remain, with the reason logged',expected);
   }
   {
    const data=clone();data.queries.financial.current[0].MemberCount=20614;data.queries.financial.current.push({FinancialStatusCode:'  ',MemberCount:1},{MemberCount:1});
@@ -84,6 +89,9 @@ const wait=async(page,type='summary',state='ready')=>page.waitForFunction(({type
   }
   {
    const t=await setup(all,clone(),{fail:'Members Joined'});await wait(t.page,'summary','error');await wait(t.page,'categories');await wait(t.page,'financial');await wait(t.page,'groups','error');
+   const joined=snapshot.folder+'/Members Joined',p=snapshot.periods;
+   const failed=[p.current,p.previous].map(d=>'IQA '+joined+' (StartDate '+d.start+', EndDate '+d.end+') returned an error (HTTP 403).');
+   assert.deepEqual(t.logs.map(l=>l.text.replace('Membership stats: ','')).sort(),[...failed].sort(),'each failed request logged once, not once per card');t.logs.length=0;
    t.mode.fail=null;const retry=t.page.locator('[data-us-membership="summary"] .us-membership__retry');await retry.focus();await retry.click();await wait(t.page);await wait(t.page,'groups');await wait(t.page,'categories');await wait(t.page,'financial');
    assert.equal(t.calls.length,16,'retry reloads shared folder once');assert.equal(await t.page.locator('.us-membership__metric > strong').nth(2).innerText(),'8');
    assert(await t.page.locator('[data-us-membership="summary"] > .us-membership__content').evaluate(n=>n===document.activeElement));

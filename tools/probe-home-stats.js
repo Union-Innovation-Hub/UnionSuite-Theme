@@ -8,7 +8,7 @@
   'use strict';
   if (window.usHomeStatsProbeRunning) throw Error('A Home Stats probe is already running.');
   window.usHomeStatsProbeRunning = true;
-  const folder = '$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats';
+  const folder = '$/_i4u_/Client/Home Page - UnionSuite/Stats';
   // Normally discovered from QueryParameterDefinition. If the report cannot map
   // your prompts, enter their exact API names here after reviewing that output.
   // Example: joined: {start:'Joined from', end:'Joined before'}

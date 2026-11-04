@@ -402,11 +402,13 @@ SOFTWARE.
   // Its parts then have set null, and body is where its rows will go.
   const pagerScript = script => !script.src && /\.simplePaginate\s*\(/.test(script.textContent);
   const anchorOf = parts => parts.set || parts.body;
+  const ownSets = container => [...container.querySelectorAll('.QueryTemplateSet')].filter(set => set.closest('.ContentItemContainer') === container);
+  const emptyBodies = container => [...container.querySelectorAll('.panel > .panel-body-container > .panel-body')]
+    .filter(body => body.closest('.ContentItemContainer') === container && [...body.children].some(child => child.matches('script') && pagerScript(child)));
   function templateParts(container) {
     if (!container?.matches('.ContentItemContainer')) throw new Error('Query Template refresh requires its ContentItemContainer.');
-    const sets = [...container.querySelectorAll('.QueryTemplateSet')].filter(set => set.closest('.ContentItemContainer') === container);
-    const bodies = sets.length ? [] : [...container.querySelectorAll('.panel > .panel-body-container > .panel-body')]
-      .filter(body => body.closest('.ContentItemContainer') === container && [...body.children].some(child => child.matches('script') && pagerScript(child)));
+    const sets = ownSets(container);
+    const bodies = sets.length ? [] : emptyBodies(container);
     if (sets.length !== 1 && bodies.length !== 1) throw new Error('Expected one Query Template Display in the refresh target.');
     const set = sets[0] || null, body = set ? set.parentElement : bodies[0], panel = body.closest('.panel');
     const owner = panel && panel.closest('.ContentItemContainer') === container ? panel.parentElement : container;
@@ -420,11 +422,14 @@ SOFTWARE.
     let grids = root ? ownGrids(root) : [];
     const inGrid = trigger?.closest('[data-gridid]');
     if (inGrid?.matches(gridSelector) && inGrid.closest('.ContentItemContainer') === container) grids = [inGrid];
-    const sets = container ? [...container.querySelectorAll('.QueryTemplateSet')].filter(set => set.closest('.ContentItemContainer') === container) : [];
+    // An empty Query Template counts too, so adding the first record (the
+    // home page's first task, owner 4 November 2026) refreshes it.
+    const sets = container ? ownSets(container) : [];
+    const templates = sets.length || !container ? sets.length : emptyBodies(container).length;
     return Object.freeze({owner:identity(root), container:identity(container),
       report:grids.length === 1 ? identity(grids[0].parentElement.parentElement) : null,
-      template:!grids.length && sets.length === 1 ? identity(container) : null,
-      ambiguous:grids.length > 1 || (!grids.length && sets.length > 1)});
+      template:!grids.length && templates === 1 ? identity(container) : null,
+      ambiguous:grids.length > 1 || (!grids.length && templates > 1)});
   }
   function reportControl(origin) {
     if (origin?.ambiguous) throw new Error('The action origin contains multiple reports. Configure an explicit refresh target.');
@@ -18725,7 +18730,9 @@ SOFTWARE.
     const current = () => states.get(state.root) === state && state.controller === controller && !controller.signal.aborted && state.root.isConnected;
     for (const link of opening.keys()) if (state.list.contains(link)) clearOpening(link);
     state.list.replaceChildren(); state.list.setAttribute('aria-busy','true');
-    state.status.textContent = 'Loading counts…';
+    // The shared spinner before the text; any later message replaces both.
+    const spinner = element('span','us-button-spinner us-attention__spinner'); spinner.setAttribute('aria-hidden','true');
+    state.status.replaceChildren(spinner,'Loading counts…');
     if (document.activeElement === state.retry) {state.status.tabIndex=-1;state.status.focus({preventScroll:true});}
     state.retry.hidden = true;
     try {
@@ -23611,6 +23618,14 @@ SOFTWARE.
   const percent=(value,total)=>total===0?'0.0':value>0&&value/total*100<.1?'<0.1':value<total&&value/total*100>99.9?'>99.9':(value/total*100).toFixed(1);
   const el=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;};
   const own=(root,cls)=>root.querySelector(':scope > .'+cls);
+  // Staff only see "unavailable"; the console says which IQA failed and why.
+  const log=(level,message)=>console[level]('Membership stats: '+message);
+  const cardName=root=>root.getAttribute('aria-label')||root.dataset.usMembership+' card';
+  function failure(error) {
+    if(error?.status)return 'returned an error (HTTP '+error.status+').';
+    if(error?.name==='AbortError')return 'timed out after 30 seconds.';
+    return 'failed: '+(error?.message||String(error));
+  }
   function integer(value) {
     value=unwrap(value);
     if(typeof value!=='number' && !(typeof value==='string' && /^\d+(?:\.0+)?$/.test(value.trim())))throw Error('Invalid member count.');
@@ -23672,7 +23687,7 @@ SOFTWARE.
           method:'GET',credentials:'same-origin',cache:'no-store',redirect:'error',signal:controller.signal,
           headers:{Accept:'application/json',...(token?{RequestVerificationToken:token}:{})}
         });
-        if(!response.ok)throw Error('Membership query failed (HTTP '+response.status+').');
+        if(!response.ok)throw Object.assign(Error('Membership query failed (HTTP '+response.status+').'),{status:response.status});
         data=await response.json();
         if(!data||unwrap(data.IsSuccessStatusCode)===false||unwrap(data.IsValid)===false)throw Error('Membership query failed.');
       } finally {clearTimeout(timer);}
@@ -23694,13 +23709,24 @@ SOFTWARE.
     const path=cfg.folder+'/'+cfg.names[type],id=JSON.stringify([apiRoot(),path,filters,type]);
     if(!cache.has(id)) {
       const entry={folder:cfg.folder,status:'pending'};
-      entry.promise=fetchRows(path,filters).then(rows=>normalize(rows,type)).then(data=>{entry.status='ready';return data;},error=>{entry.status='failed';throw error;});
+      // Logged once per request; the cards sharing it each show "unavailable".
+      const dates=period?' ('+cfg.start+' '+period.start+', '+cfg.end+' '+period.end+')':'';
+      entry.promise=fetchRows(path,filters).then(rows=>normalize(rows,type)).then(data=>{entry.status='ready';return data;},error=>{
+        entry.status='failed';log('error','IQA '+path+dates+' '+failure(error));throw error;
+      });
       cache.set(id,entry);
     }
     return cache.get(id).promise;
   }
   const good=result=>result?.status==='fulfilled'?result.value:null;
-  function matches(total,breakdown){return total&&breakdown&&total.total===breakdown.total;}
+  // A breakdown must add up to Total Member Count; the console says when it doesn't.
+  function reconciled(state,total,breakdown,type) {
+    if(!total||!breakdown)return false;
+    if(total.total===breakdown.total)return true;
+    const {cfg}=state;
+    log('error',cardName(state.root)+': '+cfg.folder+'/'+cfg.names[type]+' adds up to '+breakdown.total+', but '+cfg.folder+'/'+cfg.names.total+' returns '+total.total+'. The breakdown must count every current member exactly once.');
+    return false;
+  }
   function financialCount(cfg,data){return data.rows.filter(row=>row.code!==null&&cfg.financialCodes.includes(row.code)).reduce((sum,row)=>sum+row.count,0);}
   function delta(value,lowerBetter=false) {
     return el('span','us-membership__delta'+(value===0?' is-neutral':(lowerBetter?value>0:value<0)?' is-negative':''),signed(value));
@@ -23719,7 +23745,7 @@ SOFTWARE.
   }
   function summary(state,results) {
     const {cfg,content}=state,[total,financial,joined,joinedBefore,resigned,resignedBefore]=results.map(good);
-    const validFinancial=matches(total,financial),paid=validFinancial?financialCount(cfg,financial):null;
+    const validFinancial=reconciled(state,total,financial,'financial'),paid=validFinancial?financialCount(cfg,financial):null;
     const grid=el('div','us-membership__metrics');
     grid.append(metric('Total members',total?.total??null,total?'Current membership':null),
       metric('Financial members',paid,validFinancial?percent(paid,total.total)+'% of current members':null),
@@ -23730,7 +23756,7 @@ SOFTWARE.
   }
   function financial(state,results) {
     const {cfg,content}=state,[total,data]=results.map(good);
-    if(!matches(total,data))return false;
+    if(!reconciled(state,total,data,'financial'))return false;
     const paid=financialCount(cfg,data),rows=[...data.rows].sort((a,b)=>Number(cfg.financialCodes.includes(b.code))-Number(cfg.financialCodes.includes(a.code))||(a.code===null?1:b.code===null?-1:b.count-a.count));
     const body=el('div','us-membership__financial'),donut=el('div','us-membership__donut');let stop=0;
     const colors=['var(--teal-300)','var(--brand-500)','var(--neutral-400)'];let other=0;
@@ -23749,7 +23775,7 @@ SOFTWARE.
   }
   function groups(state,results) {
     const {cfg,content}=state,[total,data,joined,resigned]=results.map(good);
-    if(!matches(total,data)||!joined||!resigned)return false;
+    if(!reconciled(state,total,data,'groups')||!joined||!resigned)return false;
     const merged=new Map(data.rows.map(row=>[row.code,{...row,joined:0,resigned:0}]));
     for(const [field,set] of [['joined',joined],['resigned',resigned]])for(const row of set.rows){
       if(!merged.has(row.code))merged.set(row.code,{code:row.code,label:row.label,count:0,joined:0,resigned:0});
@@ -23766,7 +23792,7 @@ SOFTWARE.
     return true;
   }
   function categories(state,results) {
-    const [total,data]=results.map(good);if(!matches(total,data))return false;
+    const [total,data]=results.map(good);if(!reconciled(state,total,data,'categories'))return false;
     const body=el('div','us-membership__body'),list=el('dl','us-membership__bars');
     for(const row of data.rows){
       const entry=el('div'),dd=el('dd','',number(row.count));dd.append(el('span','',percent(row.count,total.total)+'%'));
@@ -23807,6 +23833,7 @@ SOFTWARE.
       state.root.dataset.usMembershipState=success?'ready':'error';
     } catch(error) {
       if(!current())return;
+      log('error',cardName(state.root)+': '+(error?.message||String(error)));
       state.content.replaceChildren(el('p','us-membership__unavailable','Membership figures are unavailable.'));
       state.status.textContent='Check query access and card configuration, then retry.';state.retry.hidden=false;state.failed=true;state.ready=true;state.root.dataset.usMembershipState='error';
     } finally {if(current()){state.loading=false;state.root.removeAttribute('aria-busy');if(state.restoreFocus&&document.activeElement===state.content)state.content.focus({preventScroll:true});state.restoreFocus=false;}}

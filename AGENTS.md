@@ -27,7 +27,8 @@
 - Preserve literal underscores in iMIS folder identifiers, including `_i4u_`
   and `Home_Page`. Chat formatting can render these as italics; do not replace
   the underscores with asterisks. Show paths in code formatting when discussing them.
-- The Home Stats IQA folder is `$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats`.
+- The Home Stats IQA folder is `$/_i4u_/Client/Home Page - UnionSuite/Stats`
+  (moved from `$/_i4u_/SandBox/CRM Layouts/Home_Page/Stats` on 4 November 2026).
 
 ## iMIS query API reference
 
