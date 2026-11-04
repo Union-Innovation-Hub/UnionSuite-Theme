@@ -96,6 +96,26 @@
       }
     }
   });
+  // The old contact page's Quick Actions call CreateCasePopupFn() by name.
+  // Its original (cdn.uhub.org.au/EMS/js/i4u_JsFunctions.js) opens the
+  // retired /_i4u_/Core/Cases/Create-Case-Staff.aspx in the domain's default
+  // website; this opens the same page as member.create-case (owner,
+  // 4 November 2026). That script and the theme load in either order, so it
+  // is set again once the page has loaded. Never lock it with
+  // Object.defineProperty: the script's later function declaration would
+  // then throw and stop the rest of that script.
+  function createCasePopup() {
+    const url = websitePath('/Cases_CreateCase');
+    const query = new URLSearchParams(location.search);
+    url.searchParams.set('ID',query.get('ID') || query.get('id') || '');
+    location.href = url.href;
+  }
+  function replaceCreateCasePopup() {
+    window.CreateCasePopupFn = createCasePopup;
+  }
+  replaceCreateCasePopup();
+  globalThis.document?.addEventListener?.('DOMContentLoaded',replaceCreateCasePopup);
+  window.addEventListener?.('load',replaceCreateCasePopup);
   define('member.add-job',{
     presentation:{label:'Add job',icon:'plus',default:'button',menu:'menu-item'},
     context:{partyId:{...party,validate:recordId}},

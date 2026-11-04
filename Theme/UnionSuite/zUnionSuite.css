@@ -1041,12 +1041,22 @@ button.us-iqa-find-busy > *:not(:where(.us-report-no-styling, .us-report-no-styl
   width: 100%;
 }
 
-/* Revert caret on dropdown button */
+/* Revert caret on dropdown button. Not in a theme-styled action menu
+   (US-ACTIONS hides its .caret and draws a chevron): this rule is the more
+   specific, so the old contact page's Quick Actions showed both (owner,
+   4 November 2026). :where keeps its specificity unchanged. */
 .wrapper.SVG-enabled .dropdown.revertCaret .caret::before {
   display: none;
 }
 
-.wrapper.SVG-enabled .dropdown.revertCaret .caret {
+.wrapper.SVG-enabled .dropdown.revertCaret:not(:where(
+  .us-actions:not(
+    .us-report-no-styling,
+    .us-report-no-styling *,
+    [data-us-actions-ignore],
+    [data-us-actions-ignore] *
+  )
+)) .caret {
   display: inline-block;
   width: 0;
   height: 0;
@@ -1181,6 +1191,65 @@ table.DataDisplay .DataValue {
 .account-banner-short .banner-info .ContentItemContainer:has(.top-banner) .QueryTemplateItem {
   color: inherit;
   font-size: inherit;
+}
+
+/* Small screens: a temporary clean-up of the original account page until
+   the new contact layout replaces it (owner, 4 November 2026). Below 768px
+   iMIS stacks the banner bottom-up (10-UltraWaveResponsive.css,
+   column-reverse), putting the alerts first and the member banner last.
+   The source order is the one wanted: member banner, details and Quick
+   Actions, then alerts. The 767px breakpoint is that native rule's. */
+@media (max-width: 767px) {
+  .main .account-banner-short {
+    flex-direction: column;
+  }
+
+  .main .account-banner-short .banner-top-bar {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  /* Quick Actions on its own row, full width, at touch size. */
+  .main .account-banner-short .banner-top-bar > .area-top-bar-right,
+  .main .account-banner-short .banner-top-bar .us-actions {
+    width: 100%;
+  }
+
+  .main .account-banner-short .banner-top-bar .us-actions > .us-actions__toggle {
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Alerts: sized to their content. On wide screens they scroll inside a
+     fixed-height column, which collapses once its min-height goes. */
+  .main .account-banner-short .banner-content {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .main .account-banner-short .banner-content > .area-bottom-bar-right {
+    min-height: 0;
+  }
+
+  .main .account-banner-short .banner-content > .area-bottom-bar-right > .ContentItemContainer {
+    flex: none;
+    overflow: visible;
+  }
+
+  /* The empty left zone would still take the row's gap. */
+  .main .account-banner-short .banner-content > .area-bottom-bar-left:not(:has(.iMIS-WebPart > .ContentItemContainer)) {
+    display: none;
+  }
+
+  /* The tabs' panels: less inset around and inside them. */
+  .main:has(.account-banner-short) .tabs-wrapper.tabs-vertical > .RadMultiPage {
+    padding: 12px 8px;
+  }
+
+  .main:has(.account-banner-short) .section .panel-body-container {
+    padding: 8px 0;
+  }
 }
 
 /* Contact Layout */
