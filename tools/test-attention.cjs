@@ -14,6 +14,9 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
  try {
   const page=await browser.newPage({viewport:{width:1200,height:850}}), errors=[], calls=[];
   page.on('pageerror',e=>errors.push(e.message));
+  const logs=[];page.on('console',m=>{if(m.text().startsWith('Needs Attention section:'))logs.push([m.type(),m.text()]);});
+  const easyEdit=on=>page.evaluate(on=>window.gIsEasyEditEnabled=on,on);
+  const reload=()=>page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));
   let mode='valid';
   const dataRows=[
     {Count:3,Header:'Applications',Label:'Awaiting review',Link:'/reports?kind=applications'},
@@ -51,6 +54,8 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
     if(mode==='invalid' && i===0) row.Count=null;
     if(mode==='invalid' && i===1) row.Count=-1;
     if(mode==='invalid' && i===2) row.Label='';
+    // iMIS's reply when a grouped count IQA matches nothing.
+    if(mode==='no-rows'&&i===2||mode==='all-no-rows'){body={Items:{$values:[]},Offset:0,Limit:2,Count:0,TotalCount:0,HasNext:false,NextOffset:0};await route.fulfill({contentType:'application/json',body:JSON.stringify(body)});return;}
     body={TotalCount:mode==='invalid'&&i===3?2:1,Items:{$values:[{Properties:{$values:Object.entries(row).map(([Name,Value])=>({Name,Value:{$value:Value}}))}}]}};
     if(mode==='delayed') await new Promise(resolve=>setTimeout(resolve,120));
    }
@@ -79,6 +84,20 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
   const boxes=await cards.evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().top));
   assert(boxes.every((top,i)=>i===0||top>boxes[i-1]),'mobile stacks four cards');
   await page.screenshot({path:'.preview/attention-mobile.png',fullPage:true});
+  const loaded=()=>page.waitForFunction(()=>!document.querySelector('#mount [aria-busy]')&&!document.querySelector('#mount .us-attention__status').textContent.startsWith('Loading'));
+  const retry=page.locator('#mount .us-attention__retry');
+  // Staff never see errors: a failed IQA drops its card and the console says why.
+  mode='query-error';logs.length=0;await reload();await loaded();
+  assert.deepEqual(await cards.locator('.us-attention__number').allTextContents(),['3','2','4']);
+  assert.equal(await status.textContent(),'');assert.equal(await retry.isVisible(),false);
+  assert.deepEqual(logs,[['error','Needs Attention section: IQA '+folder+'/02 Query returned an error (HTTP 500).']]);
+  mode='folder-error';logs.length=0;await reload();await loaded();
+  assert.equal(await cards.count(),0);assert.equal(await status.textContent(),'');assert.equal(await retry.isVisible(),false);
+  assert.deepEqual(logs,[['error','Needs Attention section: couldn’t load '+folder+' — returned an error (HTTP 403).']]);
+  mode='empty';logs.length=0;await reload();await loaded();
+  assert.equal(await status.textContent(),'');assert.deepEqual(logs,[['warning','Needs Attention section: no tracker IQAs were found in '+folder+'.']]);
+  // Easy Edit shows the error cards, messages and Retry.
+  await easyEdit(true);
   mode='query-error';await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));await settled();
   assert.equal(await cards.nth(1).locator('.us-attention__number').textContent(),'—');
   assert.match(await status.textContent(),/3 of 4/);
@@ -87,13 +106,21 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
   assert.equal(await page.evaluate(()=>document.activeElement.className),'us-attention__items','retry retains a useful focus location');
   mode='invalid';await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));await settled();
   assert.deepEqual(await cards.locator('.us-attention__number').allTextContents(),['—','—','—','—']);
+  // A tracker with no rows has nothing needing attention: its card is left out, not an error, and the console says so.
+  mode='no-rows';logs.length=0;await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));await loaded();
+  assert.deepEqual(logs,[['info','Needs Attention section: IQA '+folder+'/03 Query returned 0 results.']]);
+  assert.deepEqual(await cards.locator('.us-attention__copy > strong').allTextContents(),['Applications','Failed payments','<img src=x onerror=alert(1)>']);
+  assert.equal(await status.textContent(),'');assert.equal(await page.locator('#mount .us-attention__retry').isVisible(),false);
+  assert.equal(await page.locator('#mount .us-attention__items').evaluate(n=>n.style.getPropertyValue('--us-attention-columns')),'3');
+  mode='all-no-rows';await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));await loaded();
+  assert.equal(await cards.count(),0);assert.equal(await status.textContent(),'Nothing needs attention.');
   mode='empty';await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));
   await page.waitForFunction(()=>document.querySelector('#mount .us-attention__status').textContent.startsWith('No tracker'));
   assert.equal(await cards.count(),0);
   mode='folder-error';await page.evaluate(()=>UnionSuiteAttention.reload(document.querySelector('#mount .us-attention')));
   await page.waitForFunction(()=>document.querySelector('#mount .us-attention__status').textContent.startsWith('Couldn’t'));
   assert.equal(await page.locator('#mount .us-attention__retry').isVisible(),true);
-  mode='valid';
+  await easyEdit(false);mode='valid';
   // Direct, empty, configured and nested Content HTML wrappers do not change ownership.
   for(const wrapping of [html=>'<div>'+html+'</div>',html=>'<div class="author-wrapper">'+html+'</div>',html=>'<div class="panel"><div class="ContentItemContainer">'+html+'</div></div>']) {
     await page.locator('#mount').evaluate((node,html)=>node.innerHTML=html,wrapping(template));await settled();
@@ -120,6 +147,6 @@ const ids=[1,2,3,4,5].map(i=>'00000000-0000-4000-8000-'+String(i).padStart(12,'0
   assert.match(await frame.locator('#attention-example-status').textContent(),/Sample destination/);
   assert((await guide.locator('#code-attention').textContent()).includes(folder));
   assert.deepEqual(guideErrors,[]);
-  console.log('Needs Attention passed: folder contract, four-query cap/order, field validation, safe links, errors/retry, wrappers/replacement, responsive cards and offline guide.');
+  console.log('Needs Attention passed: folder contract, four-query cap/order, field validation, safe links, errors/retry in Easy Edit only, console logging, trackers with no rows, wrappers/replacement, responsive cards and offline guide.');
  } finally {await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

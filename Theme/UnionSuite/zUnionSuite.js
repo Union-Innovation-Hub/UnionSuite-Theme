@@ -18456,6 +18456,16 @@ SOFTWARE.
     if (text !== undefined) node.textContent = text;
     return node;
   };
+  // Error cards, messages and Retry show only in Easy Edit; staff see the
+  // cards that loaded. Every empty or failed tracker IQA is logged to the
+  // console, prefixed with the section's name.
+  const easyEdit = () => window.gIsEasyEditEnabled === true || Boolean(document.body?.classList.contains('TemplateAreaEasyEditOn'));
+  const log = (level, message) => console[level]('Needs Attention section: ' + message);
+  function failure(error) {
+    if (error?.status) return 'returned an error (HTTP ' + error.status + ').';
+    if (error?.name === 'AbortError') return 'timed out after 20 seconds.';
+    return 'failed: ' + (error?.message || String(error));
+  }
   function apiRoot() {
     if (!window.gWebRoot) return '/api/';
     const root = new URL(String(window.gWebRoot || '/'), window.location.origin);
@@ -18475,7 +18485,7 @@ SOFTWARE.
         headers:{Accept:'application/json', ...(token ? {RequestVerificationToken:token} : {}), ...(body ? {'Content-Type':'application/json'} : {})},
         ...(body ? {body:JSON.stringify(body)} : {})
       });
-      if (!response.ok) throw Error('iMIS request failed (HTTP ' + response.status + ').');
+      if (!response.ok) throw Object.assign(Error('iMIS request failed (HTTP ' + response.status + ').'), {status:response.status});
       const data = await response.json();
       if (!data || unwrap(data.IsSuccessStatusCode) === false || unwrap(data.IsValid) === false) throw Error('iMIS could not complete the query.');
       return data;
@@ -18530,6 +18540,9 @@ SOFTWARE.
       : 'iqa?' + new URLSearchParams({QueryDocumentVersionKey:query.id,Limit:'2'});
     const data = await request(path, null, signal);
     const rows = values(data.Items);
+    // No rows means nothing needs attention: an IQA that counts by grouping
+    // returns no rows rather than a zero row. Its card is left out.
+    if (!rows.length && Number(unwrap(data.TotalCount) ?? 0) === 0 && unwrap(data.HasNext) !== true) return null;
     if (rows.length !== 1 || Number(unwrap(data.TotalCount)) > 1 || unwrap(data.HasNext) === true) throw Error('Each tracker IQA must return exactly one summary row.');
     const rawCount = property(rows[0],'Count'), header = property(rows[0],'Header'), label = property(rows[0],'Label');
     const count = typeof rawCount === 'number' ? rawCount : typeof rawCount === 'string' && /^\d+$/.test(rawCount.trim()) ? Number(rawCount.trim()) : NaN;
@@ -18625,7 +18638,8 @@ SOFTWARE.
         const value = new URLSearchParams(location.search).get(filter);
         if (!value || !value.trim()) {
           if (!current()) return;
-          state.status.textContent = 'Counts need ' + filter + ' in the page address.';
+          log('warn', 'counts for ' + path + ' need ' + filter + ' in the page address; nothing was queried.');
+          state.status.textContent = easyEdit() ? 'Counts need ' + filter + ' in the page address.' : '';
           return;
         }
         scope = {folder:path,filter,value:value.trim()};
@@ -18633,20 +18647,32 @@ SOFTWARE.
       const queries = await queriesInFolder(path, controller.signal);
       const results = await Promise.allSettled(queries.map(query => queryCount(query, controller.signal, scope)));
       if (!current()) return;
+      const editing = easyEdit();
       let failed = 0;
       const cards = results.map((result,i) => {
-        if (result.status === 'fulfilled') return card(result.value);
+        const iqa = path + '/' + queries[i].name;
+        if (result.status === 'fulfilled') {
+          if (result.value) return card(result.value);
+          log('info', 'IQA ' + iqa + ' returned 0 results.');
+          return null;
+        }
         failed++;
-        return card({count:null,header:queries[i].name,label:'Count unavailable',link:null});
-      });
+        log('error', 'IQA ' + iqa + ' ' + failure(result.reason));
+        return editing ? card({count:null,header:queries[i].name,label:'Count unavailable',link:null}) : null;
+      }).filter(Boolean);
+      if (!queries.length) log('warn', 'no tracker IQAs were found in ' + path + '.');
       state.list.style.setProperty('--us-attention-columns',String(Math.max(1,cards.length)));
       state.list.replaceChildren(...cards);
-      state.status.textContent = !queries.length ? 'No tracker queries were found in this folder.' : failed ? (queries.length-failed) + ' of ' + queries.length + ' counts loaded. Check query fields, REST access and sign-in, then retry.' : '';
-      state.retry.hidden = !failed;
-    } catch {
+      state.status.textContent = !queries.length ? (editing ? 'No tracker queries were found in this folder.' : '')
+        : failed ? (editing ? (queries.length-failed) + ' of ' + queries.length + ' counts loaded. Check query fields, REST access and sign-in, then retry.' : '')
+        : !cards.length ? 'Nothing needs attention.' : '';
+      state.retry.hidden = !(failed && editing);
+    } catch (error) {
       if (!current()) return;
-      state.status.textContent = 'Couldn’t load Needs Attention. Check the folder path, query access and sign-in, then retry.';
-      state.retry.hidden = false;
+      log('error', 'couldn’t load ' + (state.path.trim() || 'the folder') + ' — ' + failure(error));
+      const editing = easyEdit();
+      state.status.textContent = editing ? 'Couldn’t load Needs Attention. Check the folder path, query access and sign-in, then retry.' : '';
+      state.retry.hidden = !editing;
     } finally {
       if (current()) {
         state.list.removeAttribute('aria-busy');
