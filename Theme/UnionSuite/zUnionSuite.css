@@ -15862,6 +15862,15 @@ html.us-taskbar-mounted #hd .search-dropdown {
   font-weight: var(--fw-normal);
 }
 
+/* Long text (a description, which US-FIELD-GROUPS makes full width) reads
+   as body copy: normal weight and looser lines, not the medium weight
+   short values use to stand out from their labels. */
+.us-fields__field--wide dd {
+  color: var(--text-base);
+  font-weight: var(--fw-normal);
+  line-height: 1.6;
+}
+
 /* us-field-groups: the us-fields panel built from an IQA's column names by
    US-FIELD-GROUPS. A named group gets a sub-heading with a hairline beside it;
    a numbered group only starts a new line. The optional status alert (the

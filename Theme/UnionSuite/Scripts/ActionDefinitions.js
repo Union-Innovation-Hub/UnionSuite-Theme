@@ -818,9 +818,9 @@
    with CaseID and CaseNum, both from the page URL.
 
    Reused from the agreement actions above:
-   - The CloudToolz call (UnionSuiteAgreements). Case notes and tasks live in
-     the same Zen_CloudFiles_Notes table as agreement notes, so the task tick
-     saves through /ca/complete-task by note ordinal. To confirm.
+   - The CloudToolz call (UnionSuiteAgreements). The case task tick posts
+     through it to the cases flow /cases/complete-task (cases.item-status
+     below), not the agreements /ca/complete-task.
    - The restricted note loader (/ca/note-access), defined once for the page.
    - Attachment View, Download and Edit: they read only the row, so the case
      template keeps the agreements.*-attachment classes. */
@@ -1704,13 +1704,18 @@
       successMessage: 'Lead staff updated.'}
   });
 
-  // Case task rows carry data-us-task-save="cases.item-status".
+  // Case task rows carry data-us-task-save="cases.item-status". The tick
+  // saves through the cases flow /cases/complete-task (owner, 4 November
+  // 2026; it was the agreements /ca/complete-task). The flow finds the case
+  // from the task, checks the user's entity access to it and logs the change.
   window.UnionSuiteTaskRows?.defineSaver?.('cases.item-status', async ({root, done}) => {
     const ordinal = (root.getAttribute('data-us-task-ordinal') || '').trim();
     if (!/^\d+$/.test(ordinal)) throw new Error('The case task has no ordinal.');
-    const save = window.UnionSuiteAgreements?.saveItemStatus;
-    if (!save) throw new Error('The task status save (UnionSuiteAgreements) is unavailable.');
-    await save(ordinal, done ? 'Complete' : 'Not Complete', root.getAttribute('data-us-task-note-type') || 'Task');
+    await post('/cases/complete-task', {
+      TaskID: ordinal,
+      Action: done ? 'Complete' : 'Not Complete',
+      NoteType: root.getAttribute('data-us-task-note-type') || 'Task'
+    });
   });
 
   // Unlock on a restricted case attachment (US-RESTRICTED-ATTACHMENTS in

@@ -46,9 +46,9 @@
                              blank for none (new)
      PriorityBadge           "High Priority" or blank (unchanged)
 
-     The tick saves through CloudToolz /ca/complete-task
-     (data-us-task-save="cases.item-status"; case and agreement tasks are
-     both Zen_CloudFiles_Notes rows, to confirm). -->
+     The tick saves through CloudToolz /cases/complete-task
+     (data-us-task-save="cases.item-status"), which finds the case from the
+     task, checks the user's entity access and logs the change. -->
 <div class="us-task us-task--detail us-task--compact" data-us-task-completed="{#query.IsCompleted}"
   data-us-task-due-state="{#query.DueState}" data-us-task-due-label="{#query.DueLabel}"
   data-us-task-save="cases.item-status" data-us-task-note-type="Task" data-us-task-ordinal="{#query.TaskOrdinal}"

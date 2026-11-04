@@ -1,0 +1,809 @@
+{
+  "hierarchies": [
+    {
+      "id": 1893,
+      "coreOrgId": null,
+      "parentId": 1857,
+      "isFolder": false,
+      "excludeFromWorkflowInstancesDisplay": false,
+      "definitionId": "c551c2d7bda1459c8ce9642bcb713aa1",
+      "displayName": "Cases: Complete Task",
+      "version": 1,
+      "isPublished": true,
+      "createdAt": "2026-11-04T11:49:33.9746385+00:00",
+      "lastExecutedAt": null,
+      "avgRuntime": null,
+      "latestInstanceStatus": null,
+      "protected": false,
+      "cronSetting": null,
+      "endpointPath": "/cases/complete-task",
+      "inMaintenanceWindow": false,
+      "securedEndpoint": "green",
+      "createdBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "updatedBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "hasChildRecords": false
+    }
+  ],
+  "flowz": [
+    {
+      "definitionId": "c551c2d7bda1459c8ce9642bcb713aa1",
+      "versionId": "43603856006f47888e3e5e810c13cfd4",
+      "tenantId": null,
+      "name": "Cases: Complete Task",
+      "displayName": "Cases: Complete Task",
+      "description": "Sets a case task's status from the case page's task tick, after checking the user's entity access to the task's case, and logs the change.",
+      "channel": null,
+      "version": 1,
+      "variables": {
+        "data": {}
+      },
+      "customAttributes": {
+        "data": {}
+      },
+      "contextOptions": null,
+      "isSingleton": false,
+      "persistenceBehavior": "WorkflowBurst",
+      "deleteCompletedInstances": false,
+      "isPublished": true,
+      "isLatest": true,
+      "tag": null,
+      "activities": [
+        {
+          "activityId": "eae75a1b-1843-4237-a123-c8c44f4a901b",
+          "type": "HttpEndpoint",
+          "name": "EndpointData",
+          "displayName": "HTTP Endpoint",
+          "x": 40,
+          "y": 40,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Path",
+              "expressions": {
+                "Literal": "/cases/complete-task"
+              }
+            },
+            {
+              "name": "Methods",
+              "expressions": {
+                "Json": "[\"POST\"]"
+              }
+            },
+            {
+              "name": "ReadContent",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "TargetType",
+              "expressions": {}
+            },
+            {
+              "name": "Schema",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": ""
+              }
+            },
+            {
+              "name": "Authorize",
+              "expressions": {}
+            },
+            {
+              "name": "Policy",
+              "expressions": {}
+            },
+            {
+              "name": "AuthorizeWithCustomHeader",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderName",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderValue",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateCallerUrl",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateImisRequest",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "ImisRequestVerificationRole",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateOutlookPluginToken",
+              "expressions": {}
+            },
+            {
+              "name": "RequiredOutlookPluginUsername",
+              "expressions": {}
+            },
+            {
+              "name": "OutlookPluginMailboxEmail",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "4492f548-5b01-4a97-af75-5094ddfd904b",
+          "type": "RequestAuthorization",
+          "displayName": "Request Authorization",
+          "x": 40,
+          "y": 291,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Role",
+              "expressions": {}
+            },
+            {
+              "name": "HttpRequest",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.EndpointData.Output()"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "fa96378e-2602-4cae-82a1-3100e963788a",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - Unauthorised",
+          "x": 510,
+          "y": 291,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "Literal": "Unauthorised"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "Unauthorized"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8af87950-3f06-421b-b51f-b1d737ad93fa",
+          "type": "Fault",
+          "displayName": "Fault",
+          "x": 980,
+          "y": 291,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Message",
+              "expressions": {
+                "Literal": "Unauthorised request to /cases/complete-task"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "6ec81e89-9caa-4126-a760-2ba8b788902c",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Validation",
+          "displayName": "SQL - Validation and Timestamp",
+          "description": null,
+          "x": 40,
+          "y": 542,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "syntax": null,
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "-- The task is a Zidebar note; its CaseOrdinal gives the case, so the page\r\n-- sends only the task's ordinal (TaskID) and the action.\r\nDECLARE @TaskOrd int = TRY_CAST(@TaskOrdinal AS int);\r\nDECLARE @CaseOrdinal int = (\r\n\tSELECT TOP 1 CaseOrdinal\r\n\tFROM ZideBar.Zen_CloudFiles_Notes\r\n\tWHERE Ordinal = @TaskOrd\r\n);\r\n\r\nDECLARE @EntityCode AS varchar(20) = COALESCE(\r\n  (SELECT OrgCode FROM [Cases].[i4u_UT_Cases] WHERE Ordinal = @CaseOrdinal),\r\n  (SELECT EntityCode FROM [ZenCrm].[Individuals] WHERE ImisId = @LoggedInUser),\r\n  (SELECT OrgCode FROM UnionTemplate.Entities WHERE IsDefault = 1) -- Final fallback, default org code\r\n);\r\nDECLARE @localTimestamp datetime = COALESCE([UnionTemplate].fn_GetDateTimeWithTimeZone(@EntityCode), GETUTCDATE());\r\n\r\nDECLARE @valid int = 1\r\nDECLARE @message varchar(4000) = ''\r\n\r\n-- check the action is one the task list sends\r\nIF @Action IS NULL OR @Action NOT IN ('Complete', 'Not Complete', 'In Progress')\r\n    SET @message += 'Action is not valid. | '\r\n\r\n-- check the task exists and belongs to a case\r\nIF @CaseOrdinal IS NULL OR NOT EXISTS (\r\n\tSELECT *\r\n\tFROM Cases.i4u_UT_Cases\r\n\tWHERE Ordinal = @CaseOrdinal\r\n)\r\n    SET @message += 'Task is not a case task. | '\r\n\r\n-- check if users entity matches the task's case\r\nIF NOT EXISTS (\r\n\tSELECT *\r\n\tFROM Cases.i4u_UT_Cases C\r\n\tINNER JOIN UnionTemplate.EntityAccess A\r\n\t\tON C.OrgCode = A.EntityCode\r\n\tWHERE C.Ordinal = @CaseOrdinal\r\n\t\tAND A.StaffimisID = @LoggedInUser\r\n)\r\n    SET @message += 'Unauthorised entity | '\r\n\r\nIF @message <> ''\r\n\tSET @valid = 0\r\n\r\n-- One row whether or not the task exists. Actioned and TaskStatus are the\r\n-- new values (the iMIS update's collection); Old* are as they were.\r\nSELECT\r\n\t@valid AS [Valid],\r\n\t@message AS [Message],\r\n\tCONVERT(varchar(23), @localTimestamp, 126) AS [Timestamp],\r\n\tN.Ordinal AS [Ordinal],\r\n\t@CaseOrdinal AS [CaseOrdinal],\r\n\tC.CaseID AS [CaseID],\r\n\tCAST(CASE WHEN @Action = 'Complete' THEN 1 ELSE 0 END AS bit) AS [Actioned],\r\n\t@Action AS [TaskStatus],\r\n\tN.Actioned AS [OldActioned],\r\n\tCAST(N.TaskStatus AS varchar(150)) AS [OldTaskStatus]\r\nFROM (SELECT 1 AS [One]) X\r\nLEFT JOIN ZideBar.Zen_CloudFiles_Notes N\r\n\tON N.Ordinal = @TaskOrd\r\nLEFT JOIN Cases.i4u_UT_Cases C\r\n\tON C.Ordinal = @CaseOrdinal;"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify([{\"Name\":\"@TaskOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.TaskID) ?? \"\")},{\"Name\":\"@Action\",\"Value\":String((activities.EndpointData.Output().Body.Action) ?? \"\")},{\"Name\":\"@LoggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "ConnectionId",
+              "syntax": null,
+              "expressions": {
+                "Literal": "default"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "ad70edf3-ba6d-41c5-b524-84b9f58cea37",
+          "type": "WriteHttpResponse",
+          "name": null,
+          "displayName": "HTTP Response - General Error",
+          "description": null,
+          "x": 510,
+          "y": 542,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": null,
+              "expressions": {
+                "Literal": "An unexpected error occurred. Please contact a system adminstrator."
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "a1fb3108-13f6-4458-94bf-fb71bbde6930",
+          "type": "If",
+          "name": null,
+          "displayName": "IF: Task Valid",
+          "description": null,
+          "x": 40,
+          "y": 793,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].Valid == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "db54e3c9-4300-403b-8472-30536f3a251d",
+          "type": "WriteHttpResponse",
+          "name": null,
+          "displayName": "HTTP Response - Task Not Valid",
+          "description": null,
+          "x": 510,
+          "y": 793,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": null,
+              "expressions": {
+                "Literal": "Task not valid"
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "BadRequest"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "b8cefeb6-d4b0-43b6-8458-87d37cee919a",
+          "type": "BulkDataSourceOperation",
+          "displayName": "Update iMIS - Zen_CloudFiles_Notes",
+          "x": 40,
+          "y": 1044,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "DataSource",
+              "expressions": {
+                "Literal": "Standalone|Zen_CloudFiles_Notes|Multi"
+              }
+            },
+            {
+              "name": "DataSourceOperation",
+              "expressions": {
+                "Literal": "Update"
+              }
+            },
+            {
+              "name": "CollectionToProcess",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "// The task's new values, keyed by its Ordinal, from SQL_Validation.\r\n(() => {\r\n  const task = activities.SQL_Validation.ResultSet()[0];\r\n  return [{ Ordinal: task.Ordinal, Actioned: task.Actioned, TaskStatus: task.TaskStatus }];\r\n})()"
+              }
+            },
+            {
+              "name": "KeyField",
+              "expressions": {}
+            },
+            {
+              "name": "SwitchOnStopwatch",
+              "expressions": {}
+            },
+            {
+              "name": "MaxDegreeOfParallelism",
+              "expressions": {}
+            },
+            {
+              "name": "DataSourceType",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {},
+          "name": "iMIS_TaskUpdate"
+        },
+        {
+          "activityId": "ba699374-8737-4256-b42a-4bde7f8c1ee2",
+          "type": "WriteHttpResponse",
+          "name": null,
+          "displayName": "HTTP Response - iMIS update failure",
+          "description": null,
+          "x": 510,
+          "y": 1044,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": null,
+              "expressions": {
+                "Literal": "The task could not be updated in iMIS."
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "d2e43184-a54c-460b-98d1-bc8361729882",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_TaskUpdate",
+          "displayName": "SQL: CT Update - Zen_CloudFiles_Notes",
+          "x": 40,
+          "y": 1295,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "UPDATE ZideBar.Zen_CloudFiles_Notes\r\nSET Actioned = CASE\r\n          WHEN @Action = 'Complete' THEN 1\r\n          ELSE 0\r\n     END,\r\n     TaskStatus = @Action,\r\n     LastUpdatedBy = @LoggedInUser,\r\n     LastUpdatedOn = @LocalTimestamp\r\nWHERE Ordinal = @TaskOrdinal\r\n\tAND CaseOrdinal = @CaseOrdinal\r\n\r\nSELECT\r\n     Ordinal,\r\n     Actioned,\r\n     TaskStatus\r\nFROM ZideBar.Zen_CloudFiles_Notes\r\nWHERE Ordinal = @TaskOrdinal"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify([{\"Name\":\"@TaskOrdinal\",\"Value\":String((activities.SQL_Validation.ResultSet()[0].Ordinal) ?? \"\")},{\"Name\":\"@CaseOrdinal\",\"Value\":String((activities.SQL_Validation.ResultSet()[0].CaseOrdinal) ?? \"\")},{\"Name\":\"@Action\",\"Value\":String((activities.EndpointData.Output().Body.Action) ?? \"\")},{\"Name\":\"@LoggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")},{\"Name\":\"@LocalTimestamp\",\"Value\":String((activities.SQL_Validation.ResultSet()[0].Timestamp) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "c09ce99f-6363-4e3e-9674-9b447cf6037c",
+          "type": "WriteHttpResponse",
+          "name": null,
+          "displayName": "HTTP Response - CT update failure",
+          "description": null,
+          "x": 510,
+          "y": 1295,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_TaskUpdate.Exception() + ' ' + \r\nactivities.SQL_TaskUpdate.InnerException()"
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "323babb6-696c-484f-a380-5e4b66f55cc1",
+          "type": "RunJavaScript",
+          "name": "CreateLogContext",
+          "displayName": "JS: Create Log Context",
+          "description": null,
+          "x": 40,
+          "y": 1546,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "// UPDATE LOG CONTEXT HERE\r\nvar endpoint = activities.EndpointData.Output();\r\nvar body = endpoint.Body;\r\nvar task = activities.SQL_Validation.ResultSet()[0]; // the task and its case, read before the update\r\n\r\nvar logContext = {\r\n    \"Note\": \"Case \" + task.CaseID + \": Set Task Status\", // UPDATE HERE\r\n    \"Table\": \"Zen_CloudFiles_Notes\", // UPDATE HERE\r\n    \"UpdateReason\": \"Edit\", // UPDATE HERE\r\n    \"workflowDefinitionId\": workflowDefinitionId, // DON'T UPDATE, VARIABLE IS PROVIDED BY CLOUDTOOLZ\r\n    \"sourceOrdinal\": String(task.Ordinal) // the task's ordinal\r\n}\r\n// UPDATE FIELDS YOU WANT TO COMPARE HERE - names must match the keys in logBody below\r\nvar fieldsToCompare = [\"Actioned\", \"TaskStatus\"];\r\n\r\n// The task's values, new and as they were (SQL_Validation reads them before\r\n// the update), under the Zen_CloudFiles_Notes column names.\r\nvar logBody = {\r\n    \"Actioned\": String(task.Actioned ?? \"\"),\r\n    \"TaskStatus\": String(body.Action ?? \"\"),\r\n    \"OldValue\": JSON.stringify({\r\n        \"Actioned\": String(task.OldActioned ?? \"\"),\r\n        \"TaskStatus\": String(task.OldTaskStatus ?? \"\")\r\n    })\r\n}\r\n\r\n// compile all variables into one object\r\nvar logChanges = {\r\n    \"logContext\": logContext, // DON'T CHANGE\r\n    \"fieldsToCompare\": fieldsToCompare, // DON'T CHANGE\r\n    \"body\": logBody,\r\n    \"profileID\": String(task.CaseID), // the case the change belongs to\r\n    \"updatedByID\": endpoint.Headers.loggedinpartyid\r\n}\r\nsetVariable('logChanges', logChanges);"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "4379d08e-a9f1-4a8e-b8cf-1a7698317097",
+          "type": "RunWorkflow",
+          "name": "LogChangesToIMIS",
+          "displayName": "Log Changes To IMIS",
+          "description": null,
+          "x": 40,
+          "y": 1797,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "WorkflowDefinitionId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getWorkflowDefinitionIdByName('LogChangesToIMIS')"
+              }
+            },
+            {
+              "name": "Input",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getVariable('logChanges')"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "Mode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "FireAndForget"
+              }
+            },
+            {
+              "name": "TenantId",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "CorrelationId",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "ContextId",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "CustomAttributes",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "RetryFailedActivities",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "685072f8-b602-4a9a-8db8-819f01d4d616",
+          "type": "WriteHttpResponse",
+          "name": null,
+          "displayName": "HTTP Response",
+          "description": null,
+          "x": 40,
+          "y": 2048,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify({ TaskID: activities.SQL_Validation.ResultSet()[0].Ordinal, Action: activities.EndpointData.Output().Body.Action })"
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "OK"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        }
+      ],
+      "connections": [
+        {
+          "sourceActivityId": "eae75a1b-1843-4237-a123-c8c44f4a901b",
+          "targetActivityId": "4492f548-5b01-4a97-af75-5094ddfd904b",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "4492f548-5b01-4a97-af75-5094ddfd904b",
+          "targetActivityId": "fa96378e-2602-4cae-82a1-3100e963788a",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "fa96378e-2602-4cae-82a1-3100e963788a",
+          "targetActivityId": "8af87950-3f06-421b-b51f-b1d737ad93fa",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "4492f548-5b01-4a97-af75-5094ddfd904b",
+          "targetActivityId": "6ec81e89-9caa-4126-a760-2ba8b788902c",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "6ec81e89-9caa-4126-a760-2ba8b788902c",
+          "targetActivityId": "a1fb3108-13f6-4458-94bf-fb71bbde6930",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "6ec81e89-9caa-4126-a760-2ba8b788902c",
+          "targetActivityId": "ad70edf3-ba6d-41c5-b524-84b9f58cea37",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "a1fb3108-13f6-4458-94bf-fb71bbde6930",
+          "targetActivityId": "b8cefeb6-d4b0-43b6-8458-87d37cee919a",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "a1fb3108-13f6-4458-94bf-fb71bbde6930",
+          "targetActivityId": "db54e3c9-4300-403b-8472-30536f3a251d",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "b8cefeb6-d4b0-43b6-8458-87d37cee919a",
+          "targetActivityId": "d2e43184-a54c-460b-98d1-bc8361729882",
+          "outcome": "Successful"
+        },
+        {
+          "sourceActivityId": "b8cefeb6-d4b0-43b6-8458-87d37cee919a",
+          "targetActivityId": "ba699374-8737-4256-b42a-4bde7f8c1ee2",
+          "outcome": "Failed"
+        },
+        {
+          "sourceActivityId": "b8cefeb6-d4b0-43b6-8458-87d37cee919a",
+          "targetActivityId": "ba699374-8737-4256-b42a-4bde7f8c1ee2",
+          "outcome": "NoRecords"
+        },
+        {
+          "sourceActivityId": "d2e43184-a54c-460b-98d1-bc8361729882",
+          "targetActivityId": "323babb6-696c-484f-a380-5e4b66f55cc1",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "d2e43184-a54c-460b-98d1-bc8361729882",
+          "targetActivityId": "c09ce99f-6363-4e3e-9674-9b447cf6037c",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "323babb6-696c-484f-a380-5e4b66f55cc1",
+          "targetActivityId": "4379d08e-a9f1-4a8e-b8cf-1a7698317097",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "4379d08e-a9f1-4a8e-b8cf-1a7698317097",
+          "targetActivityId": "685072f8-b602-4a9a-8db8-819f01d4d616",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "4379d08e-a9f1-4a8e-b8cf-1a7698317097",
+          "targetActivityId": "685072f8-b602-4a9a-8db8-819f01d4d616",
+          "outcome": "Not Found"
+        }
+      ]
+    }
+  ]
+}

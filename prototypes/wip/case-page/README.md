@@ -216,8 +216,10 @@ Known IQAs, from the live tenant's IQA list:
    (`us-activity-detail us-activity-detail-history`); the toggle comes from
    `us-details-view-history` in the `us-case-changes` preset
    (`US-DETAILS-VIEW`, guide `#change-history-details`).
-7. **Task saving.** Whether `/ca/complete-task` saves case tasks. Both are
-   `Zen_CloudFiles_Notes` rows, but this hasn't been confirmed.
+7. **Task saving.** Case task ticks save through the cases flow
+   `/cases/complete-task` (`flows/Cases-Complete-Task.flow.json`, 4 November
+   2026), not the agreements `/ca/complete-task`. Import and live check
+   are tracked in the repo `TODO.md` under Cases.
 8. **Case statuses.** The full list, to set each status tone. New, Open and
    In progress are amber; Closed is neutral.
 9. **Access.** The live page has a "No Access to Case" layout
