@@ -16,7 +16,7 @@
   const state = {
     prefill: pick('prefill', ['today', 'new']),
     from: pick('from', ['member', 'note']),
-    save: pick('save', ['ok', 'fail']),
+    save: pick('save', ['ok', 'partial', 'fail']),
     scheme: pick('scheme', ['light', 'dark'])
   };
   document.documentElement.setAttribute('data-us-color-scheme', state.scheme);
@@ -34,12 +34,14 @@
     CaseAccessLevel: [['Individual', 'Individual'], ['Open', 'Open', true], ['Team', 'Team']]
   };
 
+  // As the subtypes IQA returns them. Race is disabled, so the form leaves
+  // it out.
   const SUBTYPES = [
-    {value: 201, label: 'Verbal', ParentTag: '69'},
-    {value: 202, label: 'Online', ParentTag: '69'},
-    {value: 211, label: 'Race', ParentTag: '60'},
-    {value: 212, label: 'Age', ParentTag: '60'},
-    {value: 221, label: 'Unfair dismissal', ParentTag: '64'}
+    {Ordinal: 201, TagName: 'Verbal', TagStatus: true, ParentTagOrdinal: 69, ParentTagName: 'Bullying / Harassment'},
+    {Ordinal: 202, TagName: 'Online', TagStatus: true, ParentTagOrdinal: 69, ParentTagName: 'Bullying / Harassment'},
+    {Ordinal: 211, TagName: 'Race', TagStatus: false, ParentTagOrdinal: 60, ParentTagName: 'Discrimination'},
+    {Ordinal: 212, TagName: 'Age', TagStatus: true, ParentTagOrdinal: 60, ParentTagName: 'Discrimination'},
+    {Ordinal: 221, TagName: 'Unfair dismissal', TagStatus: true, ParentTagOrdinal: 64, ParentTagName: 'Dismissal'}
   ];
 
   const NOTE = 'Priya called about her night shift supervisor, who has made comments about her accent in front of the team since July.';
@@ -57,7 +59,7 @@
   ];
 
   function answer(flow, body) {
-    if (flow === 'Cases/Create-Prefill') {
+    if (flow === 'Cases/Union-Suite/Create-Case-Staff-Prefill') {
       const today = {ReqVals: RULES};
       if (state.from === 'note') {
         today['id-val-CaseDescription'] = 'Created from Note: ' + NOTE;
@@ -65,12 +67,11 @@
       if (state.prefill === 'today') {
         return today;
       }
+      // As flows/build-flows.cjs's prefill answers (29 October 2026).
       return {
-        ...today,
-        Member: {Name: 'Priya Natarajan', ID: '20544', MemberType: 'Full member', Standing: 'New member', StandingTone: 'warning'},
-        Me: {ID: '23264'},
-        Note: state.from === 'note' ? {Note: NOTE, CreatedOn: '28 Oct 2026', CreatedBy: "Mary O'Conner"} : null,
-        SubTypes: SUBTYPES,
+        ReqVals: RULES,
+        Member: {Name: 'Priya Natarajan', ID: '20544'},
+        Note: state.from === 'note' ? {Note: NOTE, CreatedOn: '2026-10-28'} : null,
         Workplaces: [
           {WorkplaceID: '4101', 'Workplace Name': 'Dandenong DC – night shift', Employer: 'Northside Distribution Pty Ltd', Classification: 'Storeperson Grade 2', 'Member Job Status': 'Active', 'Job Start Date': '2020-03-02'},
           {WorkplaceID: '4120', 'Workplace Name': 'Frankston Hospital – catering', Employer: 'Bayside Health', Classification: 'Food services assistant', 'Member Job Status': 'Active', 'Job Start Date': '2023-08-14'},
@@ -78,15 +79,17 @@
         ]
       };
     }
-    if (flow === 'Cases/SetSessionStorage') {
-      return {SubTypes: JSON.stringify(SUBTYPES)};
-    }
-    if (flow === 'Cases/Create-Case-Staff') {
+    if (flow === 'Cases/Union-Suite/Create-Case-Staff') {
       log('Create-Case-Staff body:\n' + JSON.stringify(body, null, 2));
-      return state.save === 'ok'
-        // A hash link, so opening the case stays on this page.
-        ? {'class-html-Message': '<div class="AsiSuccess AsiSuccessIcon">Case: <a href="#Cases_ManageCase?CaseID=C231&amp;CaseNum=228">C231</a> Successfully Created</div>'}
-        : {'class-html-Message': '<div class="AsiError AsiErrorIcon">An error occured: please contact an administrator.</div>'};
+      // As flows/build-flows.cjs's create flow answers. The success link is
+      // a hash, so opening the case stays on this page.
+      if (state.save === 'ok') {
+        return {'class-html-Message': '<div class="AsiSuccess AsiSuccessIcon">Case: <a href="#Cases_ManageCase?CaseID=C231&amp;CaseNum=228">C231</a> Successfully Created</div>'};
+      }
+      if (state.save === 'partial') {
+        return {Partial: true, CaseID: 'C231', CaseNum: '228', FailedStep: 'the lead staff member', 'class-html-Message': '<div class="AsiError AsiErrorIcon">Case C231 was created, but the lead staff member could not be saved. <a href="#Cases_ManageCase?CaseID=C231&amp;CaseNum=228">Open C231</a> to finish it, or contact an administrator.</div>'};
+      }
+      return {Error: true, 'class-html-Message': '<div class="AsiError AsiErrorIcon">The case could not be created. Nothing was saved; please try again, or contact an administrator if it keeps happening.</div>'};
     }
     return {};
   }
@@ -165,7 +168,10 @@
         node.type = 'hidden';
         node.id = field.name;
         node.name = field.name;
-        node.value = field.type === 'urlParameters' ? (params.get(field.urlParameter) || (field.urlParameter === 'ID' ? '20544' : '')) : (field.value || '');
+        // ID defaults to the sample member; ?ID= (blank) tries the page without one.
+        node.value = field.type === 'urlParameters'
+          ? (params.has(field.urlParameter) ? params.get(field.urlParameter) : (field.urlParameter === 'ID' ? '20544' : ''))
+          : (field.value || '');
       } else if (field.type === 'button') {
         node = document.createElement('div');
         node.className = 'formbuilder-button form-group field-' + field.name;
@@ -245,6 +251,17 @@
       }
     }, 700);
   }
+
+  // iMIS's /api/query, for the subtypes IQA: its rows, a little late.
+  const pageFetch = window.fetch.bind(window);
+  window.fetch = (url, options) => {
+    if (!String(url).startsWith('/api/query?')) {
+      return pageFetch(url, options);
+    }
+    log('GET ' + decodeURIComponent(String(url)));
+    const body = JSON.stringify({Items: {$values: SUBTYPES}, Count: SUBTYPES.length, HasNext: false});
+    return new Promise(resolve => setTimeout(() => resolve(new Response(body, {status: 200})), 300));
+  };
 
   fetch('dist/Create-Case-Staff-Form.json')
     .then(response => response.json())

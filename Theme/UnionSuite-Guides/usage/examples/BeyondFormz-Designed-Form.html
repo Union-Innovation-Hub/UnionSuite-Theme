@@ -1,0 +1,75 @@
+<div data-beyondformid="guide-example">
+  <div class="rendered-form formbuilder-embedded-bootstrap">
+    <div>
+      <h2 class="us-bf-title">New case</h2>
+    </div>
+    <p class="us-bf-for"><span>For</span> <strong>Priya Natarajan</strong><span>· Member 20544</span></p>
+    <p class="us-bf-origin">
+      <span class="us-bf-origin__head">From a note, 28 Oct 2026. It will be linked to this case.</span>
+      <span class="us-bf-origin__text">Priya called about her night shift supervisor, who has made comments about her accent in front of the team since July.</span>
+    </p>
+    <div>
+      <h3 class="us-bf-section">The case</h3>
+    </div>
+    <div class="row">
+      <div class="formbuilder-text form-group field-CaseName row-1 col-md-8">
+        <label for="CaseName" class="formbuilder-text-label">Title<span class="us-bf-optional"> (optional)</span></label>
+        <input type="text" id="CaseName" name="CaseName" class="form-control" placeholder="e.g. Bullying complaint – night shift supervisor">
+      </div>
+      <div class="formbuilder-date form-group field-DateIncident row-1 col-md-4">
+        <label for="DateIncident" class="formbuilder-date-label">Date of incident<span class="us-bf-optional"> (optional)</span></label>
+        <input type="date" id="DateIncident" name="DateIncident" class="form-control" value="2026-11-02">
+        <div class="us-bf-quick" role="group" aria-label="Quick dates">
+          <button type="button">Today</button>
+          <button type="button" class="us-bf-quiet"><i class="ti ti-x" aria-hidden="true"></i> Clear date</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="formbuilder-textarea form-group field-CaseDescription us-bf-invalid row-2 col-md-12">
+        <label for="CaseDescription" class="formbuilder-textarea-label">What happened?<span class="formbuilder-required">*</span></label>
+        <textarea id="CaseDescription" name="CaseDescription" class="form-control" rows="3" aria-invalid="true" aria-describedby="CaseDescription-error"></textarea>
+        <p class="us-bf-error" id="CaseDescription-error"><i class="ti ti-alert-circle" aria-hidden="true"></i>Say what happened.</p>
+      </div>
+    </div>
+    <div>
+      <h3 class="us-bf-section">Handling</h3>
+    </div>
+    <div class="row">
+      <div class="formbuilder-select form-group field-CaseAccessLevel row-3 col-md-12">
+        <label id="CaseAccessLevel-label" class="formbuilder-select-label">Who can see it<span class="formbuilder-required">*</span></label>
+        <div class="us-bf-segmented" role="radiogroup" aria-labelledby="CaseAccessLevel-label" aria-describedby="CaseAccessLevel-hint">
+          <button type="button" role="radio" aria-checked="false" tabindex="-1"><i class="ti ti-world" aria-hidden="true"></i>Open</button>
+          <button type="button" role="radio" aria-checked="false" tabindex="-1"><i class="ti ti-users" aria-hidden="true"></i>Team</button>
+          <button type="button" role="radio" aria-checked="true" tabindex="0"><i class="ti ti-lock" aria-hidden="true"></i>Individual</button>
+        </div>
+        <p class="us-bf-hint" id="CaseAccessLevel-hint">Only staff on this case can see it. Managers see every case.</p>
+      </div>
+    </div>
+    <div class="us-bf-staff" role="group" aria-labelledby="us-bf-staff-title" data-required>
+      <p class="us-bf-staff__title" id="us-bf-staff-title">Staff on this case<span class="formbuilder-required">*</span><span class="us-bf-optional">(one of)</span></p>
+      <div class="row">
+        <div class="formbuilder-select form-group field-CaseStaffMembers row-4 col-md-12">
+          <label for="CaseStaffMembers" class="formbuilder-select-label">Lead staff member</label>
+          <select id="CaseStaffMembers" name="CaseStaffMembers" class="form-control">
+            <option value="">No lead yet</option>
+            <option value="104114">Ash Hunt</option>
+          </select>
+          <div class="us-bf-check">
+            <label><input type="checkbox" name="AssignMe" value="1"><span>Assign me to this case</span></label>
+          </div>
+        </div>
+      </div>
+      <p class="us-bf-warning" role="status"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span>Choose a lead staff member or tick Assign me.</span></p>
+    </div>
+    <div class="us-bf-actions">
+      <p class="Message" role="status" aria-live="polite"></p>
+      <div class="form-group field-CancelButton">
+        <button type="button" class="btn btn-default us-outline-button">Cancel</button>
+      </div>
+      <div class="formbuilder-button form-group field-CreateCaseButton">
+        <button type="button" class="btn-primary btn PrimaryButton" id="CreateCaseButton">Create case</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -183,6 +183,14 @@ You cannot edit IQA display templates from CSS, so the fix is a shim:
 **Before removing any icon dependency, grep every content record for `fa-`.**
 The stylesheets being clean proves nothing.
 
+**Implemented** (30 October 2026): the `US-FA-SHIM` block in
+`Theme/UnionSuite/zUnionSuite.css` maps about 420 common Font Awesome 6 names
+and older aliases to Tabler codepoints, plus the `fa-fw`, size and `fa-spin`
+modifiers. A scan of the 96 pages linked from the staff site's navigation
+found only `fa-circle-check`, `fa-building`, `fa-briefcase` and
+`fa-list-check` in server-rendered markup; Query Templates loaded later were
+not scanned. Unmapped names still render as nothing; add them to the block.
+
 ### 3.3 `:empty` does not match iMIS's empty headings
 
 iMIS emits a `__Head` div for every content item, titled or not. An untitled one

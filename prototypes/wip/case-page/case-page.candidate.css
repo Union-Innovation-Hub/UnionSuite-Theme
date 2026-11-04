@@ -70,7 +70,10 @@
    the member card first, then the main column's panels (resolution,
    tasks, recent activity), then the side column's others (meetings, case
    team). No author class is needed: the row is found by the card it
-   holds. Target: zUnionSuite.css, with US-CASE-MEMBER. */
+   holds. Target: zUnionSuite.css, with US-CASE-MEMBER.
+   Promoted 29 October 2026 as US-CCO-COLUMNS, keyed to the tab's width and
+   the live markup (column > WebPartZone > ContentItemContainer); this copy
+   stays for the prototype's markup. */
 @media (max-width: 991px) {
   .row:has(> [class*="col-"] [data-us-case-member]) {
     display: flex;

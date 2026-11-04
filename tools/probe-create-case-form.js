@@ -1,5 +1,5 @@
 // CREATE CASE FORM PROBE: paste this whole file into the browser console on
-// the staff Create case page (/_i4u_/Core/Cases/Create-Case-Staff.aspx?ID=…),
+// the staff Create case page (/Cases_CreateCase?ID=…),
 // once the form has loaded.
 //
 // Read-only. It never creates a case: while it runs, every POST except the

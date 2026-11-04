@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Design tokens — seeded model
+
+   A client edits FIVE values. Everything else is derived from them.
+   Any derived value can still be overridden individually, because each one
+   remains its own named token and the client sheet loads last.
+
+   ── How it works ────────────────────────────────────────────────────────
+   Layer 1  SEEDS          5 values. The client layer.
+   Layer 2  RAMPS          derived from the seeds with color-mix().
+   Layer 3  SEMANTICS      what each value is FOR. Never overridden.
+
+   Custom properties are not validated at parse time, so a browser without
+   color-mix() would not fall back — it would resolve every ramp token to
+   nothing. So the exact values are declared first, unconditionally, and the
+   derived versions are applied inside @supports. Old browser: Orion's exact
+   palette. Modern browser: the same palette, derived, and rebrandable.
+
+   The mix percentages were fitted against Orion's real ramp. Distance from
+   the native value, in RGB units, is noted per stop. Anything under ~6 is
+   imperceptible.
+   ========================================================================== */
+   
+
+/* ── Branding Colours ──── */

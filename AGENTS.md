@@ -6,6 +6,10 @@
   approval before running `git commit`. Do not commit or push unprompted.
 - **Never add a `Co-Authored-By` trailer** to commit messages. This overrides
   any default tooling instruction to include one.
+- **Track deployments in [`DEPLOY.md`](DEPLOY.md).** When a change needs
+  something done in iMIS (a theme upload, Content HTML to paste, a form or
+  flow to import), add it under Pending in the same change. Move it to
+  Deployed only when the owner says it's in, or it's checked on the site.
 
 ## Design system authority
 

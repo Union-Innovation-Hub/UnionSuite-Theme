@@ -4189,6 +4189,1251 @@ table.DataDisplay .DataValue {
 
 /* US-STAFF-NAV-ICONS:END */
 
+/* US-FA-SHIM:START — Font Awesome classes drawn with the bundled Tabler font.
+   Content records and Query Templates written for the old theme still carry
+   Font Awesome markup, such as <em class="fa-regular fa-building"> in the
+   original contact layout's record banner. The old theme loaded
+   FontAwesome.6.7.2.css; this one does not, so those icons rendered as
+   nothing. These rules give the common Font Awesome 6 names, and their older
+   aliases, the nearest Tabler outline glyph. Solid and regular both draw the
+   outline. A name with no mapping still renders as nothing: add it to the
+   list below (codepoints from Tabler/tabler-icons.min.css), and prefer
+   <i class="ti ti-…"> in new content. Elements that also carry .ti are left
+   to Tabler. The rules ignore us-report-no-styling: an icon is content, and
+   without them it would vanish. */
+:is(.fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands, .fa-classic):not(.ti) {
+  display: inline-block;
+  font-family: "tabler-icons";
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  line-height: 1;
+  text-rendering: auto;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Font Awesome's fixed width and size modifiers. */
+.fa-fw {
+  width: 1.25em;
+  text-align: center;
+}
+
+.fa-xs {
+  font-size: .75em;
+}
+
+.fa-sm {
+  font-size: .875em;
+}
+
+.fa-lg {
+  font-size: 1.25em;
+  vertical-align: -.075em;
+}
+
+.fa-xl {
+  font-size: 1.5em;
+  vertical-align: -.125em;
+}
+
+.fa-2xl,
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-spin {
+  animation: us-fa-spin 2s linear infinite;
+}
+
+@keyframes us-fa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-spin {
+    animation: none;
+  }
+}
+
+/* Glyphs, in Tabler name order. Font Awesome name first, then its aliases. */
+.fa-address-book::before {
+  content: "\f021"; /* ti-address-book */
+}
+
+.fa-sliders::before,
+.fa-sliders-h::before {
+  content: "\ec38"; /* ti-adjustments-horizontal */
+}
+
+.fa-circle-exclamation::before,
+.fa-exclamation-circle::before {
+  content: "\ea05"; /* ti-alert-circle */
+}
+
+.fa-triangle-exclamation::before,
+.fa-exclamation-triangle::before,
+.fa-warning::before {
+  content: "\ea06"; /* ti-alert-triangle */
+}
+
+.fa-box-archive::before,
+.fa-archive::before {
+  content: "\ea0b"; /* ti-archive */
+}
+
+.fa-reply::before,
+.fa-mail-reply::before {
+  content: "\eb77"; /* ti-arrow-back-up */
+}
+
+.fa-reply-all::before,
+.fa-mail-reply-all::before {
+  content: "\f9ec"; /* ti-arrow-back-up-double */
+}
+
+.fa-arrow-down::before {
+  content: "\ea16"; /* ti-arrow-down */
+}
+
+.fa-arrow-left::before {
+  content: "\ea19"; /* ti-arrow-left */
+}
+
+.fa-arrow-right::before {
+  content: "\ea1f"; /* ti-arrow-right */
+}
+
+.fa-arrow-up::before {
+  content: "\ea25"; /* ti-arrow-up */
+}
+
+.fa-expand::before,
+.fa-up-right-and-down-left-from-center::before,
+.fa-maximize::before {
+  content: "\ea28"; /* ti-arrows-maximize */
+}
+
+.fa-compress::before,
+.fa-down-left-and-up-right-to-center::before,
+.fa-minimize::before {
+  content: "\ea29"; /* ti-arrows-minimize */
+}
+
+.fa-up-down-left-right::before,
+.fa-arrows::before,
+.fa-arrows-up-down-left-right::before {
+  content: "\f22f"; /* ti-arrows-move */
+}
+
+.fa-sort::before,
+.fa-unsorted::before {
+  content: "\eb5a"; /* ti-arrows-sort */
+}
+
+.fa-at::before {
+  content: "\ea2b"; /* ti-at */
+}
+
+.fa-award::before {
+  content: "\ea2c"; /* ti-award */
+}
+
+.fa-ban::before {
+  content: "\ea2e"; /* ti-ban */
+}
+
+.fa-bell::before {
+  content: "\ea35"; /* ti-bell */
+}
+
+.fa-bell-slash::before {
+  content: "\ece9"; /* ti-bell-off */
+}
+
+.fa-bolt::before,
+.fa-flash::before {
+  content: "\ea38"; /* ti-bolt */
+}
+
+.fa-book::before {
+  content: "\ea39"; /* ti-book */
+}
+
+.fa-book-open::before {
+  content: "\efc5"; /* ti-book-2 */
+}
+
+.fa-bookmark::before {
+  content: "\ea3a"; /* ti-bookmark */
+}
+
+.fa-cube::before,
+.fa-box::before {
+  content: "\ea45"; /* ti-box */
+}
+
+.fa-android::before {
+  content: "\ec16"; /* ti-brand-android */
+}
+
+.fa-apple::before {
+  content: "\ec17"; /* ti-brand-apple */
+}
+
+.fa-facebook::before,
+.fa-facebook-f::before,
+.fa-square-facebook::before {
+  content: "\ec1a"; /* ti-brand-facebook */
+}
+
+.fa-github::before {
+  content: "\ec1c"; /* ti-brand-github */
+}
+
+.fa-google::before {
+  content: "\ec1f"; /* ti-brand-google */
+}
+
+.fa-instagram::before {
+  content: "\ec20"; /* ti-brand-instagram */
+}
+
+.fa-linkedin::before,
+.fa-linkedin-in::before {
+  content: "\ec8c"; /* ti-brand-linkedin */
+}
+
+.fa-tiktok::before {
+  content: "\ec73"; /* ti-brand-tiktok */
+}
+
+.fa-twitter::before {
+  content: "\ec27"; /* ti-brand-twitter */
+}
+
+.fa-whatsapp::before {
+  content: "\ec74"; /* ti-brand-whatsapp */
+}
+
+.fa-microsoft::before,
+.fa-windows::before {
+  content: "\ecd8"; /* ti-brand-windows */
+}
+
+.fa-x-twitter::before,
+.fa-square-x-twitter::before {
+  content: "\fc0f"; /* ti-brand-x */
+}
+
+.fa-youtube::before {
+  content: "\ec90"; /* ti-brand-youtube */
+}
+
+.fa-briefcase::before,
+.fa-suitcase::before {
+  content: "\ea46"; /* ti-briefcase */
+}
+
+.fa-building::before,
+.fa-building-user::before {
+  content: "\ea4f"; /* ti-building */
+}
+
+.fa-landmark::before,
+.fa-building-columns::before,
+.fa-university::before {
+  content: "\ebe2"; /* ti-building-bank */
+}
+
+.fa-industry::before {
+  content: "\ee1c"; /* ti-building-factory */
+}
+
+.fa-hospital::before {
+  content: "\ea4d"; /* ti-building-hospital */
+}
+
+.fa-city::before {
+  content: "\ec39"; /* ti-building-skyscraper */
+}
+
+.fa-store::before,
+.fa-shop::before {
+  content: "\ea4e"; /* ti-building-store */
+}
+
+.fa-warehouse::before {
+  content: "\ebe3"; /* ti-building-warehouse */
+}
+
+.fa-lightbulb::before {
+  content: "\ea51"; /* ti-bulb */
+}
+
+.fa-bus::before {
+  content: "\ebe4"; /* ti-bus */
+}
+
+.fa-calculator::before {
+  content: "\eb80"; /* ti-calculator */
+}
+
+.fa-calendar::before {
+  content: "\ea53"; /* ti-calendar */
+}
+
+.fa-calendar-check::before {
+  content: "\f824"; /* ti-calendar-check */
+}
+
+.fa-calendar-days::before,
+.fa-calendar-alt::before {
+  content: "\fd2f"; /* ti-calendar-month */
+}
+
+.fa-calendar-plus::before {
+  content: "\ebba"; /* ti-calendar-plus */
+}
+
+.fa-calendar-week::before {
+  content: "\fd30"; /* ti-calendar-week */
+}
+
+.fa-calendar-xmark::before,
+.fa-calendar-times::before {
+  content: "\f832"; /* ti-calendar-x */
+}
+
+.fa-camera::before {
+  content: "\ea54"; /* ti-camera */
+}
+
+.fa-car::before {
+  content: "\ebbb"; /* ti-car */
+}
+
+.fa-caret-down::before {
+  content: "\eb5d"; /* ti-caret-down */
+}
+
+.fa-caret-left::before {
+  content: "\eb5e"; /* ti-caret-left */
+}
+
+.fa-caret-right::before {
+  content: "\eb5f"; /* ti-caret-right */
+}
+
+.fa-caret-up::before {
+  content: "\eb60"; /* ti-caret-up */
+}
+
+.fa-money-bill::before,
+.fa-money-bill-wave::before,
+.fa-money-bill-1::before,
+.fa-money-check::before,
+.fa-money-check-dollar::before {
+  content: "\ee25"; /* ti-cash-banknote */
+}
+
+.fa-certificate::before {
+  content: "\ed76"; /* ti-certificate */
+}
+
+.fa-chart-area::before,
+.fa-area-chart::before {
+  content: "\ea58"; /* ti-chart-area */
+}
+
+.fa-chart-bar::before,
+.fa-bar-chart::before,
+.fa-chart-column::before {
+  content: "\ea59"; /* ti-chart-bar */
+}
+
+.fa-chart-line::before,
+.fa-line-chart::before {
+  content: "\ea5c"; /* ti-chart-line */
+}
+
+.fa-chart-pie::before,
+.fa-pie-chart::before {
+  content: "\ea5d"; /* ti-chart-pie */
+}
+
+.fa-check::before {
+  content: "\ea5e"; /* ti-check */
+}
+
+.fa-chevron-down::before,
+.fa-angle-down::before {
+  content: "\ea5f"; /* ti-chevron-down */
+}
+
+.fa-chevron-left::before,
+.fa-angle-left::before {
+  content: "\ea60"; /* ti-chevron-left */
+}
+
+.fa-chevron-right::before,
+.fa-angle-right::before {
+  content: "\ea61"; /* ti-chevron-right */
+}
+
+.fa-chevron-up::before,
+.fa-angle-up::before {
+  content: "\ea62"; /* ti-chevron-up */
+}
+
+.fa-angles-left::before,
+.fa-angle-double-left::before {
+  content: "\ea64"; /* ti-chevrons-left */
+}
+
+.fa-angles-right::before,
+.fa-angle-double-right::before {
+  content: "\ea65"; /* ti-chevrons-right */
+}
+
+.fa-circle::before {
+  content: "\ea6b"; /* ti-circle */
+}
+
+.fa-circle-arrow-left::before,
+.fa-arrow-circle-left::before {
+  content: "\f6fb"; /* ti-circle-arrow-left */
+}
+
+.fa-circle-arrow-right::before,
+.fa-arrow-circle-right::before {
+  content: "\f6fd"; /* ti-circle-arrow-right */
+}
+
+.fa-circle-check::before,
+.fa-check-circle::before {
+  content: "\ea67"; /* ti-circle-check */
+}
+
+.fa-circle-dot::before,
+.fa-dot-circle::before {
+  content: "\efb1"; /* ti-circle-dot */
+}
+
+.fa-circle-minus::before,
+.fa-minus-circle::before {
+  content: "\ea68"; /* ti-circle-minus */
+}
+
+.fa-circle-plus::before,
+.fa-plus-circle::before {
+  content: "\ea69"; /* ti-circle-plus */
+}
+
+.fa-circle-xmark::before,
+.fa-times-circle::before,
+.fa-xmark-circle::before {
+  content: "\ea6a"; /* ti-circle-x */
+}
+
+.fa-clipboard::before,
+.fa-paste::before {
+  content: "\ea6f"; /* ti-clipboard */
+}
+
+.fa-clipboard-check::before {
+  content: "\ea6c"; /* ti-clipboard-check */
+}
+
+.fa-clipboard-list::before {
+  content: "\ea6d"; /* ti-clipboard-list */
+}
+
+.fa-clock::before,
+.fa-clock-four::before {
+  content: "\ea70"; /* ti-clock */
+}
+
+.fa-cloud-arrow-down::before,
+.fa-cloud-download::before,
+.fa-cloud-download-alt::before {
+  content: "\ea71"; /* ti-cloud-download */
+}
+
+.fa-cloud-arrow-up::before,
+.fa-cloud-upload::before,
+.fa-cloud-upload-alt::before {
+  content: "\ea75"; /* ti-cloud-upload */
+}
+
+.fa-code::before {
+  content: "\ea77"; /* ti-code */
+}
+
+.fa-coins::before {
+  content: "\f65d"; /* ti-coins */
+}
+
+.fa-file-contract::before {
+  content: "\fefb"; /* ti-contract */
+}
+
+.fa-copy::before {
+  content: "\ea7a"; /* ti-copy */
+}
+
+.fa-credit-card::before,
+.fa-credit-card-alt::before {
+  content: "\ea84"; /* ti-credit-card */
+}
+
+.fa-dollar-sign::before,
+.fa-dollar::before,
+.fa-usd::before {
+  content: "\eb84"; /* ti-currency-dollar */
+}
+
+.fa-database::before {
+  content: "\ea88"; /* ti-database */
+}
+
+.fa-desktop::before,
+.fa-display::before {
+  content: "\ea89"; /* ti-device-desktop */
+}
+
+.fa-floppy-disk::before,
+.fa-save::before {
+  content: "\eb62"; /* ti-device-floppy */
+}
+
+.fa-laptop::before {
+  content: "\eb64"; /* ti-device-laptop */
+}
+
+.fa-mobile::before,
+.fa-mobile-screen::before,
+.fa-mobile-screen-button::before,
+.fa-mobile-alt::before,
+.fa-mobile-phone::before {
+  content: "\ea8a"; /* ti-device-mobile */
+}
+
+.fa-ellipsis::before,
+.fa-ellipsis-h::before {
+  content: "\ea95"; /* ti-dots */
+}
+
+.fa-ellipsis-vertical::before,
+.fa-ellipsis-v::before {
+  content: "\ea94"; /* ti-dots-vertical */
+}
+
+.fa-download::before {
+  content: "\ea96"; /* ti-download */
+}
+
+.fa-pen-to-square::before,
+.fa-edit::before {
+  content: "\ea98"; /* ti-edit */
+}
+
+.fa-exclamation::before {
+  content: "\efb4"; /* ti-exclamation-mark */
+}
+
+.fa-arrow-up-right-from-square::before,
+.fa-external-link::before,
+.fa-external-link-alt::before,
+.fa-square-up-right::before {
+  content: "\ea99"; /* ti-external-link */
+}
+
+.fa-eye::before {
+  content: "\ea9a"; /* ti-eye */
+}
+
+.fa-eye-slash::before {
+  content: "\ecf0"; /* ti-eye-off */
+}
+
+.fa-file::before {
+  content: "\eaa4"; /* ti-file */
+}
+
+.fa-file-invoice-dollar::before {
+  content: "\efe0"; /* ti-file-dollar */
+}
+
+.fa-file-arrow-down::before,
+.fa-file-download::before {
+  content: "\ea9d"; /* ti-file-download */
+}
+
+.fa-file-export::before {
+  content: "\ede9"; /* ti-file-export */
+}
+
+.fa-file-import::before {
+  content: "\edea"; /* ti-file-import */
+}
+
+.fa-file-invoice::before {
+  content: "\eb67"; /* ti-file-invoice */
+}
+
+.fa-file-excel::before {
+  content: "\f03e"; /* ti-file-spreadsheet */
+}
+
+.fa-file-lines::before,
+.fa-file-alt::before,
+.fa-file-text::before {
+  content: "\eaa2"; /* ti-file-text */
+}
+
+.fa-file-csv::before {
+  content: "\fb09"; /* ti-file-type-csv */
+}
+
+.fa-file-word::before {
+  content: "\fb0a"; /* ti-file-type-doc */
+}
+
+.fa-file-pdf::before {
+  content: "\fb10"; /* ti-file-type-pdf */
+}
+
+.fa-file-arrow-up::before,
+.fa-file-upload::before {
+  content: "\ec91"; /* ti-file-upload */
+}
+
+.fa-filter::before {
+  content: "\eaa5"; /* ti-filter */
+}
+
+.fa-flag::before {
+  content: "\eaa6"; /* ti-flag */
+}
+
+.fa-fire::before {
+  content: "\ec2c"; /* ti-flame */
+}
+
+.fa-folder::before {
+  content: "\eaad"; /* ti-folder */
+}
+
+.fa-folder-open::before {
+  content: "\faf7"; /* ti-folder-open */
+}
+
+.fa-gavel::before,
+.fa-legal::before {
+  content: "\ef90"; /* ti-gavel */
+}
+
+.fa-gift::before {
+  content: "\eb68"; /* ti-gift */
+}
+
+.fa-grip::before,
+.fa-th::before {
+  content: "\eaba"; /* ti-grid-dots */
+}
+
+.fa-hand::before {
+  content: "\ec2e"; /* ti-hand-stop */
+}
+
+.fa-hashtag::before {
+  content: "\eabc"; /* ti-hash */
+}
+
+.fa-headset::before {
+  content: "\eb90"; /* ti-headset */
+}
+
+.fa-heart::before {
+  content: "\eabe"; /* ti-heart */
+}
+
+.fa-handshake::before,
+.fa-handshake-simple::before,
+.fa-handshake-angle::before {
+  content: "\f0f3"; /* ti-heart-handshake */
+}
+
+.fa-circle-question::before,
+.fa-question-circle::before {
+  content: "\f91d"; /* ti-help-circle */
+}
+
+.fa-clock-rotate-left::before,
+.fa-history::before {
+  content: "\ebea"; /* ti-history */
+}
+
+.fa-house::before,
+.fa-home::before,
+.fa-house-chimney::before,
+.fa-house-user::before {
+  content: "\eac1"; /* ti-home */
+}
+
+.fa-hourglass::before,
+.fa-hourglass-half::before,
+.fa-hourglass-start::before,
+.fa-hourglass-end::before {
+  content: "\ef93"; /* ti-hourglass */
+}
+
+.fa-id-card::before,
+.fa-address-card::before,
+.fa-id-card-clip::before {
+  content: "\eac3"; /* ti-id */
+}
+
+.fa-id-badge::before {
+  content: "\eff7"; /* ti-id-badge */
+}
+
+.fa-inbox::before {
+  content: "\eac4"; /* ti-inbox */
+}
+
+.fa-circle-info::before,
+.fa-info-circle::before,
+.fa-info::before {
+  content: "\eac5"; /* ti-info-circle */
+}
+
+.fa-key::before {
+  content: "\eac7"; /* ti-key */
+}
+
+.fa-table-list::before,
+.fa-th-list::before {
+  content: "\ec14"; /* ti-layout-list */
+}
+
+.fa-link::before,
+.fa-chain::before {
+  content: "\eade"; /* ti-link */
+}
+
+.fa-list::before,
+.fa-list-ul::before {
+  content: "\eb6b"; /* ti-list */
+}
+
+.fa-list-check::before,
+.fa-tasks::before {
+  content: "\eb6a"; /* ti-list-check */
+}
+
+.fa-list-ol::before,
+.fa-list-numeric::before {
+  content: "\ef11"; /* ti-list-numbers */
+}
+
+.fa-spinner::before,
+.fa-circle-notch::before {
+  content: "\f226"; /* ti-loader-2 */
+}
+
+.fa-lock::before {
+  content: "\eae2"; /* ti-lock */
+}
+
+.fa-lock-open::before,
+.fa-unlock::before,
+.fa-unlock-alt::before {
+  content: "\eae1"; /* ti-lock-open */
+}
+
+.fa-right-to-bracket::before,
+.fa-arrow-right-to-bracket::before,
+.fa-sign-in::before,
+.fa-sign-in-alt::before {
+  content: "\eba7"; /* ti-login */
+}
+
+.fa-right-from-bracket::before,
+.fa-arrow-right-from-bracket::before,
+.fa-sign-out::before,
+.fa-sign-out-alt::before {
+  content: "\eba8"; /* ti-logout */
+}
+
+.fa-envelope::before {
+  content: "\eae5"; /* ti-mail */
+}
+
+.fa-envelope-circle-check::before {
+  content: "\f939"; /* ti-mail-check */
+}
+
+.fa-envelope-open::before,
+.fa-envelope-open-text::before {
+  content: "\eae4"; /* ti-mail-opened */
+}
+
+.fa-map::before {
+  content: "\eae9"; /* ti-map */
+}
+
+.fa-location-dot::before,
+.fa-location-pin::before,
+.fa-map-marker::before,
+.fa-map-marker-alt::before {
+  content: "\eae8"; /* ti-map-pin */
+}
+
+.fa-bars::before,
+.fa-navicon::before {
+  content: "\ec42"; /* ti-menu-2 */
+}
+
+.fa-comment::before,
+.fa-message::before {
+  content: "\eaef"; /* ti-message */
+}
+
+.fa-comment-dots::before,
+.fa-commenting::before,
+.fa-comment-sms::before,
+.fa-sms::before {
+  content: "\eaee"; /* ti-message-dots */
+}
+
+.fa-comments::before {
+  content: "\eb6c"; /* ti-messages */
+}
+
+.fa-microphone::before {
+  content: "\eaf0"; /* ti-microphone */
+}
+
+.fa-minus::before,
+.fa-subtract::before {
+  content: "\eaf2"; /* ti-minus */
+}
+
+.fa-moon::before {
+  content: "\eaf8"; /* ti-moon */
+}
+
+.fa-newspaper::before {
+  content: "\eafd"; /* ti-news */
+}
+
+.fa-note-sticky::before,
+.fa-sticky-note::before {
+  content: "\eb6d"; /* ti-note */
+}
+
+.fa-boxes-stacked::before,
+.fa-boxes::before {
+  content: "\f2c9"; /* ti-packages */
+}
+
+.fa-paperclip::before {
+  content: "\eb02"; /* ti-paperclip */
+}
+
+.fa-pen::before,
+.fa-pencil::before,
+.fa-pencil-alt::before,
+.fa-pen-clip::before {
+  content: "\eb04"; /* ti-pencil */
+}
+
+.fa-percent::before,
+.fa-percentage::before {
+  content: "\ecf4"; /* ti-percentage */
+}
+
+.fa-phone::before,
+.fa-phone-alt::before,
+.fa-phone-flip::before {
+  content: "\eb09"; /* ti-phone */
+}
+
+.fa-phone-volume::before {
+  content: "\eb05"; /* ti-phone-call */
+}
+
+.fa-phone-slash::before {
+  content: "\ecf5"; /* ti-phone-off */
+}
+
+.fa-image::before {
+  content: "\eb0a"; /* ti-photo */
+}
+
+.fa-piggy-bank::before {
+  content: "\f38c"; /* ti-pig-money */
+}
+
+.fa-thumbtack::before,
+.fa-thumb-tack::before {
+  content: "\ec9c"; /* ti-pin */
+}
+
+.fa-plane::before {
+  content: "\eb6f"; /* ti-plane */
+}
+
+.fa-pause::before {
+  content: "\ed45"; /* ti-player-pause */
+}
+
+.fa-play::before {
+  content: "\ed46"; /* ti-player-play */
+}
+
+.fa-stop::before {
+  content: "\ed4a"; /* ti-player-stop */
+}
+
+.fa-plug::before {
+  content: "\ebd9"; /* ti-plug */
+}
+
+.fa-plus::before,
+.fa-add::before {
+  content: "\eb0b"; /* ti-plus */
+}
+
+.fa-chalkboard-user::before {
+  content: "\eb70"; /* ti-presentation */
+}
+
+.fa-fax::before,
+.fa-print::before {
+  content: "\eb0e"; /* ti-printer */
+}
+
+.fa-question::before {
+  content: "\ec9d"; /* ti-question-mark */
+}
+
+.fa-receipt::before {
+  content: "\edfd"; /* ti-receipt */
+}
+
+.fa-arrows-rotate::before,
+.fa-rotate::before,
+.fa-sync::before,
+.fa-refresh::before,
+.fa-sync-alt::before {
+  content: "\eb13"; /* ti-refresh */
+}
+
+.fa-robot::before {
+  content: "\f00b"; /* ti-robot */
+}
+
+.fa-arrow-rotate-left::before,
+.fa-arrow-left-rotate::before,
+.fa-rotate-left::before,
+.fa-undo::before {
+  content: "\eb16"; /* ti-rotate */
+}
+
+.fa-arrow-rotate-right::before,
+.fa-arrow-right-rotate::before,
+.fa-rotate-right::before,
+.fa-redo::before {
+  content: "\eb15"; /* ti-rotate-clockwise */
+}
+
+.fa-route::before {
+  content: "\eb17"; /* ti-route */
+}
+
+.fa-scale-balanced::before,
+.fa-balance-scale::before {
+  content: "\ebc2"; /* ti-scale */
+}
+
+.fa-school::before,
+.fa-graduation-cap::before {
+  content: "\ecf7"; /* ti-school */
+}
+
+.fa-magnifying-glass::before,
+.fa-search::before {
+  content: "\eb1c"; /* ti-search */
+}
+
+.fa-paper-plane::before {
+  content: "\eb1e"; /* ti-send */
+}
+
+.fa-server::before {
+  content: "\eb1f"; /* ti-server */
+}
+
+.fa-gear::before,
+.fa-cog::before,
+.fa-gears::before,
+.fa-cogs::before {
+  content: "\eb20"; /* ti-settings */
+}
+
+.fa-share::before,
+.fa-share-nodes::before,
+.fa-share-alt::before,
+.fa-share-from-square::before {
+  content: "\eb21"; /* ti-share */
+}
+
+.fa-shield::before,
+.fa-shield-halved::before,
+.fa-shield-alt::before {
+  content: "\eb24"; /* ti-shield */
+}
+
+.fa-file-signature::before,
+.fa-signature::before {
+  content: "\eee0"; /* ti-signature */
+}
+
+.fa-sitemap::before {
+  content: "\eb9d"; /* ti-sitemap */
+}
+
+.fa-sort-up::before,
+.fa-sort-asc::before {
+  content: "\eb26"; /* ti-sort-ascending */
+}
+
+.fa-sort-down::before,
+.fa-sort-desc::before {
+  content: "\eb27"; /* ti-sort-descending */
+}
+
+.fa-bullhorn::before {
+  content: "\ed61"; /* ti-speakerphone */
+}
+
+.fa-square::before {
+  content: "\eb2c"; /* ti-square */
+}
+
+.fa-square-check::before,
+.fa-check-square::before {
+  content: "\eb28"; /* ti-square-check */
+}
+
+.fa-square-minus::before,
+.fa-minus-square::before {
+  content: "\eb29"; /* ti-square-minus */
+}
+
+.fa-square-plus::before,
+.fa-plus-square::before {
+  content: "\eb2a"; /* ti-square-plus */
+}
+
+.fa-layer-group::before {
+  content: "\eef7"; /* ti-stack-2 */
+}
+
+.fa-star::before {
+  content: "\eb2e"; /* ti-star */
+}
+
+.fa-stopwatch::before {
+  content: "\ff9b"; /* ti-stopwatch */
+}
+
+.fa-sun::before {
+  content: "\eb30"; /* ti-sun */
+}
+
+.fa-table::before {
+  content: "\eba1"; /* ti-table */
+}
+
+.fa-tag::before {
+  content: "\10096"; /* ti-tag */
+}
+
+.fa-tags::before {
+  content: "\ef86"; /* ti-tags */
+}
+
+.fa-bullseye::before {
+  content: "\eb35"; /* ti-target */
+}
+
+.fa-terminal::before {
+  content: "\ebdc"; /* ti-terminal */
+}
+
+.fa-thumbs-down::before {
+  content: "\eb3b"; /* ti-thumb-down */
+}
+
+.fa-thumbs-up::before {
+  content: "\eb3c"; /* ti-thumb-up */
+}
+
+.fa-ticket::before {
+  content: "\eb3d"; /* ti-ticket */
+}
+
+.fa-wrench::before {
+  content: "\eb40"; /* ti-tool */
+}
+
+.fa-screwdriver-wrench::before,
+.fa-tools::before {
+  content: "\ebca"; /* ti-tools */
+}
+
+.fa-train::before {
+  content: "\ed96"; /* ti-train */
+}
+
+.fa-trash::before,
+.fa-trash-can::before,
+.fa-trash-alt::before {
+  content: "\eb41"; /* ti-trash */
+}
+
+.fa-arrow-trend-down::before {
+  content: "\eb42"; /* ti-trending-down */
+}
+
+.fa-arrow-trend-up::before {
+  content: "\eb43"; /* ti-trending-up */
+}
+
+.fa-trophy::before {
+  content: "\eb45"; /* ti-trophy */
+}
+
+.fa-truck::before {
+  content: "\ebc4"; /* ti-truck */
+}
+
+.fa-link-slash::before,
+.fa-chain-broken::before,
+.fa-unlink::before {
+  content: "\eb46"; /* ti-unlink */
+}
+
+.fa-upload::before {
+  content: "\eb47"; /* ti-upload */
+}
+
+.fa-user::before,
+.fa-person::before,
+.fa-user-large::before {
+  content: "\eb4d"; /* ti-user */
+}
+
+.fa-user-check::before {
+  content: "\eb49"; /* ti-user-check */
+}
+
+.fa-circle-user::before,
+.fa-user-circle::before {
+  content: "\ef68"; /* ti-user-circle */
+}
+
+.fa-user-gear::before,
+.fa-user-cog::before {
+  content: "\f9d4"; /* ti-user-cog */
+}
+
+.fa-user-pen::before,
+.fa-user-edit::before {
+  content: "\f7cc"; /* ti-user-edit */
+}
+
+.fa-user-minus::before {
+  content: "\eb4a"; /* ti-user-minus */
+}
+
+.fa-user-slash::before {
+  content: "\ecf9"; /* ti-user-off */
+}
+
+.fa-user-plus::before {
+  content: "\eb4b"; /* ti-user-plus */
+}
+
+.fa-user-shield::before,
+.fa-user-lock::before {
+  content: "\f7d0"; /* ti-user-shield */
+}
+
+.fa-user-tie::before {
+  content: "\fc51"; /* ti-user-square */
+}
+
+.fa-user-xmark::before,
+.fa-user-times::before {
+  content: "\eb4c"; /* ti-user-x */
+}
+
+.fa-users::before,
+.fa-user-group::before,
+.fa-people-group::before {
+  content: "\fa21"; /* ti-users-group */
+}
+
+.fa-video::before {
+  content: "\ed22"; /* ti-video */
+}
+
+.fa-wallet::before {
+  content: "\eb75"; /* ti-wallet */
+}
+
+.fa-wifi::before {
+  content: "\eb52"; /* ti-wifi */
+}
+
+.fa-globe::before,
+.fa-earth::before,
+.fa-earth-americas::before,
+.fa-earth-oceania::before,
+.fa-earth-europe::before,
+.fa-globe-americas::before {
+  content: "\eb54"; /* ti-world */
+}
+
+.fa-xmark::before,
+.fa-times::before,
+.fa-close::before,
+.fa-remove::before {
+  content: "\eb55"; /* ti-x */
+}
+
+/* US-FA-SHIM:END */
+
 /* US-ICONS:START — the theme's own icons (.us-icon, inline SVG from
    UnionSuiteIcons in zUnionSuite.js). Like a Tabler glyph: a 1em square in
    the current text colour, so the font size and colour around it set it.
@@ -10722,8 +11967,660 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   height: 34px;
 }
 
+/* A list that can be cleared (allowClear): Select2 floats its × at 26px
+   high with a 20px margin, above centre and short of the chevron. It sits
+   in line with the chevron instead, just to its left, and the text makes
+   room for both. */
+[data-beyondformid] .form-group > .select2-container--default .select2-selection--single .select2-selection__clear:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  position: absolute;
+  top: 0;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-muted);
+  font: 400 18px/1 var(--font-ui);
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .form-group > .select2-container--default .select2-selection--single .select2-selection__clear:hover:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--text-strong);
+}
+
+[data-beyondformid] .form-group > .select2-container--default .select2-selection--single.select2-selection--clearable .select2-selection__rendered:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  padding-right: 58px;
+}
+
+/* A busy button (the shared us-button-spinner): CloudToolz's own sheet sets
+   .rendered-form.formbuilder-embedded-bootstrap .btn to inline-block,
+   above the shared inline-flex, so the ring met its label. */
+[data-beyondformid] .rendered-form :is(a, button).btn:has(> .us-button-spinner):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 [data-beyondformid] .form-group > .select2-container--default .select2-selection--multiple:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   padding: 3px 6px;
+}
+
+/* Loading (US-NATIVE-LOADERS adds the spinner). The iPart's placeholder,
+   div#formrender_<key>, shows a 20px spinner.gif until the form renders
+   into it; .us-native-loader-host already drops the gif. The placeholder
+   becomes the form's [data-beyondformid] element, so the same host also
+   covers a form its own script hides with data-us-loading until its data
+   is in. The spinner sits near the top rather than halfway down a tall
+   hidden form. */
+:is([id^="formrender_"]:not(.rendered-form *), [data-beyondformid]).us-native-loader-host:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  position: relative;
+  height: auto !important;
+  min-height: 120px;
+}
+
+:is([id^="formrender_"]:not(.rendered-form *), [data-beyondformid]).us-native-loader-host > .us-native-section-spinner:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  top: 36px;
+  margin-top: 0;
+}
+
+/* Rendering clears the placeholder, spinner and all, and a form still
+   loading gets a new one at once: no fade-in, so it does not blink. */
+@starting-style {
+  :is([id^="formrender_"]:not(.rendered-form *), [data-beyondformid]).us-native-loader-host > .us-native-section-spinner:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    opacity: 1;
+  }
+}
+
+/* A form's script may set data-us-loading on .rendered-form to keep the
+   form hidden, with the spinner showing, until its data is in. The form
+   fades in when it renders or the attribute goes. */
+[data-beyondformid] > .rendered-form[data-us-loading]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+[data-beyondformid] > .rendered-form:not([data-us-loading]):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  animation: us-beyond-form-in 180ms cubic-bezier(.2, 0, 0, 1);
+}
+
+@keyframes us-beyond-form-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-beyondformid] > .rendered-form:not([data-us-loading]):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    animation: none;
+  }
+}
+
+/* Layout for a designed BeyondFormz form (us-bf-*), first used by the
+   staff Create case form (prototypes/wip/case-create-form, promoted
+   2 November 2026). Two kinds: author classes set in a field's className
+   in the form builder (us-bf-title on an h2 header, us-bf-section on an h3
+   header), and pieces the form's injected script draws or marks (the for
+   line, origin note, hints, quick dates, warnings, errors, reveal, the
+   staff group, checkbox rows, segmented buttons and the footer). Plain
+   BeyondFormz forms are unchanged: every rule needs one of these classes
+   or a state the script sets, except [hidden] (the script's way to hide a
+   field, which Bootstrap would otherwise show) and the Select2 chips. */
+
+/* The form's script hides fields with the hidden attribute; Bootstrap's
+   display rules would otherwise win. */
+[data-beyondformid] .rendered-form [hidden]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: none !important;
+}
+
+/* The form's width: one readable column on a full page. */
+[data-beyondformid] .rendered-form:has(.us-bf-section):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-width: 760px;
+}
+
+/* Bootstrap's row gutters, tightened to the theme's field spacing on a
+   designed form (one with us-bf-section headings). The staff group
+   (.us-bf-staff) holds the lead's row. */
+[data-beyondformid] :is(.rendered-form:has(.us-bf-section), .rendered-form .us-bf-staff) > .row:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin-right: -8px;
+  margin-left: -8px;
+}
+
+[data-beyondformid] :is(.rendered-form:has(.us-bf-section), .rendered-form .us-bf-staff) > .row > .form-group:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin-bottom: var(--space-4);
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+/* Form title (a header field, h2). */
+[data-beyondformid] .rendered-form .us-bf-title:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0 0 var(--space-1);
+  color: var(--text-strong);
+  font: 700 20px/1.3 var(--font-display, var(--font-ui));
+}
+
+/* Who the record is for (a paragraph field the prefill flow fills with
+   class-html-us-bf-for). */
+[data-beyondformid] .rendered-form .us-bf-for:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 var(--space-5);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-for strong:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+[data-beyondformid] .rendered-form .us-bf-for__note:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex-basis: 100%;
+  color: var(--text-base);
+}
+
+/* Where the record came from: a quoted note, when there is one. */
+[data-beyondformid] .rendered-form .us-bf-origin:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: calc(var(--space-2) * -1) 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  color: var(--text-base);
+  font-size: 13px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-origin__head:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+[data-beyondformid] .rendered-form .us-bf-origin__text:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Section heading (a header field, h3). */
+[data-beyondformid] .rendered-form .us-bf-section:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 var(--space-4);
+  color: var(--text-strong);
+  font: 700 13px/1.4 var(--font-ui);
+  letter-spacing: .02em;
+}
+
+[data-beyondformid] .rendered-form .us-bf-section:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* A short line under a field (added by the form's script). */
+[data-beyondformid] .rendered-form .us-bf-hint:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Quick dates under a date field (Date of incident: Today, Clear date), as
+   the task form's (UnionSuiteForms.css .usf__quick). Clear date is dashed
+   and muted, and shows only while there is a date. */
+[data-beyondformid] .rendered-form .us-bf-quick:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-quick button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-base);
+  font: 12px/18px var(--font-ui);
+  cursor: pointer;
+  transition:
+    border-color 150ms cubic-bezier(.2, 0, 0, 1),
+    color 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-quick button:hover:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--brand-600);
+  color: var(--text-strong);
+}
+
+[data-beyondformid] .rendered-form .us-bf-quick button:focus-visible:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-quick .us-bf-quiet:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+
+[data-beyondformid] .rendered-form .us-bf-quick button[hidden]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: none;
+}
+
+[data-beyondformid] .rendered-form .us-bf-quick .ti:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  font-size: 13px;
+}
+
+@media (max-width: 950px) {
+  [data-beyondformid] .rendered-form .us-bf-quick button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    min-height: 32px;
+    padding-inline: 12px;
+  }
+}
+
+/* A warning under a field while a choice needs something else (Individual
+   with nobody on the case). It slides in and out. */
+[data-beyondformid] .rendered-form .us-bf-warning:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-height: 80px;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  overflow: clip;
+  border-radius: var(--radius);
+  background: var(--warning-bg);
+  color: var(--text-strong);
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 1;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    margin-top 220ms cubic-bezier(.2, 0, 0, 1),
+    padding 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-warning .ti:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: none;
+  margin-top: 1px;
+  color: var(--warning);
+  font-size: 15px;
+}
+
+/* The same warning after Create case was pressed without what it asks. */
+[data-beyondformid] .rendered-form .us-bf-warning[data-error]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+[data-beyondformid] .rendered-form .us-bf-warning[data-error] .ti:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--danger);
+}
+
+[data-beyondformid] .rendered-form .us-bf-warning[data-closed]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    margin-top 220ms cubic-bezier(.2, 0, 0, 1),
+    padding 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 120ms cubic-bezier(.2, 0, 0, 1),
+    visibility 0s 220ms;
+}
+
+/* No member on the page: the warning takes the member line's place and
+   spacing, under the title. */
+[data-beyondformid] .rendered-form .us-bf-warning#us-bf-no-member:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0 0 var(--space-5);
+}
+
+/* A field's error (added by the form's script on Create). */
+[data-beyondformid] .rendered-form .us-bf-error:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+[data-beyondformid] .form-group.us-bf-invalid > .select2-container--default .select2-selection:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--danger);
+}
+
+/* Select2's chosen items (Type, Subtype) in theme colours. Its own grey
+   chips keep the inherited text colour, which is unreadable in dark mode. */
+[data-beyondformid] .form-group > .select2-container--default .select2-selection--multiple .select2-selection__choice:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin-top: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-sunken);
+  color: var(--text-strong);
+  font-size: 12px;
+}
+
+[data-beyondformid] .form-group > .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-right-color: var(--border);
+  color: var(--text-muted);
+}
+
+[data-beyondformid] .form-group > .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:is(:hover, :focus):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  background: var(--bg-subtle);
+  color: var(--danger);
+}
+
+/* A Select2 option with a second line (Workplace: employer,
+   classification, dates). The list opens at the end of the page, outside
+   the form. */
+.select2-results .us-bf-option__name {
+  display: block;
+}
+
+.select2-results .us-bf-option__line {
+  display: block;
+  font-size: 12px;
+  opacity: .75;
+}
+
+/* "(optional)" after a label. */
+[data-beyondformid] .rendered-form .us-bf-optional:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+/* Lead staff and Assign me as one group (an Individual case needs one of
+   them). The frame is always there, clear until Individual is chosen; its
+   side padding sits in the gutter, so the fields line up with the row
+   above either way. */
+[data-beyondformid] .rendered-form .us-bf-staff:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0 -13px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  transition:
+    border-color 180ms cubic-bezier(.2, 0, 0, 1),
+    padding 220ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-staff[data-required]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  padding: 12px;
+  border-color: var(--border);
+}
+
+[data-beyondformid] .rendered-form .us-bf-staff__title:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 32px;
+  margin: 0 0 10px;
+  overflow: clip;
+  color: var(--text-strong);
+  font: 600 13px/20px var(--font-ui);
+  opacity: 1;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    margin-bottom 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-staff__title[data-closed]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    margin-bottom 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 120ms cubic-bezier(.2, 0, 0, 1),
+    visibility 0s 220ms;
+}
+
+[data-beyondformid] .rendered-form .us-bf-staff__title .formbuilder-required:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0 4px 0 2px;
+  color: var(--danger);
+}
+
+/* A field that shows only when it applies (Subtype). BeyondFormz gives the
+   field no inner wrapper, so the field itself opens: beside another field
+   (the row keeps that field's height) it only fades in; where the columns
+   stack it also slides open. A closed field keeps its column's width.
+   overflow-clip-margin leaves room for the focus glow. */
+[data-beyondformid] .rendered-form .form-group.us-bf-reveal:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 240px;
+  overflow: clip;
+  overflow-clip-margin: 6px;
+  opacity: 1;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(.2, 0, 0, 1),
+    margin-bottom 220ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .form-group.us-bf-reveal[data-closed]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 120ms cubic-bezier(.2, 0, 0, 1),
+    margin-bottom 220ms cubic-bezier(.2, 0, 0, 1),
+    visibility 0s 220ms;
+}
+
+/* A checkbox under a field (Assign me to this case): a div around its
+   label, as a label straight inside .form-group takes the field heading's
+   look. It slides in and out with the condition that shows it. */
+[data-beyondformid] .rendered-form .us-bf-check:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 44px;
+  margin: 10px 0 0;
+  overflow: clip;
+  overflow-clip-margin: 4px;
+  opacity: 1;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    margin-top 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-check[data-closed]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    max-height 220ms cubic-bezier(.2, 0, 0, 1),
+    margin-top 220ms cubic-bezier(.2, 0, 0, 1),
+    opacity 120ms cubic-bezier(.2, 0, 0, 1),
+    visibility 0s 220ms;
+}
+
+/* Only the box and its words take the click, not the row's blank space. */
+[data-beyondformid] .rendered-form .us-bf-check label:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  vertical-align: top;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  color: var(--text-base);
+  font: 400 13px/20px var(--font-ui);
+  cursor: pointer;
+}
+
+[data-beyondformid] .rendered-form .us-bf-check input:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+}
+
+@media (max-width: 950px) {
+  [data-beyondformid] .rendered-form .us-bf-check label:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    min-height: 44px;
+  }
+}
+
+/* A short list drawn as buttons (Access): the select stays in the form,
+   hidden, and is what BeyondFormz sends. It looks like the section tabs
+   (US-SECTION-TABS; owner, 2 November 2026): their track, white chosen
+   button and accent mark, with each choice's icon. */
+[data-beyondformid] .rendered-form .us-bf-segmented:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+
+  /* Transparent keeps the geometry and still draws in forced colours. */
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--us-section-track);
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-base);
+  font: 600 13px/20px var(--font-ui);
+  cursor: pointer;
+  transition:
+    background-color 150ms cubic-bezier(.2, 0, 0, 1),
+    color 150ms cubic-bezier(.2, 0, 0, 1),
+    box-shadow 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented button:hover:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  background: var(--us-section-tab-hover);
+  color: var(--text-strong);
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented button[aria-checked=true]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  background: var(--bg-surface);
+  box-shadow: 0 1px 4px rgb(0 20 30 / 12%);
+  color: var(--text-strong);
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented button[aria-checked=true]:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: calc(50% - 8px);
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented button:active:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  background: var(--bg-sunken);
+  box-shadow: inset 0 2px 4px rgb(0 20 30 / 22%);
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented button:focus-visible:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -4px;
+}
+
+@media (forced-colors: active) {
+  [data-beyondformid] .rendered-form .us-bf-segmented button[aria-checked=true]:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+}
+
+[data-beyondformid] .rendered-form .us-bf-segmented .ti:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  font-size: 16px;
+}
+
+/* Footer: the message, then Cancel and the primary button on the right. */
+[data-beyondformid] .rendered-form .us-bf-actions:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+[data-beyondformid] .rendered-form .us-bf-actions .Message:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: 1 1 200px;
+  margin: 0;
+  font-size: 13px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-actions .Message:is([data-tone=danger]):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+[data-beyondformid] .rendered-form .us-bf-actions .form-group:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: none;
+  width: auto;
+  margin: 0;
+}
+
+@media (max-width: 950px) {
+  [data-beyondformid] .rendered-form .us-bf-segmented button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    min-height: 44px;
+  }
+
+  [data-beyondformid] .rendered-form .us-bf-actions .btn:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    min-height: 44px;
+  }
+}
+
+/* On a phone the message takes its own line, and the buttons share the
+   next. */
+@media (max-width: 600px) {
+  [data-beyondformid] .rendered-form .us-bf-actions .Message:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-beyondformid] .rendered-form :is(
+    .form-group.us-bf-reveal,
+    .form-group.us-bf-reveal[data-closed],
+    .us-bf-check,
+    .us-bf-check[data-closed],
+    .us-bf-warning,
+    .us-bf-warning[data-closed],
+    .us-bf-staff,
+    .us-bf-staff__title,
+    .us-bf-staff__title[data-closed],
+    .us-bf-quick button,
+    .us-bf-segmented button
+  ):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    transition: none;
+  }
 }
 
 /* US-BEYOND-FORMS:END */
@@ -12968,7 +14865,11 @@ html.us-taskbar-mounted #hd .search-dropdown {
      fits (decided by the rail script, which sets data-us-cco-sections-inline
      and the two properties below). The content starts in that row, the bar
      shrinks to its controls on the rail's side, and the switcher's block
-     leaves room for them and lines up with the Sections box. */
+     leaves room for them and lines up with the Sections box. The room is
+     padding, not margin: the block is usually a layout row, whose negative
+     margins line its columns up with the rest of the tab; replacing them
+     set the switcher 20px in from the panels below (owner, 29 October
+     2026). */
   :root :is(.us-cco-collapsible, .us-cco-rail) :is(.cco, .tabs-wrapper).tabs-vertical[data-us-cco-rail="collapsed"][data-us-cco-sections-inline] > .RadMultiPage {
     grid-row: 1 / span 2;
   }
@@ -12983,12 +14884,12 @@ html.us-taskbar-mounted #hd .search-dropdown {
 
   :root :is(.us-cco-collapsible, .us-cco-rail) :is(.cco, .tabs-wrapper).tabs-vertical[data-us-cco-rail="collapsed"][data-us-cco-sections-inline] > .RadMultiPage > .rmpView [data-us-cco-sections-host] {
     margin-top: var(--us-cco-sections-offset, 0px);
-    margin-inline-start: var(--us-cco-bar-space, 0px);
+    padding-inline-start: var(--us-cco-bar-space, 0px);
   }
 
   :root :is(.us-cco-collapsible, .us-cco-rail) :is(.cco, .tabs-wrapper).tabs-vertical.tabs-right[data-us-cco-rail="collapsed"][data-us-cco-sections-inline] > .RadMultiPage > .rmpView [data-us-cco-sections-host] {
-    margin-inline-start: 0;
-    margin-inline-end: var(--us-cco-bar-space, 0px);
+    padding-inline-start: 0;
+    padding-inline-end: var(--us-cco-bar-space, 0px);
   }
 
   /* The banner Quick Actions chevron: a filled 10x6 chevron that turns over
@@ -13526,6 +15427,44 @@ html.us-taskbar-mounted #hd .search-dropdown {
 }
 
 /* US-CCO-RAIL:END */
+
+/* US-CCO-COLUMNS:START — a CCO tab's layout columns stack when its content is
+   narrow. Bootstrap's col-sm-* split by the window (768px and up), but a tab
+   beside a rail has far less room: on the case page at 809px the tab had
+   481px and its col-sm-4 174px (owner, 29 October 2026). Each column may grow
+   and is at least 320px, so a column that does not fit wraps to its own line
+   at full width. With room for all of them the widths are unchanged. No
+   container query: its containment would move fixed menus inside the tab. */
+.cco > .RadMultiPage .ContentWizardDisplay > div > .row > [class*="col-"]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: 1 1 auto;
+  min-width: min(100%, 320px);
+}
+
+/* The case page's member card comes first once its row stacks (C14, owner,
+   9 October 2026; again 29 October 2026), though its column is on the
+   right: the row becomes one column of panels (its columns and zones step
+   aside with display: contents), the member card, then the main column's
+   panels, then the side column's others (attachments, staff). zUnionSuite.js
+   marks a stacked row data-us-columns="stacked" (US-CCO-COLUMNS). */
+.cco > .RadMultiPage .ContentWizardDisplay > div > .row[data-us-columns="stacked"]:has([data-us-case-member]):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex-direction: column;
+  margin-inline: 0;
+}
+
+.cco > .RadMultiPage .ContentWizardDisplay > div > .row[data-us-columns="stacked"]:has([data-us-case-member]) > [class*="col-"]:not(:where(.us-report-no-styling, .us-report-no-styling *)),
+.cco > .RadMultiPage .ContentWizardDisplay > div > .row[data-us-columns="stacked"]:has([data-us-case-member]) > [class*="col-"] > .WebPartZone:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: contents;
+}
+
+.cco > .RadMultiPage .ContentWizardDisplay > div > .row[data-us-columns="stacked"]:has([data-us-case-member]) > [class*="col-"] > .WebPartZone > .ContentItemContainer:has([data-us-case-member]):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  order: -2;
+}
+
+.cco > .RadMultiPage .ContentWizardDisplay > div > .row[data-us-columns="stacked"]:has([data-us-case-member]) > [class*="col-"]:has([data-us-case-member]) > .WebPartZone > .ContentItemContainer:not(:has([data-us-case-member])):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  order: 1;
+}
+
+/* US-CCO-COLUMNS:END */
 
 
 /* US-EMBEDDED-CCO:START — put EmbeddedCCO in the CCO iPart CSS class field.

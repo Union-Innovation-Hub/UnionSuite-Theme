@@ -112,6 +112,13 @@ function savedIds(request) {
       assert.equal(await retryPage.evaluate(() => reads.length), 2, 'retry cannot launch duplicate reads');
       await settleRead(retryPage, 1, []);
       await ready(retryPage);
+      // With no bookmarks only the bar offers Add bookmarks; the header strip
+      // leaves it to Go to…, which opens the same palette.
+      const prompts = await retryPage.evaluate(() => ({
+        strip: document.querySelectorAll('#us-tb-bookmarks button').length,
+        bar: [...document.querySelectorAll('#us-tb-bookmarks-bar button')].filter(button => button.textContent.trim() === 'Add bookmarks').length
+      }));
+      assert.deepEqual(prompts, { strip: 0, bar: 1 }, 'an empty header strip has no Add bookmarks; the bar keeps one');
       await retryPage.locator(star(primary)).click();
       await writes(retryPage, 1);
       await retryPage.locator(star(added)).click();

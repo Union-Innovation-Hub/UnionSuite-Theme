@@ -203,6 +203,17 @@ the repository copy remains a legacy reference. Do not reload that whole legacy
 stylesheet just for icons. See the [navigation usage recipe](../UnionSuite-Guides/Usage-Guide.html#navigation-icons)
 for class placement, the complete mapping and troubleshooting.
 
+## Font Awesome markup
+
+The theme does not load Font Awesome. Content records and Query Templates
+written for the old theme still use its classes (for example
+`<em class="fa-regular fa-building">` in the original contact layout's record
+banner), so the `US-FA-SHIM` block in `zUnionSuite.css` draws about 420 common
+Font Awesome 6 names and older aliases with the nearest glyph from the bundled
+Tabler font. It needs `Tabler.css` and `Tabler/` deployed. A name with no
+mapping still renders as nothing: add it to the block with the codepoint from
+`Tabler/tabler-icons.min.css`. New content should use `ti ti-…` classes.
+
 ## Legacy staff styling
 
 The `US-LEGACY-UTSTAFF` block, near the top of `zUnionSuite.css` after the

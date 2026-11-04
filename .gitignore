@@ -51,8 +51,8 @@ Theme/**/*.zip
 # Built paste-in embeds; rebuild with each embed's build script
 /embeds/finance-dashboard/dist/
 
-# Built BeyondFormz exports; rebuild with the folder's build-form.cjs
-/prototypes/wip/case-create-form/beyondformz/dist/
+# Built BeyondFormz and Flowz exports; rebuild with the folder build scripts
+/prototypes/wip/case-create-form/*/dist/
 
 # Built staff help pages and chatbot JSON; rebuild with tools/build-user-guide.cjs
 /docs/user-guide/dist/

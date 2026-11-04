@@ -221,6 +221,14 @@ const parts = `<header class="us-banner__surface"><div class="us-banner__summary
 const iframe = (id,title,content,auto=false) => `<iframe class="example-frame" id="${id}" data-theme-preview${auto?' data-autofit':''} title="${esc(title)}" srcdoc="${esc(content)}" loading="${auto?'eager':'lazy'}"></iframe>`;
 const formMarkup='<form class="us-form" onsubmit="event.preventDefault()"><div class="field-grid">'+read('Theme/UnionSuite-Guides/usage/examples/Form-Fields.source.html')+'</div><div class="form-footer"><button type="submit" class="TextButton PrimaryButton">Validate example</button><button type="reset" class="TextButton">Reset</button></div></form>';
 const formDemo='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+nativePreviewCss+'\n'+theme+'\n'+read('Theme/UnionSuite-Guides/usage/examples/Form-Fields.layout.css')+'</style></head><body><main>'+formMarkup+'</main><script>'+themeJs+'</script></body></html>';
+// A designed BeyondFormz form (us-bf-*) as it renders once its injected
+// script has run: static markup, no BeyondFormz or form script. The frame's
+// own rules stand in for CloudToolz's Bootstrap sheet (full-width controls,
+// md columns), which the guide does not carry.
+const beyondDesignedMarkup=read('Theme/UnionSuite-Guides/usage/examples/BeyondFormz-Designed-Form.html').trim();
+const beyondVendorStandIn='[data-beyondformid] .rendered-form .form-control{display:block;width:100%}'
+  +'@media (min-width:768px){[data-beyondformid] .row{display:flex;flex-wrap:wrap}[data-beyondformid] .row>.col-md-4{flex:0 0 33.333%;max-width:33.333%}[data-beyondformid] .row>.col-md-8{flex:0 0 66.667%;max-width:66.667%}[data-beyondformid] .row>.col-md-12{flex:0 0 100%;max-width:100%}}';
+const beyondDesignedDemo='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+nativePreviewCss+'\n'+iconCss+'\n'+theme+'\nbody{margin:0;padding:20px 24px;background:var(--bg-surface);color:var(--text-base);font:14px/1.5 var(--font-ui);height:auto}'+beyondVendorStandIn+'</style></head><body>'+beyondDesignedMarkup+'</body></html>';
 // System Notification panel as iMIS renders it: an ASI alert (its message
 // supplies the .media icon row; the theme adds the iMIS logo), our alerts
 // (System-Alert-Message.html with sample values, placed straight in the list
@@ -322,6 +330,8 @@ html{height:auto}body{margin:0;padding:20px;height:auto;min-height:0;background:
  TABS_DEMO: iframe('tabs-demo','Approved native tabs: V5 menu, H2 Address and standalone tabs',require('./build-tab-display-options.cjs').frameDocument('guide-tabs','vertical',5,2,false),true),
  MESSAGE_DEMO: iframe('message-demo','Native iMIS feedback messages with Union Suite styling',messageDemo,true),
   FORM_DEMO: iframe('form-demo','Native form fields and primary button reversal',formDemo,true),
+  BEYOND_FORMS_DESIGNED_DEMO: iframe('beyond-forms-designed-demo','A designed BeyondFormz form: the staff Create case form, cut down',beyondDesignedDemo,true),
+  BEYOND_FORMS_DESIGNED_TEMPLATE: '<div class="snippet"><div class="snippet-bar"><span>Designed BeyondFormz form, as rendered (reference markup)</span><button type="button" data-copy="code-beyond-forms-designed">Copy</button></div><pre><code id="code-beyond-forms-designed">'+esc(beyondDesignedMarkup)+'</code></pre></div>',
   FORM_TEMPLATE: '<div class="snippet"><div class="snippet-bar"><span>Native field template</span><button type="button" data-copy="code-forms">Copy</button></div><pre><code id="code-forms">'+esc(formMarkup)+'</code></pre></div>',
   TOKENS_CSS: tokenCss + '\n' + clientRoots,
   GUIDE_CSS: read('Theme/UnionSuite-Guides/usage/source/usage-guide.css'),

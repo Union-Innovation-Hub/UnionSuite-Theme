@@ -155,6 +155,24 @@
         ],
         "createdAt": "2026-10-25T05:27:04.933Z",
         "reason": "Claude: WIP comparison mockup; its option headings and notes are review chrome around cards drawn by the live theme CSS, which owns the real type scale"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "prototypes/wip/taskbar-side-pane/Side-Pane.css"
+        ],
+        "createdAt": "2026-10-28T21:18:14.987Z",
+        "reason": "Claude: Push mode must narrow the page so content reflows beside the pane; a transform cannot reflow it, and AGENTS.md requires every visible state change to transition"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "prototypes/wip/case-create-form/index.html"
+        ],
+        "createdAt": "2026-10-28T21:29:47.686Z",
+        "reason": "Claude triage: the flagged sizes are the mock-up page's own toolbar and notes panel (preview chrome, as in the task-form mock-up), not the form being designed"
       }
     ]
   }

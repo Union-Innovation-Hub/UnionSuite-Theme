@@ -44,6 +44,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+/* US-DATE-LOCALE:START — the locale the theme shows dates in: the website's
+   iMIS culture (gCurrentCultureCode, set per website, e.g. en-AU or en-US),
+   so a US client's site shows US dates (owner, 4 November 2026). Without
+   one, en-AU, as the theme always used. Not the page's lang, which iMIS
+   leaves as a bare "en". Numbers and time-zone date maths keep fixed
+   locales. Callers use window.UnionSuiteDateLocale?.() || 'en-AU':
+   standalone builds and tests take single sections without this one. */
+(function () {
+  'use strict';
+
+  function dateLocale() {
+    const culture = String(window.gCurrentCultureCode || '').trim();
+    try {
+      if (culture && Intl.DateTimeFormat.supportedLocalesOf(culture).length) return culture;
+    } catch (_) {
+      // An invalid code: fall back.
+    }
+    return 'en-AU';
+  }
+
+  window.UnionSuiteDateLocale = dateLocale;
+})();
+/* US-DATE-LOCALE:END */
 /* US-APPEARANCE:START */
 /* Document-level preference; zzDarkMode.css owns every appearance style.
    Include shared JS in each themed iframe/popup as well as the main page. */
@@ -10803,7 +10826,14 @@ SOFTWARE.
 /* US-NATIVE-LOADERS:START — decorate native indicators; no request interception. */
 (function(){
  if(window.UnionSuiteSectionLoading)return;
- const selector='.rwWindowContent.rwLoading,:is(.rwWindowContent,.rwContent)[data-us-frame-loading],.us-dialog__body[data-us-loading],.RadAjax > .raDiv';
+ // BeyondFormz: the iPart's placeholder until the form renders into it (it
+ // then gains data-zentso-beyond-form-rendered and the form, or AsiError if
+ // it fails), and a rendered form whose own script hides it with
+ // data-us-loading until its data is in (Create case, until its prefill).
+ // The form's rows take ids from the placeholder's (formrender_<key>-row-
+ // row-1), so anything inside a form is never the placeholder.
+ const selector='.rwWindowContent.rwLoading,:is(.rwWindowContent,.rwContent)[data-us-frame-loading],.us-dialog__body[data-us-loading],.RadAjax > .raDiv,'+
+  '[id^="formrender_"]:not([data-zentso-beyond-form-rendered],.AsiError,:has(> .rendered-form),.rendered-form *),[data-beyondformid]:has(> .rendered-form[data-us-loading])';
  const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
  // A popup frame counts as loading from the moment its src changes until the
  // new document's load event. iMIS can take several seconds to build a page
@@ -10874,10 +10904,11 @@ SOFTWARE.
  function changed(r){
   if(r.type==='childList')return true;
   if(r.attributeName==='src')return r.target.tagName==='IFRAME';
+  if(r.attributeName==='data-us-loading')return true;
   return r.oldValue!==r.target.getAttribute('class');
  }
- function start(){refresh();new MutationObserver(records=>{if(records.some(changed))schedule()}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src'],attributeOldValue:true})}
- window.UnionSuiteSectionLoading={version:'1.1',refresh};
+ function start(){refresh();new MutationObserver(records=>{if(records.some(changed))schedule()}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','data-us-loading'],attributeOldValue:true})}
+ window.UnionSuiteSectionLoading={version:'1.2',refresh};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 /* US-NATIVE-LOADERS:END */
@@ -17132,7 +17163,7 @@ SOFTWARE.
   'use strict';
   if (window.UnionSuiteCcoSwitch) return;
 
-  const version = '1.0';
+  const version = '1.1';
   const disabledKey = 'UnionSuiteCcoSwitch:disabled';
   const keysKey = 'UnionSuiteCcoSwitch:keys';
   const keyLifetime = 7 * 24 * 60 * 60 * 1000;
@@ -17270,6 +17301,20 @@ SOFTWARE.
 
   const keyId = cco => location.pathname + '|' + cco.strip.id;
 
+  // iMIS can serve a page under its website's folder (/UTNewTheme/_i4u_/...)
+  // and send its tabs to the plain path (/_i4u_/...): the same page. Taken as
+  // another page, the first switch there reloaded it natively (owner,
+  // 29 October 2026). Paths match when equal, ignoring case and encoding, or
+  // when they differ by one leading folder.
+  function samePage(a, b) {
+    const path = value => decodeURIComponent(value).toLowerCase();
+    const [x, y] = [path(a), path(b)];
+    if (x === y) return true;
+    const [longer, shorter] = x.length > y.length ? [x, y] : [y, x];
+    if (!shorter.startsWith('/') || !longer.endsWith(shorter)) return false;
+    return /^\/[^/]+$/.test(longer.slice(0, longer.length - shorter.length));
+  }
+
   function readKeys() {
     try {
       const keys = JSON.parse(localStorage.getItem(keysKey) || '{}');
@@ -17385,7 +17430,7 @@ SOFTWARE.
     const redirect = entries.find(entry => entry.type === 'pageRedirect');
     if (!redirect) throw new Error('The tab strip did not return a tab URL (' + response.status + ').');
     const url = new URL(decodeURIComponent(redirect.content), location.href);
-    if (url.origin !== location.origin || url.pathname !== location.pathname) throw new Error('The tab URL is for another page.');
+    if (url.origin !== location.origin || !samePage(url.pathname, location.pathname)) throw new Error('The tab URL is for another page.');
     url.hash = '';
     const now = new URL(location.href);
     const key = [...url.searchParams.keys()].find(name => url.searchParams.get(name) === value && now.searchParams.get(name) !== value) || null;
@@ -17988,7 +18033,7 @@ SOFTWARE.
       signal: AbortSignal.timeout?.(requestTimeout)
     });
     const landed = new URL(response.url || url, location.href);
-    if (!response.ok || landed.pathname !== location.pathname) throw new FallbackError('Unexpected tab response (' + response.status + ').');
+    if (!response.ok || !samePage(landed.pathname, location.pathname)) throw new FallbackError('Unexpected tab response (' + response.status + ').');
     const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
     if (doc.querySelector('input.SignInButton') && !document.querySelector('input.SignInButton')) throw new FallbackError('The tab response is a sign-in page.');
     const fetchedForm = doc.getElementById(target.form.id);
@@ -18269,12 +18314,66 @@ SOFTWARE.
 })();
 /* US-CCO-SWITCH:END */
 
+/* US-CCO-COLUMNS:START — marks a CCO tab's layout row
+   data-us-columns="stacked" while its columns cannot sit side by side:
+   one would be under 320px, the width zUnionSuite.css lets them wrap at
+   (US-CCO-COLUMNS). The row's width alone decides, so the mark does not
+   change with the layout it causes. The case page's member card uses it to
+   come first when its row stacks (C14). */
+(function () {
+  'use strict';
+  if (window.UnionSuiteCcoColumns) return;
+
+  const ROWS = '.cco > .RadMultiPage .ContentWizardDisplay > div > .row';
+  const MIN_COLUMN = 320;
+  const watched = new WeakSet();
+
+  // A column's share of its row: col-*-N is N twelfths; no number, all of it.
+  function share(column) {
+    const span = String(column.className).match(/\bcol-(?:xs|sm|md|lg|xl)-(\d+)\b/);
+    return span ? Number(span[1]) / 12 : 1;
+  }
+
+  function update(row) {
+    const width = row.getBoundingClientRect().width;
+    const columns = [...row.children].filter(child => /\bcol-/.test(child.className));
+    const stacked = width > 0 && columns.length > 1 && columns.some(column => share(column) * width < MIN_COLUMN);
+    if (stacked) row.setAttribute('data-us-columns', 'stacked');
+    else row.removeAttribute('data-us-columns');
+  }
+
+  const resizes = typeof ResizeObserver === 'function'
+    ? new ResizeObserver(entries => entries.forEach(entry => update(entry.target)))
+    : null;
+
+  // Rows arrive with the page, a CCO tab switched in place and partial updates.
+  function scan() {
+    document.querySelectorAll(ROWS).forEach(row => {
+      if (!watched.has(row)) {
+        watched.add(row);
+        resizes?.observe(row);
+      }
+      update(row);
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan, {once: true});
+  else scan();
+  document.addEventListener('us:cco-tab-shown', scan);
+  window.addEventListener('load', () => {
+    window.Sys?.WebForms?.PageRequestManager?.getInstance?.()?.add_endRequest?.(scan);
+  }, {once: true});
+
+  window.UnionSuiteCcoColumns = {version: '1.0', refresh: scan};
+})();
+/* US-CCO-COLUMNS:END */
+
 /* US-SECTION-SWITCHER:START */
 (function(){
  'use strict';
  if(window.UnionSuiteSections)return;
  const selector='[data-us-tabs][data-us-tab-adapter="page-sections"]',states=new Map(),memory=new Map();
- let serial=0,pending=false,context=location.pathname;
+ let serial=0,pending=false;
  const indicators=new Map(),animatedLists=new Set();let indicatorFrame=0;
  function scheduleIndicators(list){
   if(list)animatedLists.add(list);
@@ -18344,8 +18443,11 @@ SOFTWARE.
  function refresh(){
   release();
   scheduleIndicators();
-  // CCO selection uses pushState query parameters within the same page.
-  if(context!==location.pathname){context=location.pathname;memory.clear();}
+  // The choice is kept for this document; a reload clears it. A CCO tab
+  // switched in place can change the address path too, e.g. from
+  // /UTNewTheme/_i4u_/... to iMIS's plain /_i4u_/..., and clearing the
+  // choice on that sent the home page back to Tasks after a Search tab
+  // switch (owner, 30 October 2026). It is still the same page.
   if(document.querySelector('.ste-toggle.on')||document.body.classList.contains('EasyEdit'))return;
   const menus=[...document.querySelectorAll(selector)];
   for(const menu of menus){
@@ -18993,7 +19095,7 @@ SOFTWARE.
       root.classList.toggle('us-task--complete',outcome);
       const date=root.querySelector('.us-task__date');
       if(date) date.textContent=saved
-        ? (done?'Actioned '+new Intl.DateTimeFormat(document.documentElement.lang||'en-AU',{day:'numeric',month:'short',year:'numeric'}).format(new Date()):dueLabels.get(root)||'')
+        ? (done?'Actioned '+new Intl.DateTimeFormat(window.UnionSuiteDateLocale?.()||'en-AU',{day:'numeric',month:'short',year:'numeric'}).format(new Date()):dueLabels.get(root)||'')
         : (originalDate||'');
       if(!saved) reportFailure(root);
       window.UnionSuiteIqaFilters?.refresh();schedule();
@@ -23549,8 +23651,9 @@ SOFTWARE.
   }
   function range(period,year=false) {
     const first=new Date(period.start+'T00:00:00Z'),last=new Date(new Date(period.end+'T00:00:00Z').getTime()-86400000);
-    const end=new Intl.DateTimeFormat('en-AU',{day:'numeric',month:'short',...(year?{year:'numeric'}:{}),timeZone:'UTC'}).format(last);
-    return first.getUTCDate()===last.getUTCDate()?end:first.getUTCDate()+'–'+end;
+    // In the website's date order: "1–30 Nov" (en-AU), "Nov 1 – 30" (en-US).
+    const format=new Intl.DateTimeFormat(window.UnionSuiteDateLocale?.()||'en-AU',{day:'numeric',month:'short',...(year?{year:'numeric'}:{}),timeZone:'UTC'});
+    return first.getTime()===last.getTime()?format.format(last):format.formatRange(first,last);
   }
   function apiRoot() {
     if(!window.gWebRoot)return '/api/';

@@ -7,9 +7,8 @@
    it), keeps its form record (ids, name, folder) and every field property
    BeyondFormz stores, and replaces the field list and scripts with the
    design in ../index.html:
-   - the scripts from this folder (form-inject.js, with
-     ../case-create-form.candidate.css written into it; prefill.js;
-     subtypes-button.js; create-button.js);
+   - the scripts from this folder (form-inject.js; prefill.js;
+     create-button.js);
    - the fields in FIELDS below.
    Writes to output.json, or dist/Create-Case-Staff-Form.json beside this
    script. Import the output in BeyondFormz. */
@@ -56,19 +55,15 @@ function field(type, name, settings) {
 
 const IQA = '$/_i4u_/Core/Cases/Value Lists/Case - Form Data/';
 
-const css = read('../case-create-form.candidate.css');
-const inject = read('form-inject.js').replace("'/* US-BF-STYLES */'", JSON.stringify(css));
-if (inject.indexOf('US-BF-STYLES') !== -1) {
-  console.error('form-inject.js: the styles placeholder was not replaced.');
-  process.exit(1);
-}
+// The us-bf-* styles are the theme's (zUnionSuite.css, US-BEYOND-FORMS).
+const inject = read('form-inject.js');
 
 /* The fields, in order. Fields sharing a row-N class sit in one row;
    col-md-N sets the width. The form's script adds the us-bf-* classes it
    needs to the field wrappers, which className cannot reach. */
 const FIELDS = [
   field('autoexecute', 'autoexecute-1743469376028-0', {
-    executeFlow: 'Cases/Create-Prefill',
+    executeFlow: 'Cases/Union-Suite/Create-Case-Staff-Prefill',
     javaScript: read('prefill.js')
   }),
 
@@ -120,11 +115,13 @@ const FIELDS = [
 
   field('header', null, {label: 'Handling', subtype: 'h3', className: 'us-bf-section'}),
 
-  field('select', 'CaseStaffMembers', {
-    label: 'Lead staff member',
+  // Who can see it before the staff (owner, 2 November 2026): Individual
+  // asks for someone on the case, and the fields that answer it follow.
+  field('select', 'CaseAccessLevel', {
+    label: 'Who can see it',
     className: 'form-control row-5 col-md-6',
-    required: false,
-    iqaPathWithParameters: IQA + 'Get Staff Members'
+    required: true,
+    iqaPathWithParameters: IQA + 'Case Value List - Access Level'
   }),
   field('select', 'CasePriority', {
     label: 'Priority',
@@ -133,11 +130,11 @@ const FIELDS = [
     iqaPathWithParameters: IQA + 'Case Value List - Priority'
   }),
 
-  field('select', 'CaseAccessLevel', {
-    label: 'Who can see it',
-    className: 'form-control row-6 col-md-12',
-    required: true,
-    iqaPathWithParameters: IQA + 'Case Value List - Access Level'
+  field('select', 'CaseStaffMembers', {
+    label: 'Lead staff member',
+    className: 'form-control row-6 col-md-6',
+    required: false,
+    iqaPathWithParameters: IQA + 'Get Staff Members'
   }),
 
   // A new case is New; the FormFields rules leave hidden fields alone.
@@ -148,7 +145,7 @@ const FIELDS = [
   field('button', 'CreateCaseButton', {
     label: 'Create case',
     className: 'btn-primary btn PrimaryButton',
-    executeFlow: 'Cases/Create-Case-Staff',
+    executeFlow: 'Cases/Union-Suite/Create-Case-Staff',
     labelHoldingMessage: 'Creating case…',
     javaScript: read('create-button.js')
   }),
@@ -156,11 +153,6 @@ const FIELDS = [
   field('urlParameters', 'NoteOrdinal', {}),
   field('urlParameters', 'InteractionOrdinal', {}),
   field('urlParameters', 'MemberID', {}),
-
-  field('button', 'SubTypeSession', {
-    label: 'Load subtypes',
-    javaScript: read('subtypes-button.js')
-  }),
 
   field('hidden', 'CurrentDate', {}),
   field('hidden', 'Module', {}),

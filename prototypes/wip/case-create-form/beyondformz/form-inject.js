@@ -3,26 +3,30 @@
    Maintained here; build-form.cjs writes it into the BeyondFormz export.
    Do not edit the copy in BeyondFormz without bringing the change back.
 
-   The form's fields are plain BeyondFormz fields. This script:
-   - adds the us-bf-* styles (until they move to the theme's
-     US-BEYOND-FORMS section);
+   The form's fields are plain BeyondFormz fields; the us-bf-* classes it
+   uses are styled by the theme (zUnionSuite.css, US-BEYOND-FORMS). This
+   script:
    - shows the form once the prefill answers, so fields never pop in one
      by one;
    - applies the FormFields rules (UnionTemplate.FormFields, Cases /
      CreateCaseStaff): Visible 0 hides a field, IsRequired marks it,
      Editable 0 disables it. Fields without a rule stay as built;
    - draws who the case is for, and the note it starts from;
-   - filters Subtype by the chosen types, and shows it only when there is
-     something to pick;
+   - reads every subtype from an IQA, filters Subtype by the chosen types,
+     and shows it only when there is something to pick;
    - fills Workplace from the prefill's Workplaces (hidden until it has some);
-   - starts Lead staff as the signed-in user and Priority at Normal;
-   - draws Access as three buttons, Individual making Lead staff required;
+   - starts Lead staff empty and Priority at Normal, and adds "Assign me to
+     this case" while the lead is empty or someone else;
+   - draws Access as three buttons; an Individual case needs a lead or
+     Assign me;
+   - sends the chosen types', lead's, workplace's and priority's names for
+     the change log;
    - checks the required fields when Create case is pressed, before
      BeyondFormz sends anything, and opens the new case once it is saved.
 
    The other field scripts hand their answers to window.usCreateCase:
-   the prefill (autoexecute) calls prefill(data), the hidden SubTypeSession
-   button calls setSubTypes(list), Create case calls created(data). */
+   the prefill (autoexecute) calls prefill(data), Create case calls
+   created(data). */
 
 (function () {
   'use strict';
@@ -38,15 +42,11 @@
 
   /* ---------- Settings ---------- */
 
-  // Replaced by build-form.cjs with case-create-form.candidate.css.
-  const STYLES = '/* US-BF-STYLES */';
-
   // What a missing required field says. Others say "Fill this in."
   const MISSING = {
     CaseName: 'Give the case a title.',
     CaseTypes: 'Choose at least one type.',
     CaseDescription: 'Say what happened.',
-    CaseStaffMembers: 'Choose a lead: an Individual case is seen only by its staff.',
     CaseAccessLevel: 'Choose who can see the case.',
     CasePriority: 'Choose a priority.'
   };
@@ -56,6 +56,12 @@
     Team: {icon: 'ti-users', hint: 'Only the Case Team can see it. Managers see every case.'},
     Individual: {icon: 'ti-lock', hint: 'Only staff on this case can see it. Managers see every case.'}
   };
+
+  // Every subtype (Ordinal, TagName, TagStatus, ParentTagOrdinal,
+  // ParentTagName). Its ParentTagOrdinal filter is optional but defaults
+  // to 0, which returns nothing: sent blank, it returns every subtype
+  // (dev tenant, 2 November 2026).
+  const SUBTYPES_QUERY = '$/_i4u_/Core/Cases/Layouts v2/API - Value List - Subtypes';
 
   const NORMAL_PRIORITY = '3';
   const NOTE_PREFIX = 'Created from Note: ';
@@ -96,6 +102,7 @@
       return '';
     }
   }
+
   /* The current website's path, e.g. "/UTTemplate", from gWebSiteRoot or
      the __ClientContext websiteRoot. When several websites share a domain,
      a bare shortcut such as /Cases_ManageCase opens the default website,
@@ -253,9 +260,24 @@
     }
   }
 
-  /* Required fields that are shown and editable, and empty. */
+  /* After Create case, how many fields still need filling in: the fields
+     showing an error, and the staff group (one field; Lead staff is where
+     it is fixed). It goes down as each is filled, and goes once none are
+     left. Only called while errors from Create are showing. */
+  function showMissingCount() {
+    const count = form.querySelectorAll('[aria-invalid=true]').length + (staffMissed ? 1 : 0);
+    if (!count) {
+      setMessage('');
+    } else {
+      setMessage(count === 1 ? 'One field needs filling in.' : count + ' fields need filling in.', 'danger');
+    }
+  }
+
+  /* Required fields that are shown and editable, and empty. An Individual
+     case also needs someone on it (nobodyOnIt), which the staff group's
+     message answers rather than a field's error. */
   function missingFields() {
-    return [...form.querySelectorAll('[required]')].filter(el => {
+    const missing = [...form.querySelectorAll('[required]')].filter(el => {
       if (el.disabled || el.type === 'hidden') {
         return false;
       }
@@ -265,6 +287,12 @@
       }
       return !hasValue(el);
     });
+    return missing;
+  }
+
+  // An Individual case with no lead and Assign me not ticked.
+  function nobodyOnIt() {
+    return access.value === 'Individual' && !hasValue(lead) && !assignMeBox.checked;
   }
 
   function fieldName(el) {
@@ -377,8 +405,26 @@
     title.after(forLine, origin);
   }
 
+  /* No member on the page (no ID in the address): a case needs one, so the
+     form says where to start instead, and Create case cannot be pressed
+     (owner, 29 October 2026). The create flow refuses one too. */
+  const noMember = String((control('MemberID') || {}).value || '').trim() === '';
+  const noMemberNote = document.createElement('p');
+  noMemberNote.className = 'us-bf-warning';
+  noMemberNote.id = 'us-bf-no-member';
+  noMemberNote.setAttribute('role', 'status');
+  noMemberNote.innerHTML = '<i class="ti ti-alert-triangle" aria-hidden="true"></i><span>No member is chosen, so a case cannot be created here. ' +
+    'Open the member\'s profile and use Create case on their Cases list.</span>';
+  noMemberNote.hidden = !noMember;
+  if (title) {
+    forLine.after(noMemberNote);
+  }
+
+  // Only for the member the page names (its ID): an older prefill, asked
+  // with no ID, sent back the first contact it found (owner, 29 October 2026).
   function drawMember(member) {
-    if (!member || !member.Name) {
+    const pageMember = String((control('MemberID') || {}).value || '').trim();
+    if (!member || !member.Name || pageMember === '' || String(member.ID || '').trim() !== pageMember) {
       return;
     }
     const tone = member.StandingTone || 'warning';
@@ -409,7 +455,7 @@
     if (description) {
       description.value = text;
     }
-    const by = note ? [note.CreatedOn, note.CreatedBy].filter(Boolean).join(' · ') : '';
+    const by = note ? [fullDate(note.CreatedOn), note.CreatedBy].filter(Boolean).join(' · ') : '';
     origin.innerHTML = '<span class="us-bf-origin__head">From a note' + (by ? ', ' + escapeHtml(by) : '') +
       '. It will be linked to this case.</span><span class="us-bf-origin__text">' + escapeHtml(text) + '</span>';
     origin.hidden = false;
@@ -418,6 +464,20 @@
   /* ---------- Sections ---------- */
 
   form.querySelectorAll('h3').forEach(heading => heading.classList.add('us-bf-section'));
+
+  /* ---------- Searchable lists ---------- */
+
+  // A single list (Lead staff, Workplace) opens with the cursor in its
+  // search box, so typing filters at once (owner, 2 November 2026: on the
+  // dev tenant a second click was needed to search).
+  $(form).on('select2:open', () => {
+    setTimeout(() => {
+      const search = document.querySelector('.select2-container--open .select2-search--dropdown .select2-search__field');
+      if (search) {
+        search.focus();
+      }
+    }, 0);
+  });
 
   /* ---------- Type and Subtype ---------- */
 
@@ -451,60 +511,40 @@
 
   $(types).on('change', refreshSubTypes);
 
-  /* Every subtype, as {value, label, ParentTag}. Also takes the tag IQA's
-     names (Ordinal, TagName, ParentTagOrdinal) and a list of lists, as
-     the old SubTypeFire answer was. */
-  function setSubTypes(list) {
-    const rows = [].concat(...(Array.isArray(list) ? list : []).map(row => (Array.isArray(row) ? row : [row])));
-    allSubTypes = rows
-      .map(row => ({
-        value: row.value != null ? row.value : row.Ordinal,
-        label: row.label != null ? row.label : row.TagName,
-        ParentTag: row.ParentTag != null ? row.ParentTag : row.ParentTagOrdinal
-      }))
+  /* Every subtype a new case can take, as {value, label, ParentTag}, from
+     the subtypes IQA's rows. A disabled tag (TagStatus false) stays on the
+     cases that have it but is not offered here: a new case has none yet. */
+  function setSubTypes(rows) {
+    allSubTypes = (Array.isArray(rows) ? rows : [])
+      .filter(row => row.TagStatus !== false && String(row.TagStatus).toLowerCase() !== 'false')
+      .map(row => ({value: row.Ordinal, label: row.TagName, ParentTag: row.ParentTagOrdinal}))
       .filter(row => row.value != null && row.label != null && row.ParentTag != null);
-    subTypesLoaded = true;
-    clearTimeout(subTypesTimer);
-    if (!allSubTypes.length) {
-      console.warn('Create case: the subtypes answer had no usable rows.', list);
-    }
     refreshSubTypes();
   }
 
-  /* The hidden button that fetches every subtype (Cases/SetSessionStorage).
-     Pressed once the prefill has answered: pressed while the form was
-     still loading, BeyondFormz did not send it (dev tenant, 29 October
-     2026). The old form's copy in session storage fills the list in the
-     meantime. */
-  const subTypeButton = document.getElementById('SubTypeSession');
-  let subTypesLoaded = false;
-  let subTypesRequested = false;
-  let subTypesTimer = 0;
-
-  if (subTypeButton) {
-    subTypeButton.closest('.form-group').hidden = true;
-  }
-
-  function requestSubTypes() {
-    if (subTypesLoaded || subTypesRequested || !subTypeButton) {
-      return;
-    }
-    subTypesRequested = true;
-    try {
-      const cached = parse(sessionStorage.getItem('CaseSubTypes'));
-      if (Array.isArray(cached) && cached.length) {
-        setSubTypes(cached);
-        subTypesLoaded = false;
-      }
-    } catch (error) {
-      // No session storage: wait for the answer.
-    }
-    $(subTypeButton).trigger('click');
-    subTypesTimer = setTimeout(() => {
-      if (!subTypesLoaded) {
-        console.warn('Create case: Cases/SetSessionStorage did not answer, so Subtype has nothing to show.');
-      }
-    }, 8000);
+  // Read once, as the script starts: Subtype stays closed until a type is
+  // chosen, so nothing waits for it.
+  function loadSubTypes() {
+    const token = document.getElementById('__RequestVerificationToken');
+    const search = new URLSearchParams({QueryName: SUBTYPES_QUERY, ParentTagOrdinal: '', limit: '500'});
+    fetch('/api/query?' + search, {
+      credentials: 'same-origin',
+      headers: {Accept: 'application/json', RequestVerificationToken: token ? token.value : ''}
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const rows = (data && data.Items && data.Items.$values) || [];
+        if (!rows.length) {
+          console.warn('Create case: the subtypes IQA returned no rows, so Subtype has nothing to show.');
+        }
+        setSubTypes(rows);
+      })
+      .catch(error => console.warn('Create case: the subtypes IQA failed (' + error.message + '), so Subtype has nothing to show.'));
   }
 
   /* ---------- Workplace ---------- */
@@ -517,29 +557,86 @@
     workplaceField.hidden = true;
   }
 
-  function monthYear(value) {
-    if (!value) {
-      return '';
+  /* Dates show in the website's iMIS culture (gCurrentCultureCode, set per
+     website), so a US client's site shows US dates (owner, 4 November
+     2026). Without one, en-AU. The form runs without the theme, so this is
+     its own copy of US-DATE-LOCALE in zUnionSuite.js. */
+  function dateLocale() {
+    const culture = String(window.gCurrentCultureCode || '').trim();
+    try {
+      if (culture && Intl.DateTimeFormat.supportedLocalesOf(culture).length) {
+        return culture;
+      }
+    } catch (error) {
+      // An invalid code: fall back.
     }
-    const date = new Date(value);
-    return isNaN(date) ? String(value) : date.toLocaleDateString('en-AU', {month: 'short', year: 'numeric'});
+    return 'en-AU';
   }
 
-  /* One job, as the jobs IQA returns it ("Workplace Name", "Member Job
-     Status", "Job Start Date", "Job End Date") or with short names. */
+  // Whether the website writes the month before the day (en-US: 11/4/2026).
+  function monthFirst() {
+    const parts = new Intl.DateTimeFormat(dateLocale()).formatToParts(new Date(2026, 10, 4));
+    const order = parts.map(part => part.type);
+    return order.indexOf('month') < order.indexOf('day');
+  }
+
+  // A date from ISO, or as iMIS writes it in the website's order
+  // (d/MM/yyyy, or M/d/yyyy on a US site). Null when it isn't one.
+  function readDate(value) {
+    const raw = String(value ?? '').trim();
+    const local = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (local) {
+      const [day, month] = monthFirst() ? [+local[2], +local[1]] : [+local[1], +local[2]];
+      return new Date(+local[3], month - 1, day);
+    }
+    // A date alone (2026-11-04) is the local day, not UTC midnight.
+    const isoDay = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const date = isoDay ? new Date(+isoDay[1], +isoDay[2] - 1, +isoDay[3]) : new Date(raw);
+    return raw && !isNaN(date) ? date : null;
+  }
+
+  // A date as month and year; other text as it is.
+  function monthYear(value) {
+    const raw = String(value ?? '').trim();
+    const date = readDate(raw);
+    return date ? date.toLocaleDateString(dateLocale(), {month: 'short', year: 'numeric'}) : raw;
+  }
+
+  // A date as day, month and year; other text (an older flow's
+  // "4 Nov 2026") as it is.
+  function fullDate(value) {
+    const raw = String(value ?? '').trim();
+    const date = readDate(raw);
+    return date ? date.toLocaleDateString(dateLocale(), {day: 'numeric', month: 'short', year: 'numeric'}) : raw;
+  }
+
+  // A column by any of its names, whatever its case, spaces, underscores or
+  // hyphens, as the case page's jobs IQA is read (Workplace Name,
+  // WorkplaceName).
+  function column(row, ...names) {
+    const key = name => String(name).replace(/[\s_-]/g, '').toLowerCase();
+    const wanted = names.map(key);
+    const found = Object.keys(row).find(name => wanted.indexOf(key(name)) !== -1);
+    return found === undefined || row[found] == null ? '' : String(row[found]).trim();
+  }
+
+  /* One job, as the jobs IQA returns it: the columns of the case page's
+     API - Manage Case - Primary Contacts Workplaces. */
   function job(row) {
-    const status = String(row['Member Job Status'] || row.Status || 'Active');
-    const start = monthYear(row['Job Start Date'] || row.Start);
-    const end = monthYear(row['Job End Date'] || row.End);
+    const status = column(row, 'Member Job Status', 'Status') || 'Active';
+    const start = monthYear(column(row, 'Job Start Date', 'Start'));
+    const end = monthYear(column(row, 'Job End Date', 'End'));
     const group = /finish|former/i.test(status) ? 'former' : /not started/i.test(status) ? 'upcoming' : 'current';
     const dates = group === 'former'
       ? [start, end].filter(Boolean).join(' – ')
       : group === 'upcoming' ? (start ? 'Starts ' + start : '') : (start ? 'Since ' + start : '');
+    const employer = [column(row, 'Work-Employer', 'Employer'), column(row, 'Work-Classification', 'Classification')].filter(Boolean);
+    const about = employer.length ? employer : [column(row, 'Workplace Type')].filter(Boolean);
     return {
       group,
-      id: String(row.WorkplaceID || row['Workplace ID'] || ''),
-      text: row['Workplace Name'] || row.Workplace || '',
-      line: [row.Employer, row.Classification, dates].filter(Boolean).join(' · ')
+      id: column(row, 'Workplace ID', 'WorkplaceID', 'ID'),
+      text: column(row, 'Workplace Name', 'Workplace'),
+      line: [...about, dates].filter(Boolean).join(' · ')
     };
   }
 
@@ -572,33 +669,57 @@
     workplaceField.hidden = false;
   }
 
-  /* ---------- Lead staff and Priority ---------- */
+  /* ---------- Lead staff, Assign me, and Priority ---------- */
 
   const lead = control('CaseStaffMembers');
-  let leadPartyId = signedInPartyId();
+  const leadField = wrapper('CaseStaffMembers');
+  const me = signedInPartyId();
+  const leadOptions = {width: '100%', placeholder: 'No lead yet', allowClear: true};
 
-  $(lead).select2({width: '100%', placeholder: 'No lead yet', allowClear: true});
+  $(lead).select2(leadOptions);
 
-  // Select2 copies each option's text once, so "(you)" goes in first.
-  function setLead(partyId) {
-    leadPartyId = partyId;
-    if (!filled(lead)) {
-      return;
-    }
-    // An empty, disabled first option: a lead left empty is not sent,
-    // which the create flow reads as "no lead".
+  // Lead staff starts empty (owner, 29 October 2026). The signed-in user is
+  // marked "(you)" in the list; Select2 copies each option's text once, so
+  // the mark goes in before the list is drawn again.
+  whenFilled(lead, () => {
+    // An empty, disabled first option: a lead left empty is not sent, which
+    // the create flow reads as "no lead".
     $(lead).find('option[value=""]').remove();
     $(lead).prepend('<option value="" disabled></option>');
-    const option = partyId && lead.querySelector('option[value="' + partyId + '"]');
-    if (option && !/\(you\)$/.test(option.textContent)) {
-      option.textContent += ' (you)';
+    const mine = me && lead.querySelector('option[value="' + me + '"]');
+    if (mine && !/\(you\)$/.test(mine.textContent)) {
+      mine.textContent += ' (you)';
     }
     $(lead).select2('destroy');
-    $(lead).select2({width: '100%', placeholder: 'No lead yet', allowClear: true});
-    $(lead).val(option ? partyId : '').trigger('change');
+    $(lead).select2(leadOptions);
+    $(lead).val('').trigger('change');
+  });
+
+  /* "Assign me to this case" (owner, 29 October 2026): adds the signed-in
+     user to the case's staff with no type. A field this script adds, which
+     BeyondFormz sends with the rest (AssignMe=1 when ticked; nothing when
+     not). Shown while the lead is empty or someone else. */
+  // A div around the label: the theme styles a field's own label (a label
+  // straight inside .form-group) as its heading.
+  const assignMe = document.createElement('div');
+  assignMe.className = 'us-bf-check';
+  assignMe.innerHTML = '<label><input type="checkbox" name="AssignMe" value="1"><span>Assign me to this case</span></label>';
+  const assignMeBox = assignMe.querySelector('input');
+  leadField.appendChild(assignMe);
+
+  function showAssignMe() {
+    const show = me !== '' && $(lead).val() !== me;
+    if (show) {
+      assignMe.removeAttribute('data-closed');
+    } else {
+      assignMe.setAttribute('data-closed', '');
+      assignMeBox.checked = false;
+    }
+    assignMeBox.disabled = !show;
   }
 
-  whenFilled(lead, () => setLead(leadPartyId));
+  $(lead).on('change', showAssignMe);
+  showAssignMe();
 
   const priority = control('CasePriority');
   whenFilled(priority, () => {
@@ -658,8 +779,71 @@
       }
     });
     accessHint.textContent = (ACCESS[value] || {}).hint || '';
-    setRequired('CaseStaffMembers', value === 'Individual');
+    updateAccessWarning();
   }
+
+  /* Individual with nobody on the case (owner, 29 October 2026): a warning
+     as soon as it is chosen, not only when Create case is pressed. It goes
+     once a lead is chosen or Assign me ticked, and comes back if both are
+     undone. One message, not a field error as well (owner, 2 November
+     2026): Create case with nobody on it turns the same line red. */
+  const accessWarning = document.createElement('p');
+  accessWarning.className = 'us-bf-warning';
+  accessWarning.id = 'CaseAccessLevel-warning';
+  accessWarning.setAttribute('role', 'status');
+  accessWarning.setAttribute('data-closed', '');
+
+  /* On an Individual case, Lead staff and Assign me are framed as one
+     group, titled "Staff on this case * (one of)", with the warning inside
+     it: the requirement is the pair's, not either field's (owner,
+     2 November 2026). Marks only: the check on Create decides. */
+  const leadRow = leadField.closest('.row') || leadField;
+  const staffGroup = document.createElement('div');
+  staffGroup.className = 'us-bf-staff';
+  staffGroup.setAttribute('role', 'group');
+  staffGroup.setAttribute('aria-labelledby', 'us-bf-staff-title');
+  staffGroup.innerHTML = '<p class="us-bf-staff__title" id="us-bf-staff-title" data-closed>Staff on this case' +
+    '<span class="formbuilder-required">*</span><span class="us-bf-optional">(one of)</span></p>';
+  leadRow.before(staffGroup);
+  staffGroup.append(leadRow, accessWarning);
+  const staffOneOf = staffGroup.querySelector('.us-bf-optional');
+
+  // Set when Create case is pressed with nobody on the case; cleared once
+  // someone is.
+  let staffMissed = false;
+
+  function updateAccessWarning() {
+    const individual = access.value === 'Individual';
+    // Lead staff is not "(optional)" on an Individual case. markOptional
+    // adds the mark after the prefill, so it is looked up each time.
+    const leadOptional = leadField.querySelector(':scope > label .us-bf-optional');
+    staffGroup.toggleAttribute('data-required', individual);
+    staffGroup.querySelector('.us-bf-staff__title').toggleAttribute('data-closed', !individual);
+    // With Assign me not offered, Lead staff is the only way on.
+    staffOneOf.hidden = assignMeBox.disabled;
+    if (leadOptional) {
+      leadOptional.hidden = individual;
+    }
+    // The title and the hint above say why; the line says only what to do.
+    if (nobodyOnIt()) {
+      const ask = assignMeBox.disabled ? 'Choose a lead staff member.' : 'Choose a lead staff member or tick Assign me.';
+      const icon = staffMissed ? 'ti-alert-circle' : 'ti-alert-triangle';
+      accessWarning.innerHTML = '<i class="ti ' + icon + '" aria-hidden="true"></i><span>' + escapeHtml(ask) + '</span>';
+      accessWarning.toggleAttribute('data-error', staffMissed);
+      accessWarning.removeAttribute('data-closed');
+      group.setAttribute('aria-describedby', accessHint.id + ' ' + accessWarning.id);
+    } else {
+      accessWarning.setAttribute('data-closed', '');
+      group.setAttribute('aria-describedby', accessHint.id);
+      if (staffMissed) {
+        staffMissed = false;
+        showMissingCount();
+      }
+    }
+  }
+
+  $(lead).on('change', updateAccessWarning);
+  assignMeBox.addEventListener('change', updateAccessWarning);
 
   group.addEventListener('click', event => {
     const button = event.target.closest('button');
@@ -683,9 +867,40 @@
 
   /* ---------- Date of incident ---------- */
 
+  // No later than today: the picker greys out the days after it. Under the
+  // field, quick dates as the task form draws them (UnionSuiteForms.js
+  // dateHtml): Today, and Clear date while there is a date.
   const incident = control('DateIncident');
   if (incident) {
-    incident.max = new Date().toLocaleDateString('en-CA');
+    const today = () => new Date().toLocaleDateString('en-CA');
+    incident.max = today();
+
+    const quick = document.createElement('div');
+    quick.className = 'us-bf-quick';
+    quick.setAttribute('role', 'group');
+    quick.setAttribute('aria-label', 'Quick dates');
+    quick.innerHTML =
+      '<button type="button" data-us-today>Today</button>' +
+      '<button type="button" class="us-bf-quiet" data-us-clear-date hidden><i class="ti ti-x" aria-hidden="true"></i> Clear date</button>';
+    incident.after(quick);
+
+    const clear = quick.querySelector('[data-us-clear-date]');
+    const syncClear = () => {
+      clear.hidden = !incident.value;
+    };
+
+    quick.addEventListener('click', event => {
+      const button = event.target.closest('button');
+      if (!button) {
+        return;
+      }
+      incident.value = button.hasAttribute('data-us-today') ? today() : '';
+      // Native events, so jQuery's handlers and plain listeners both hear.
+      incident.dispatchEvent(new Event('input', {bubbles: true}));
+      incident.dispatchEvent(new Event('change', {bubbles: true}));
+    });
+    incident.addEventListener('input', syncClear);
+    incident.addEventListener('change', syncClear);
   }
 
   function stampCurrentDate() {
@@ -700,6 +915,32 @@
   }
 
   stampCurrentDate();
+
+  /* Names of what was chosen, for the change log only: the create flow
+     logs "Discrimination" rather than 60. Fields this script adds, sent
+     with the rest. */
+  function stampNames() {
+    const chosenText = select => [...select.selectedOptions].map(option => option.textContent.replace(/ \(you\)$/, '')).join(', ');
+    const mine = me && lead.querySelector('option[value="' + me + '"]');
+    const names = {
+      CaseTypeNames: chosenText(types),
+      CaseSubTypeNames: chosenText(subTypes),
+      LeadStaffName: hasValue(lead) ? chosenText(lead) : '',
+      AssignMeName: assignMeBox.checked && mine ? mine.textContent.replace(/ \(you\)$/, '') : '',
+      WorkplaceName: workplace && hasValue(workplace) ? chosenText(workplace) : '',
+      PriorityName: priority ? chosenText(priority) : ''
+    };
+    Object.keys(names).forEach(name => {
+      let field = form.querySelector('input[type=hidden][name="' + name + '"]');
+      if (!field) {
+        field = document.createElement('input');
+        field.type = 'hidden';
+        field.name = name;
+        form.appendChild(field);
+      }
+      field.value = names[name];
+    });
+  }
 
   /* ---------- Footer: message, Cancel, Create case ---------- */
 
@@ -724,6 +965,13 @@
   cancelField.appendChild(cancel);
   actions.append(cancelField, createField);
 
+  // Without a member, Create case stays unavailable, saying why.
+  if (noMember) {
+    createButton.disabled = true;
+    createButton.setAttribute('aria-describedby', noMemberNote.id);
+    createButton.title = 'Open Create case from a member\'s profile';
+  }
+
   /* ---------- Create case ---------- */
 
   const createLabel = 'Create case';
@@ -740,7 +988,7 @@
       : createLabel;
     // After BeyondFormz's own click handler has started the save.
     setTimeout(() => {
-      createButton.disabled = on;
+      createButton.disabled = on || noMember;
     }, 0);
     if (on) {
       saveTimer = setTimeout(() => {
@@ -760,27 +1008,31 @@
       event.preventDefault();
       event.stopImmediatePropagation();
     };
-    if (saving) {
+    if (saving || noMember) {
       stop();
       return;
     }
 
     form.querySelectorAll('[aria-invalid=true]').forEach(clearError);
     const missing = missingFields();
-    if (missing.length) {
+    staffMissed = nobodyOnIt();
+    updateAccessWarning();
+    if (missing.length || staffMissed) {
       stop();
       missing.forEach(el => showError(el, MISSING[fieldName(el)] || 'Fill this in.'));
-      setMessage(missing.length === 1 ? 'One field needs filling in.' : missing.length + ' fields need filling in.', 'danger');
-      if ($(missing[0]).data('select2')) {
-        $(missing[0]).select2('open');
+      showMissingCount();
+      const first = missing[0] || lead;
+      if ($(first).data('select2')) {
+        $(first).select2('open');
       } else {
-        missing[0].focus();
+        first.focus();
       }
       return;
     }
 
     setMessage('');
     stampCurrentDate();
+    stampNames();
     busy(true);
   }, true);
 
@@ -789,18 +1041,27 @@
     const el = event.target;
     if (el.getAttribute('aria-invalid') === 'true' && hasValue(el)) {
       clearError(el);
-      if (!form.querySelector('[aria-invalid=true]')) {
-        setMessage('');
-      }
+      showMissingCount();
     }
   });
 
-  /* The create flow's answer. {CaseID, CaseNum}, or today's message with
-     the case link: either way, open the case. Anything else is an error,
-     which the flow has already written into the message. */
+  /* The create flow's answer. {CaseID, CaseNum}, or the old flow's message
+     with the case link: either way, open the case. Error (nothing saved) and
+     Partial (saved, with a step missing; its message links the case) stay
+     on the form with the flow's message, which BeyondFormz has written in. */
   function created(answer) {
     const data = parse(answer) || {};
     const html = String(data['class-html-Message'] || '');
+    if (data.Error || data.Partial) {
+      busy(false);
+      if (message) {
+        message.dataset.tone = 'danger';
+      }
+      if (!html) {
+        setMessage("The case wasn't created. Try again; if it keeps happening, contact an administrator.", 'danger');
+      }
+      return;
+    }
     let url = '';
     let caseId = data.CaseID || '';
     if (data.CaseID && data.CaseNum) {
@@ -839,46 +1100,32 @@
     markOptional();
     drawMember(parse(data.Member));
     drawNote(parse(data.Note));
-    if (data.SubTypes) {
-      setSubTypes(parse(data.SubTypes));
-    } else {
-      requestSubTypes();
-    }
     const member = parse(data.Member) || {};
-    setWorkplaces(parse(data.Workplaces), member.Name);
-    const me = parse(data.Me);
-    if (me && me.ID && !hasValue(lead)) {
-      setLead(String(me.ID));
+    // Jobs belong to the page's member; without one there are none to show.
+    if (!noMember) {
+      setWorkplaces(parse(data.Workplaces), member.Name);
     }
+    // markOptional has just added Lead staff's "(optional)".
+    updateAccessWarning();
     prefilled = true;
     revealWhenReady();
   }
 
   /* ---------- Start ---------- */
 
-  if (!document.getElementById('us-bf-styles')) {
-    const style = document.createElement('style');
-    style.id = 'us-bf-styles';
-    style.textContent = STYLES;
-    document.head.appendChild(style);
-  }
-
   form.setAttribute('data-us-loading', '');
   revealTimer = setTimeout(() => {
     markOptional();
+    updateAccessWarning();
     revealForm();
-    requestSubTypes();
   }, SHOW_ANYWAY_AFTER);
+  loadSubTypes();
 
-  window.usCreateCase = {prefill, setSubTypes, created};
+  window.usCreateCase = {prefill, created};
 
   // Answers that arrived before this script ran.
   if (window.usCreateCasePending) {
     prefill(window.usCreateCasePending);
     delete window.usCreateCasePending;
-  }
-  if (window.usCreateCaseSubTypesPending) {
-    setSubTypes(window.usCreateCaseSubTypesPending);
-    delete window.usCreateCaseSubTypesPending;
   }
 })();

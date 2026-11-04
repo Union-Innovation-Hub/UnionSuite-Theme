@@ -35,6 +35,7 @@ Repo: `Union-Innovation-Hub/UnionSuite-Theme` on GitHub, branch `main` (commit s
 | [`README.md`](README.md) | Project overview and current feature status | yes |
 | [`PRODUCT.md`](PRODUCT.md) | Product context: users, constraints, design principles | yes |
 | [`TODO.md`](TODO.md) | Open work across the theme | yes |
+| [`DEPLOY.md`](DEPLOY.md) | What's built but not yet in iMIS, and what has gone in | yes |
 
 ## The theme — `Theme/`
 
@@ -112,7 +113,7 @@ Recents), `list-search-and-paging/`, `cco-inline-loading/`, `task-rows/`.
 |---|---|
 | `agreement-page/` | WIP, not approved |
 | `case-page/` | WIP; parts are in the theme. Start with `HANDOVER.md` |
-| `case-create-form/` | Streamlined staff Create case BeyondFormz form: mock-up, and the export build in `beyondformz/` (not yet imported) |
+| `case-create-form/` | Streamlined staff Create case BeyondFormz form: mock-up, the form's export build (`beyondformz/`, imported on dev) and its prefill and create flows (`flows/`, not yet imported). Its `us-bf-*` styles are in the theme (`US-BEYOND-FORMS`, 2 November 2026) |
 | `contact-page-v3/` | Approved direction; paused, see its README handover |
 | `contact-page-v2/` | Earlier layout prototype; v3 is the approved direction |
 | `activity-cards/`, `dues-adjustments/`, `membership-stats-filters/`, `bulletin-markdown/`, `login-screen/`, `workplace-reassign/` | WIP mockups, not in the theme |

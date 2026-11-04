@@ -88,7 +88,9 @@
     if (!record || !forms) return '';
     const by = String(forms.column(record, 'AddedBy') ?? '').trim();
     const day = forms.dateOnly(forms.column(record, 'AddedOn'));
-    const on = day ? new Date(day + 'T00:00:00').toLocaleDateString('en-AU', {day: 'numeric', month: 'long', year: 'numeric'}) : '';
+    // In the website's date format (US-DATE-LOCALE in zUnionSuite.js).
+    const locale = root.UnionSuiteDateLocale ? root.UnionSuiteDateLocale() : 'en-AU';
+    const on = day ? new Date(day + 'T00:00:00').toLocaleDateString(locale, {day: 'numeric', month: 'long', year: 'numeric'}) : '';
     if (!by && !on) return '';
     return 'Added' + (by ? ' by ' + by : '') + (on ? ' on ' + on : '');
   }

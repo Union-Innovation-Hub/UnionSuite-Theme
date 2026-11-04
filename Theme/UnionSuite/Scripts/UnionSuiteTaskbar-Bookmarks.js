@@ -1678,14 +1678,9 @@
     const stripItems = document.createElement('div');
     stripItems.className = 'us-bookmarks-items';
     for (const route of routes.slice(0, settings.stripLimit)) stripItems.append(createPin(route));
-    if (!routes.length) {
-      stripItems.append(createButton(
-        'Add bookmarks',
-        icon('star') + '<span>Add bookmarks</span>',
-        'us-feature-button',
-        event => openPanel('palette', event.currentTarget)
-      ));
-    }
+    // With no bookmarks the header strip stays empty: Go to… beside it opens
+    // the same palette (owner, 4 November 2026). The bookmarks bar below
+    // keeps its Add bookmarks prompt.
     strip.append(stripItems);
     if (hasUnsavedChange) strip.setAttribute('data-unsaved', 'true');
 
