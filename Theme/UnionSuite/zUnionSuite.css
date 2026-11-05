@@ -21156,9 +21156,6 @@ a[data-us-comms-log-held] {
   --size: .42px;
 }
 
-/* The star on a query row in the folder list sits in the row's icon group,
-   styled with the folder star in US-OB-BOOKMARKS. */
-
 @media (prefers-reduced-motion: reduce) {
   .us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"],
   .us-iqa-finder__item,
@@ -21180,14 +21177,14 @@ a[data-us-comms-log-held] {
 /* US-IQA-FINDER:END */
 
 /* US-OB-BOOKMARKS:START — the iMIS object browser (IQA browser, content
-   designer, document browser): Copy path and bookmark icons on the list rows,
-   and the Bookmarks pane above the folder tree
-   (Scripts/ObjectBrowser-Bookmarks.js). */
+   designer, document browser): Copy path on the list rows, Copy path and the
+   bookmark star for the open folder in the address box, and the Bookmarks
+   pane above the folder tree (Scripts/ObjectBrowser-Bookmarks.js). */
 
-/* Room at the row's right end for the icons, held to its vertical middle. */
+/* Room at the row's right end for Copy path, held to its vertical middle. */
 .us-ob-row > td {
   position: relative;
-  padding-right: 76px;
+  padding-right: 44px;
 }
 
 .us-ob-actions {
@@ -21199,11 +21196,9 @@ a[data-us-comms-log-held] {
   transform: translateY(-50%);
 }
 
-/* Shown on the selected row, on keyboard focus, and always on a starred
-   item; hidden ones take no clicks (visibility turns after the fade). */
-.us-ob-actions > button.us-copy,
-.us-ob-actions > .us-ob-star,
-.us-ob-actions > .us-iqa-finder__star {
+/* Shown on the selected row and on keyboard focus; hidden ones take no
+   clicks (visibility turns after the fade). */
+.us-ob-actions > button.us-copy {
   --copy-colour: currentColor;
   --copy-hover: rgb(255 255 255 / 15%);
   --copy-hover-colour: currentColor;
@@ -21231,8 +21226,7 @@ a[data-us-comms-log-held] {
     color 120ms;
 }
 
-.us-ob-row:is(.selected, :focus-within) .us-ob-actions > button,
-.us-ob-actions > button[aria-pressed="true"] {
+.us-ob-row:is(.selected, :focus-within) .us-ob-actions > button {
   opacity: 1;
   visibility: visible;
   transition-delay: 0s;
@@ -21246,23 +21240,92 @@ a[data-us-comms-log-held] {
   }
 }
 
-.us-ob-actions > :is(.us-ob-star, .us-iqa-finder__star):hover {
-  background: rgb(255 255 255 / 15%);
-  color: inherit;
+/* The open folder's Copy path and star, inside the address box's right end,
+   as a web browser's bookmark star. The box and the tools are floated
+   natively; the tools pull back over the box's padding. */
+input.us-ob-address {
+  padding-right: 66px;
 }
 
-.us-ob-actions > :is(.us-ob-star, .us-iqa-finder__star):focus-visible {
+.us-ob-address-tools {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  float: left;
+  align-items: center;
+  gap: 2px;
+  height: 33px;
+  margin-left: -64px;
+  padding-right: 2px;
+}
+
+.us-ob-address-tools > button.us-copy {
+  width: 30px;
+  height: 30px;
+}
+
+.us-ob-address-star {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 180ms cubic-bezier(.2, 0, 0, 1);
+}
+
+.us-ob-address-star:hover:not(:disabled) {
+  background: var(--icon-hover-bg);
+  color: var(--icon-hover-colour);
+}
+
+.us-ob-address-star[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.us-ob-address-star:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: -2px;
 }
 
-/* A starred item off the selected row keeps the accent star. */
-.us-ob-row:not(.selected) .us-ob-actions > [aria-pressed="true"] {
-  color: var(--accent);
+.us-ob-address-star:disabled {
+  opacity: .45;
+  cursor: default;
 }
 
-/* "Copied" sits left of the button as a small chip, clear of the star. */
-.us-ob-actions > button.us-copy > .us-copy-label {
+/* A short pop as the star fills. */
+.us-ob-address-star--pop > .ti {
+  animation: us-ob-star-pop 240ms cubic-bezier(.2, 0, 0, 1);
+}
+
+@keyframes us-ob-star-pop {
+  0% {
+    transform: scale(.7);
+  }
+
+  60% {
+    transform: scale(1.18);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* "Copied" sits left of the button as a small chip, clear of the star and
+   over the end of the path. */
+.us-ob-actions > button.us-copy > .us-copy-label,
+.us-ob-address-tools > button.us-copy > .us-copy-label {
   inset-inline-start: auto;
   inset-inline-end: calc(100% + 4px);
   padding: 3px 6px;
@@ -21458,13 +21521,28 @@ a[data-us-comms-log-held] {
 @media (max-width: 950px) {
   .us-ob-row > td {
     height: 44px;
-    padding-right: 100px;
+    padding-right: 56px;
     vertical-align: middle;
   }
 
-  .us-ob-actions > button.us-copy,
-  .us-ob-actions > .us-ob-star,
-  .us-ob-actions > .us-iqa-finder__star {
+  .us-ob-actions > button.us-copy {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* The address box grows to the touch size so its tools fit inside. */
+  input.us-ob-address {
+    height: 44px;
+    padding-right: 94px;
+  }
+
+  .us-ob-address-tools {
+    height: 44px;
+    margin-left: -92px;
+  }
+
+  .us-ob-address-tools > button.us-copy,
+  .us-ob-address-star {
     width: 44px;
     height: 44px;
   }
@@ -21482,16 +21560,21 @@ a[data-us-comms-log-held] {
 
 @media (prefers-reduced-motion: reduce) {
   .us-ob-actions > button,
+  .us-ob-address-star,
   .us-ob-bookmarks__toggle,
   .us-ob-bookmarks__chevron,
   .us-ob-bookmarks__go,
   .us-ob-bookmarks__star {
     transition: none;
   }
+
+  .us-ob-address-star--pop > .ti {
+    animation: none;
+  }
 }
 
 @media (forced-colors: active) {
-  .us-ob-actions > [aria-pressed="true"],
+  .us-ob-address-star[aria-pressed="true"],
   .us-ob-bookmarks__star,
   .us-ob-bookmarks__go[aria-current] .us-ob-bookmarks__name {
     color: Highlight;

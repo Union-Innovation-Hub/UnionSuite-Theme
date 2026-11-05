@@ -8,8 +8,9 @@
  *     searches;
  *   • each result goes to its folder (selecting it there) or opens it in
  *     the designer, and has a star.
- * Each query row in the folder list gets a star too, in the row's icon
- * group after Copy path (ObjectBrowser-Bookmarks.js). Favourites are saved
+ * Query rows in the folder list have no star (owner, 5 November 2026: the
+ * object browser bookmarks the open folder from the address box instead,
+ * ObjectBrowser-Bookmarks.js); queries are starred here. Favourites are saved
  * to the user's i4u_UT_UserSettings row (SettingsKey IQA-Favourites), so
  * they follow the user; recent opens and searches stay in this browser.
  *
@@ -279,7 +280,6 @@
       })
       .catch(() => {})));
     Promise.all(missing.map(key => lookups.get(key))).then(() => {
-      notify();
       if (panel && !panel.hidden && !input.value.trim()) renderPanel();
     });
   }
@@ -321,8 +321,6 @@
       favourites.error = 'Favourites couldn’t be loaded.';
       console.error('[UnionSuiteIqaFinder] favourites', error);
     }
-    paintRowStars();
-    notify();
     if (panel && !panel.hidden) renderPanel();
   }
 
@@ -377,8 +375,6 @@
     const refocus = panel && panel.contains(document.activeElement) && document.activeElement.dataset.key === lower;
     favourites.keys = isFavourite(lower) ? favourites.keys.filter(each => each !== lower) : [lower].concat(favourites.keys);
     saveFavourites();
-    paintRowStars();
-    notify();
     if (panel && !panel.hidden) renderPanel();
     if (refocus) panel.querySelector('.us-iqa-finder__star[data-key="' + lower + '"]')?.focus();
   }
@@ -454,7 +450,7 @@
   }
 
   /* ===========================================================================
-   * Stars on the folder list
+   * Stars on the panel's results
    * ======================================================================== */
   function starButton(key, name) {
     const on = isFavourite(key);
@@ -477,47 +473,6 @@
       toggleFavourite(key);
     });
     return button;
-  }
-
-  // The row's icon group, shared with the folder bookmarks script
-  // (ObjectBrowser-Bookmarks.js), which puts Copy path first in it.
-  function actionGroup(row) {
-    const cell = row.cells[0];
-    if (!cell) return null;
-    let group = cell.querySelector(':scope > .us-ob-actions');
-    if (!group) {
-      group = element('span', 'us-ob-actions');
-      cell.append(group);
-    }
-    row.classList.add('us-ob-row');
-    return group;
-  }
-
-  function paintRowStars() {
-    if (!favourites.loaded) return;
-    document.querySelectorAll('tr.ObjectBrowserContentItem[data-documenttypecode="IQD"]').forEach(row => {
-      const key = row.id.toLowerCase();
-      if (!GUID.test(key)) return;
-      const group = actionGroup(row);
-      if (!group) return;
-      const existing = group.querySelector(':scope > .us-iqa-finder__star');
-      const on = isFavourite(key);
-      if (existing && existing.getAttribute('aria-pressed') === String(on)) return;
-      const name = row.getAttribute('data-documentname') || 'this query';
-      const replacement = starButton(key, name);
-      if (existing) existing.replaceWith(replacement);
-      else group.append(replacement);
-    });
-  }
-
-  // The folder bookmarks pane lists the starred queries too.
-  function notify() {
-    window.dispatchEvent(new CustomEvent('unionsuite:iqa-favourites'));
-  }
-
-  function favouriteEntries() {
-    resolveMissing(favourites.keys);
-    return favourites.keys.map(knownEntry).filter(Boolean);
   }
 
   /* ===========================================================================
@@ -757,7 +712,6 @@
 
   function afterPostback() {
     mount();
-    paintRowStars();
     if (pendingSelect) selectRow(pendingSelect);
   }
 
@@ -768,9 +722,6 @@
     } catch (_) {
       /* No partial postbacks on this page. */
     }
-    // Folder lists change through partial updates; stars follow them.
-    const list = document.querySelector('[id$="_ObjectBrowser1_ContentListUpdatePanel"]') || document.body;
-    new MutationObserver(() => paintRowStars()).observe(list, { childList: true, subtree: true });
     loadFavourites();
     // Opens recorded in the designer popup show at once.
     window.addEventListener('storage', event => {
@@ -781,13 +732,7 @@
   window.UnionSuiteIqaFinder = Object.freeze(Object.assign({
     version: '1.0',
     find: text => searchServer(text),
-    favourites: () => favourites.keys.slice(),
-    // For the folder bookmarks pane: starred queries already named, going
-    // to one, and unstarring one.
-    favouriteEntries,
-    favouritesLoaded: () => favourites.loaded || Boolean(favourites.error),
-    goTo,
-    toggleFavourite
+    favourites: () => favourites.keys.slice()
   }, core));
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });

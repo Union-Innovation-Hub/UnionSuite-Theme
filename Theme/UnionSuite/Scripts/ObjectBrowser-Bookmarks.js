@@ -7,18 +7,17 @@
  *   • the content designer  /ContentManagement/ContentDesigner.aspx
  *   • the document browser  /AsiCommon/Controls/BSA/DocumentBrowser.aspx
  *
- * Each row in the right-hand list gets a small group of icons at its right
- * end, shown on the selected row (and on hover or focus on wide screens):
- *   • Copy path — the theme's shared copy button (US-COPY). It copies the
- *     item's full path, such as $/_i4u_/Core/Cases/Case List, and never opens
- *     the IQA, page or document;
- *   • a bookmark star on folders. The IQA browser's own query star (IQA
- *     Finder) sits in the same group.
+ * Each row in the right-hand list gets Copy path at its right end, shown on
+ * the selected row (and on hover or focus on wide screens): the theme's shared
+ * copy button (US-COPY). It copies the item's full path, such as
+ * $/_i4u_/Core/Cases/Case List, and never opens the IQA, page or document.
+ *
+ * The address box gets the same for the open folder, as a web browser's
+ * address bar does: Copy path (the box flashes) and a bookmark star.
  *
  * A Bookmarks pane sits above the left folder tree. It lists the bookmarked
- * folders for this screen's tree ($ or @); on the IQA browser it also lists
- * the starred queries. Choosing one goes there through the page's own address
- * box and Go button.
+ * folders for this screen's tree ($ or @). Choosing one goes there through
+ * the page's own address box and Go button.
  *
  * Bookmarks are saved to the user's i4u_UT_UserSettings row (SettingsKey
  * Folder-Bookmarks) as [[key, path], …], so they follow the user. A copy in
@@ -174,6 +173,18 @@
     return String(byId('_Address')?.value || '').trim().replace(/\/+$/, '');
   }
 
+  // The open folder's document key, from the tree's selected node.
+  function currentKey() {
+    const tree = byId('_RadTreeView1');
+    try {
+      const node = tree && window.$find?.(tree.id)?.get_selectedNode();
+      const key = String(node?.get_attributes?.()?.getAttribute?.('DocumentVersionKey') || '').toLowerCase();
+      return GUID.test(key) ? key : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   function treeRoot() {
     const folder = currentFolder();
     return /^[$@]/.test(folder) ? folder.charAt(0) : (ON_IQA_BROWSER ? '$' : '');
@@ -318,9 +329,8 @@
   }
 
   /* ===========================================================================
-   * Icons on the list rows
+   * Copy path on the list rows
    * ======================================================================== */
-  // Shared with IQA Finder, which puts its query star in the same group.
   function actionGroup(row) {
     const cell = row.cells[0];
     if (!cell) return null;
@@ -340,7 +350,7 @@
 
   const rowName = row => row.getAttribute('data-documentname') || row.querySelector('.ObjectBrowserContentListName')?.textContent.trim() || '';
 
-  function copyButton(row) {
+  function rowCopyButton(row) {
     const name = rowName(row);
     // The copy flash lands on the name as shown in the row.
     const label = row.querySelector('.ObjectBrowserContentListName > span') || row.querySelector('.ObjectBrowserContentListName');
@@ -360,68 +370,90 @@
     return button;
   }
 
-  function starButton(entry, name, className) {
-    const on = isBookmarked(entry.k);
-    const button = element('button', className);
-    button.type = 'button';
-    button.dataset.key = entry.k;
-    button.setAttribute('aria-pressed', String(on));
-    button.setAttribute('aria-label', (on ? 'Remove ' : 'Bookmark ') + name + (on ? ' from bookmarks' : ''));
-    button.title = on ? 'Remove bookmark' : 'Bookmark this folder';
-    button.append(icon(on ? 'ti-star-filled' : 'ti-star'));
-    return button;
-  }
-
-  function paintStar(star, on, name) {
-    if (star.getAttribute('aria-pressed') === String(on)) return;
-    star.setAttribute('aria-pressed', String(on));
-    star.setAttribute('aria-label', (on ? 'Remove ' : 'Bookmark ') + name + (on ? ' from bookmarks' : ''));
-    star.title = on ? 'Remove bookmark' : 'Bookmark this folder';
-    star.querySelector('i').className = 'ti ' + (on ? 'ti-star-filled' : 'ti-star');
-  }
-
-  let healing = false;
-
   function paintRows() {
-    const folder = currentFolder();
-    const address = String(byId('_Address')?.value || '').trim().replace(/\/+$/, '');
-    // Paths are only trusted for repair when the tree and address agree.
-    const settled = folder && samePath(folder, address);
-    let healed = state.list;
-
     document.querySelectorAll('tr.ObjectBrowserContentItem').forEach(row => {
-      const key = row.id.toLowerCase();
-      if (!GUID.test(key)) return;
+      if (!GUID.test(row.id)) return;
       const group = actionGroup(row);
-      if (!group) return;
-      const name = rowName(row);
+      if (!group || group.querySelector(':scope > .us-ob-copy')) return;
+      const copy = rowCopyButton(row);
+      if (copy) group.prepend(copy);
+    });
+  }
 
-      if (!group.querySelector(':scope > .us-ob-copy')) {
-        const copy = copyButton(row);
-        if (copy) group.prepend(copy);
-      }
+  /* ===========================================================================
+   * Copy path and the bookmark star for the open folder, in the address box
+   * ======================================================================== */
+  function addressTools(address) {
+    const tools = element('span', 'us-ob-address-tools');
 
-      if (row.getAttribute('data-iscontainer') !== 'true') return;
-      let star = group.querySelector(':scope > .us-ob-star');
-      if (!star) {
-        star = starButton({ k: key }, name, 'us-ob-star');
-        shield(star);
-        star.addEventListener('click', event => {
-          event.preventDefault();
-          toggle({ k: key, p: joinPath(currentFolder(), rowName(row)) });
-        });
-        group.append(star);
-      }
-      paintStar(star, isBookmarked(key), name);
-      if (settled && isBookmarked(key)) healed = renameIn(healed, key, joinPath(folder, name));
+    const copy = element('button', 'us-copy us-ob-address-copy');
+    copy.type = 'button';
+    copy.title = 'Copy this folder’s path';
+    copy.setAttribute('aria-label', 'Copy this folder’s path');
+    // The address box flashes; the open folder's path is what is copied,
+    // even if something else has been typed in the box.
+    copy.setAttribute('data-us-copy-target', address.id);
+    copy.addEventListener('click', () => {
+      copy.setAttribute('data-us-copy-text', currentFolder() || address.value);
     });
 
-    if (healed !== state.list && !healing) {
-      healing = true;
-      setList(healed);
-      save();
-      renderPane();
-      healing = false;
+    const star = element('button', 'us-ob-address-star');
+    star.type = 'button';
+    star.setAttribute('aria-pressed', 'false');
+    star.append(icon('ti-star'));
+    star.addEventListener('click', () => {
+      const key = currentKey();
+      const path = currentFolder();
+      if (!key || !path) return;
+      // A short pop as the star fills; its colour turns by transition.
+      star.classList.remove('us-ob-address-star--pop');
+      if (!isBookmarked(key)) {
+        void star.offsetWidth;
+        star.classList.add('us-ob-address-star--pop');
+      }
+      toggle({ k: key, p: path });
+    });
+    star.addEventListener('animationend', () => star.classList.remove('us-ob-address-star--pop'));
+
+    tools.append(copy, star);
+    return tools;
+  }
+
+  // The address box sits in an update panel that partial postbacks redraw,
+  // so the tools are put back after the box whenever they are missing.
+  function paintAddress() {
+    const address = byId('_Address');
+    if (!address) return;
+    let tools = address.nextElementSibling?.classList.contains('us-ob-address-tools') ? address.nextElementSibling : null;
+    if (!tools) {
+      tools = addressTools(address);
+      address.after(tools);
+      address.classList.add('us-ob-address');
+    }
+    const star = tools.querySelector('.us-ob-address-star');
+
+    const key = currentKey();
+    const path = currentFolder();
+    const on = Boolean(key) && isBookmarked(key);
+    const name = nameOf(path) || path;
+    star.disabled = !key || !path;
+    if (star.getAttribute('aria-pressed') !== String(on) || star.dataset.path !== path) {
+      star.setAttribute('aria-pressed', String(on));
+      star.dataset.path = path;
+      star.title = on ? 'Remove this folder from bookmarks' : 'Bookmark this folder';
+      star.setAttribute('aria-label', on ? 'Remove ' + name + ' from bookmarks' : 'Bookmark ' + name);
+      star.querySelector('i').className = 'ti ' + (on ? 'ti-star-filled' : 'ti-star');
+    }
+
+    // A bookmarked folder seen at a new path (moved or renamed) keeps its
+    // bookmark. Only trusted when the tree and the address box agree.
+    const typed = String(address.value || '').trim().replace(/\/+$/, '');
+    if (on && samePath(path, typed)) {
+      const healed = renameIn(state.list, key, path);
+      if (healed !== state.list) {
+        setList(healed);
+        save();
+      }
     }
   }
 
@@ -433,37 +465,31 @@
   let toggleButton = null;
   let countBadge = null;
 
-  const iqaFinder = () => ON_IQA_BROWSER && typeof window.UnionSuiteIqaFinder?.favouriteEntries === 'function' ? window.UnionSuiteIqaFinder : null;
-
-  function bookmarkItem(entry, kind) {
+  function bookmarkItem(entry) {
     const item = element('li', 'us-ob-bookmarks__item');
     item.dataset.key = entry.k;
     const go = element('button', 'us-ob-bookmarks__go');
     go.type = 'button';
     go.title = entry.p;
     go.append(
-      icon(kind === 'query' ? 'ti-file-search' : 'ti-folder'),
-      element('span', 'us-ob-bookmarks__name', kind === 'query' ? entry.n : nameOf(entry.p)),
+      icon('ti-folder'),
+      element('span', 'us-ob-bookmarks__name', nameOf(entry.p)),
       element('span', 'us-ob-bookmarks__path', parentOf(entry.p))
     );
-    if (kind === 'folder' && samePath(entry.p, currentFolder())) go.setAttribute('aria-current', 'location');
-    go.addEventListener('click', () => {
-      if (kind === 'query') iqaFinder()?.goTo(entry);
-      else goToFolder(entry.p);
-    });
+    if (samePath(entry.p, currentFolder())) go.setAttribute('aria-current', 'location');
+    go.addEventListener('click', () => goToFolder(entry.p));
 
     const remove = element('button', 'us-ob-bookmarks__star');
     remove.type = 'button';
     remove.setAttribute('aria-pressed', 'true');
-    remove.setAttribute('aria-label', 'Remove ' + (kind === 'query' ? entry.n : nameOf(entry.p)) + ' from bookmarks');
+    remove.setAttribute('aria-label', 'Remove ' + nameOf(entry.p) + ' from bookmarks');
     remove.title = 'Remove bookmark';
     remove.append(icon('ti-star-filled'));
     remove.addEventListener('click', () => {
       // The row folds away first; then the list is drawn without it.
       const next = item.nextElementSibling?.querySelector('button') || item.previousElementSibling?.querySelector('button') || toggleButton;
       fold(item, false).then(() => {
-        if (kind === 'query') iqaFinder()?.toggleFavourite(entry.k);
-        else toggle(entry);
+        toggle(entry);
         // Focus stays in the pane rather than falling to the page.
         const again = next && next.isConnected ? next : pane?.querySelector('.us-ob-bookmarks__go') || toggleButton;
         again?.focus({ preventScroll: true });
@@ -474,37 +500,23 @@
     return item;
   }
 
-  function listSection(title, entries, kind, showTitle) {
-    const fragment = document.createDocumentFragment();
-    if (!entries.length) return fragment;
-    if (showTitle) fragment.append(element('h3', 'us-ob-bookmarks__heading', title));
-    const list = element('ul', 'us-ob-bookmarks__list');
-    entries.forEach(entry => list.append(bookmarkItem(entry, kind)));
-    fragment.append(list);
-    return fragment;
-  }
-
   function drawBody() {
-    const root = treeRoot();
-    const folders = forRoot(state.list, root);
-    const queries = iqaFinder()?.favouriteEntries() || [];
+    const folders = forRoot(state.list, treeRoot());
     const nodes = [];
-    if (folders.length || queries.length) {
-      const both = folders.length > 0 && queries.length > 0;
-      nodes.push(listSection('Folders', folders, 'folder', both), listSection('Queries', queries, 'query', both));
+    if (folders.length) {
+      const list = element('ul', 'us-ob-bookmarks__list');
+      folders.forEach(entry => list.append(bookmarkItem(entry)));
+      nodes.push(list);
     } else {
-      // On the IQA browser the starred queries come from IQA Finder, which
-      // may load later: wait for it before saying there are none.
-      const finderWaiting = Boolean(iqaFinder()) && !iqaFinder().favouritesLoaded?.();
-      const loaded = !finderWaiting && (state.loaded || state.list.length || readLocal(CACHE_KEY, null) !== null);
+      const loaded = state.loaded || readLocal(CACHE_KEY, null) !== null;
       nodes.push(element('p', 'us-ob-bookmarks__empty', loaded
-        ? (ON_IQA_BROWSER ? 'Star a folder or query to keep it here.' : 'Star a folder to keep it here.')
+        ? 'Open a folder and choose the star in the address box to keep it here.'
         : 'Loading bookmarks…'));
     }
     if (state.error) nodes.push(element('p', 'us-ob-bookmarks__empty us-ob-bookmarks__empty--warning', state.error));
     body.replaceChildren(...nodes);
-    countBadge.textContent = String(folders.length + queries.length);
-    countBadge.hidden = !(folders.length + queries.length);
+    countBadge.textContent = String(folders.length);
+    countBadge.hidden = !folders.length;
   }
 
   // What was drawn last, so an unchanged list is not redrawn.
@@ -512,15 +524,7 @@
 
   function renderPane() {
     if (!pane || !body) return;
-    const root = treeRoot();
-    const signature = JSON.stringify([
-      forRoot(state.list, root),
-      (iqaFinder()?.favouriteEntries() || []).map(entry => [entry.k, entry.n, entry.p]),
-      currentFolder(),
-      state.loaded,
-      iqaFinder()?.favouritesLoaded?.() ?? null,
-      state.error
-    ]);
+    const signature = JSON.stringify([forRoot(state.list, treeRoot()), currentFolder(), state.loaded, state.error]);
     if (signature === drawn) return;
     const first = !drawn;
     drawn = signature;
@@ -567,6 +571,7 @@
   function refresh() {
     mountPane();
     paintRows();
+    paintAddress();
     renderPane();
   }
 
@@ -580,6 +585,8 @@
     });
   }
 
+  const OWN = '.us-ob-actions, .us-ob-actions *, .us-ob-address-tools, .us-ob-address-tools *, .us-copy-label, .us-copy-announcement';
+
   function boot() {
     refresh();
     try {
@@ -587,26 +594,24 @@
     } catch (_) {
       /* No partial postbacks on this page. */
     }
-    // Folder lists and the tree change through partial updates.
-    const watched = [byId('_ContentListUpdatePanel'), byId('_TreeUpdatePanel')].filter(Boolean);
+    // The list, tree and address box change through partial updates.
+    const watched = [byId('_ContentListUpdatePanel'), byId('_TreeUpdatePanel'), byId('_AddressUpdatePanel')].filter(Boolean);
     const observer = new MutationObserver(records => {
       // Our own icons and pane are not a reason to redraw.
-      if (records.every(record => [...record.addedNodes, ...record.removedNodes].every(node => node.nodeType === 1 && node.matches?.('.us-ob-actions, .us-ob-actions *, .us-copy-label, .us-copy-announcement')))) return;
+      if (records.every(record => [...record.addedNodes, ...record.removedNodes].every(node => node.nodeType === 1 && node.matches?.(OWN)))) return;
       queueRefresh();
     });
     (watched.length ? watched : [document.body]).forEach(node => observer.observe(node, { childList: true, subtree: true }));
-    // Starring or naming a query in IQA Finder redraws the pane.
-    window.addEventListener('unionsuite:iqa-favourites', queueRefresh);
     load();
   }
 
   window.UnionSuiteFolderBookmarks = Object.freeze(Object.assign({
-    version: '1.0',
+    version: '1.1',
     list: () => state.list.slice(),
     isBookmarked,
     toggle,
     currentFolder,
-    actionGroup,
+    currentKey,
     refresh
   }, core));
 

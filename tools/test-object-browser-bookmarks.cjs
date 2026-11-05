@@ -1,8 +1,9 @@
 // Tests Copy path and folder bookmarks on the iMIS object browser screens
 // (Theme/UnionSuite/Scripts/ObjectBrowser-Bookmarks.js): the path and list
-// functions in Node, then the row icons and the Bookmarks pane in a headless
-// browser against a page shaped like the native object browser (the
-// document browser and the IQA browser), with the iMIS API stubbed.
+// functions in Node, then the row and address box icons and the Bookmarks
+// pane in a headless browser against a page shaped like the native object
+// browser (the document browser and the IQA browser), with the iMIS API
+// stubbed.
 // Run from the project root: node tools/test-object-browser-bookmarks.cjs
 'use strict';
 
@@ -61,6 +62,8 @@ test('toggling adds newest first and removes; renaming keeps the bookmark', () =
  * In the browser
  * ------------------------------------------------------------------------ */
 const KEYS = {
+  root: 'a0000000-0000-4000-8000-000000000000',
+  open: 'a0000000-0000-4000-8000-000000000009',
   core: 'c0000000-0000-4000-8000-000000000001',
   client: 'c0000000-0000-4000-8000-000000000002',
   doc: 'd0000000-0000-4000-8000-000000000003',
@@ -75,9 +78,10 @@ function row(key, name, type, container) {
     <td><span class="ObjectBrowserIcon ObjectBrowserContentListName"><span class="pl-2">${name}</span></span></td></tr>`;
 }
 
-// The native object browser as the dev tenant renders it, cut down: an
-// address box and Go, a tree in its splitter pane (with a $find stub for
-// the selected node), Quick find, and the list.
+// The native object browser as the dev tenant renders it, cut down: the
+// floated address box and Go in their update panel, a tree in its splitter
+// pane (with a $find stub for the selected node and its key), Quick find,
+// and the list.
 function fixture(prefix, rows) {
   return `<!doctype html><html><head><meta charset="utf-8"><title>Object browser</title>
 <link rel="stylesheet" href="/theme/zUnionSuite.css">
@@ -86,14 +90,21 @@ function fixture(prefix, rows) {
   window.__rowEvents = [];
   window.__go = [];
   const path = ['$', '_i4u_'];
-  const node = i => i < 0 ? null : { get_text: () => path[i], get_parent: () => node(i - 1) };
+  const keys = ['${KEYS.root}', '${KEYS.open}'];
+  const node = i => i < 0 ? null : {
+    get_text: () => path[i],
+    get_parent: () => node(i - 1),
+    get_attributes: () => ({ getAttribute: name => name === 'DocumentVersionKey' ? keys[i] : null })
+  };
   window.$find = () => ({ get_selectedNode: () => node(path.length - 1) });
 </script></head><body>
 <input type="hidden" id="__ClientContext" value='{"loggedInPartyId":"100","isAnonymous":false}'>
 <input type="hidden" id="__RequestVerificationToken" value="t">
 <div class="ObjectBrowserWrapper">
-  <input type="text" id="${prefix}_Address" value="$/_i4u_">
-  <input type="button" id="${prefix}_AddressGoButton" value="Go" onclick="window.__go.push(document.getElementById('${prefix}_Address').value)">
+  <div id="${prefix}_AddressUpdatePanel" style="display:block;overflow:hidden">
+    <input type="text" class="InputXLarge" id="${prefix}_Address" value="$/_i4u_" style="float:left;box-sizing:border-box;width:400px;height:33px;padding:0 10px;border:1px solid #999">
+    <input type="button" id="${prefix}_AddressGoButton" value="Go" style="float:left;height:36px" onclick="window.__go.push(document.getElementById('${prefix}_Address').value)">
+  </div>
   <div class="QuickFindWrapper"><input type="text" id="${prefix}_ObjectQuickFindTextBox"></div>
   <table><tr>
     <td style="width:300px"><div id="RAD_SPLITTER_PANE_CONTENT_${prefix}_RadPaneTree" style="width:300px;height:400px;overflow:auto">
@@ -143,7 +154,7 @@ async function openPage(browser, { pagePath, prefix, rows, saved, scripts, iqaFa
   return { page, requests, context };
 }
 
-test('object browser rows and the Bookmarks pane', async t => {
+test('object browser rows, the address box and the Bookmarks pane', async t => {
   let chromium;
   try {
     ({ chromium } = require('../.tmp-iqa-integration/node_modules/playwright'));
@@ -154,7 +165,7 @@ test('object browser rows and the Bookmarks pane', async t => {
   const browser = await chromium.launch({ channel: 'msedge', headless: true });
   t.after(() => browser.close());
 
-  await t.test('document browser: copy, stars, pane, go and collapse', async () => {
+  await t.test('document browser: row copy, address copy and star, pane, go and collapse', async () => {
     const saved = JSON.stringify([[KEYS.client, '$/_i4u_/Client'], [KEYS.content, '@/_i4u_/Pages']]);
     const { page, requests, context } = await openPage(browser, {
       pagePath: '/UTNewTheme/AsiCommon/Controls/BSA/DocumentBrowser.aspx',
@@ -165,20 +176,19 @@ test('object browser rows and the Bookmarks pane', async t => {
     });
     await page.waitForSelector('.us-ob-bookmarks__go');
 
-    // Icons: copy on every row, a star on folders only.
+    // Rows: Copy path only, no stars.
     const groups = await page.$$eval('tr.ObjectBrowserContentItem', rows => rows.map(row => [...row.querySelectorAll('.us-ob-actions > button')].map(b => b.className)));
-    assert.deepEqual(groups, [['us-copy us-ob-copy', 'us-ob-star'], ['us-copy us-ob-copy', 'us-ob-star'], ['us-copy us-ob-copy']]);
+    assert.deepEqual(groups, [['us-copy us-ob-copy'], ['us-copy us-ob-copy'], ['us-copy us-ob-copy']]);
 
-    // Hidden until the row is selected; a starred folder always shows its star.
+    // Hidden until the row is selected.
     const visible = selector => page.$eval(selector, node => getComputedStyle(node).visibility);
-    assert.equal(await visible(`[id="${KEYS.core}"] .us-ob-copy`), 'hidden');
-    assert.equal(await visible(`[id="${KEYS.client}"] .us-ob-star`), 'visible');
     await page.mouse.move(0, 0);
+    assert.equal(await visible(`[id="${KEYS.core}"] .us-ob-copy`), 'hidden');
     await page.$eval(`[id="${KEYS.core}"]`, node => node.classList.add('selected'));
     assert.equal(await visible(`[id="${KEYS.core}"] .us-ob-copy`), 'visible');
 
-    // Copy path: the full path, never opening or reselecting the row, even
-    // when clicked twice quickly.
+    // Row Copy path: the full path, never opening or reselecting the row,
+    // even when clicked twice quickly.
     await page.evaluate(() => { window.__rowEvents.length = 0; });
     await page.click(`[id="${KEYS.core}"] .us-ob-copy`);
     await page.dblclick(`[id="${KEYS.core}"] .us-ob-copy`);
@@ -188,28 +198,49 @@ test('object browser rows and the Bookmarks pane', async t => {
     await page.$eval(`[id="${KEYS.doc}"]`, node => node.classList.add('selected'));
     await page.click(`[id="${KEYS.doc}"] .us-ob-copy`);
     await page.waitForFunction(() => window.__copied.includes('$/_i4u_/Case List'));
-    assert.equal(await page.getAttribute(`[id="${KEYS.doc}"] .us-ob-copy`, 'data-us-copy-state'), 'success');
+
+    // The address box: Copy path then the star, straight after the box and
+    // inside its right end.
+    const tools = await page.$eval('[id$="_Address"]', box => {
+      const next = box.nextElementSibling;
+      const a = box.getBoundingClientRect();
+      const b = next.getBoundingClientRect();
+      return { className: next.className, buttons: [...next.children].map(c => c.className), inside: b.left >= a.left && b.right <= a.right + 1 };
+    });
+    assert.deepEqual(tools, { className: 'us-ob-address-tools', buttons: ['us-copy us-ob-address-copy', 'us-ob-address-star'], inside: true });
+
+    // Address Copy path copies the open folder (even with other text typed)
+    // and flashes the box.
+    await page.fill('[id$="_Address"]', '$/_i4u_/Typed');
+    await page.click('.us-ob-address-copy');
+    await page.waitForFunction(() => window.__copied.at(-1) === '$/_i4u_');
+    assert.equal(await page.$eval('[id$="_Address"]', box => box.classList.contains('us-copy-flash')), true);
+    await page.fill('[id$="_Address"]', '$/_i4u_');
 
     // The pane sits first in the tree pane, above the tree, with this
     // tree's ($) bookmarks only.
-    assert.equal(await page.$eval('[id$="_RadPaneTree"]', host => host.firstElementChild.className), 'us-ob-bookmarks');
+    assert.equal(await page.$eval('[id^="RAD_SPLITTER_PANE_CONTENT_"]', host => host.firstElementChild.className), 'us-ob-bookmarks');
     assert.deepEqual(await page.$$eval('.us-ob-bookmarks__go', items => items.map(item => item.title)), ['$/_i4u_/Client']);
     assert.equal(await page.textContent('.us-ob-bookmarks__count'), '1');
 
-    // Starring a folder row saves it to the user's settings row and lists it.
-    await page.click(`[id="${KEYS.core}"] .us-ob-star`);
+    // The star bookmarks the open folder, saves to the user's settings row
+    // and lists it, marked as the open folder.
+    assert.equal(await page.getAttribute('.us-ob-address-star', 'aria-pressed'), 'false');
+    await page.click('.us-ob-address-star');
     await page.waitForFunction(() => document.querySelectorAll('.us-ob-bookmarks__go').length === 2);
-    assert.equal(await page.getAttribute(`[id="${KEYS.core}"] .us-ob-star`, 'aria-pressed'), 'true');
+    assert.equal(await page.getAttribute('.us-ob-address-star', 'aria-pressed'), 'true');
+    assert.equal(await page.getAttribute('.us-ob-bookmarks__go[aria-current]', 'title'), '$/_i4u_');
     await page.waitForTimeout(600);
     const put = requests.find(request => request.method === 'PUT');
     assert.ok(put, 'saved with PUT to the existing row');
     assert.match(put.url, /i4u_UT_UserSettings\/100\/7$/);
     const value = JSON.parse(put.body).Properties.$values.find(entry => entry.Name === 'Value').Value;
-    assert.deepEqual(JSON.parse(value), [[KEYS.core, '$/_i4u_/Core'], [KEYS.client, '$/_i4u_/Client'], [KEYS.content, '@/_i4u_/Pages']]);
+    assert.deepEqual(JSON.parse(value), [[KEYS.open, '$/_i4u_'], [KEYS.client, '$/_i4u_/Client'], [KEYS.content, '@/_i4u_/Pages']]);
 
     // Choosing a bookmark uses the address box and Go.
     await page.click('.us-ob-bookmarks__go[title="$/_i4u_/Client"]');
     assert.deepEqual(await page.evaluate(() => window.__go), ['$/_i4u_/Client']);
+    await page.fill('[id$="_Address"]', '$/_i4u_');
 
     // Collapse and reopen; remembered in this browser.
     await page.click('.us-ob-bookmarks__toggle');
@@ -217,36 +248,41 @@ test('object browser rows and the Bookmarks pane', async t => {
     assert.equal(await page.$eval('.us-ob-bookmarks__body', body => body.hidden), true);
     assert.equal(await page.evaluate(() => localStorage.getItem('unionsuite:folder-bookmarks:open')), 'false');
 
-    // Removing from the pane unstars the row.
+    // Removing from the pane turns the address star off.
     await page.click('.us-ob-bookmarks__toggle');
-    await page.click(`.us-ob-bookmarks__item[data-key="${KEYS.core}"] .us-ob-bookmarks__star`);
-    await page.waitForFunction(key => document.querySelector(`[id="${key}"] .us-ob-star`).getAttribute('aria-pressed') === 'false', KEYS.core);
+    await page.click(`.us-ob-bookmarks__item[data-key="${KEYS.open}"] .us-ob-bookmarks__star`);
+    await page.waitForFunction(() => document.querySelector('.us-ob-address-star').getAttribute('aria-pressed') === 'false');
+
+    // A partial postback redraws the address box; the tools come back.
+    await page.evaluate(() => {
+      const box = document.querySelector('[id$="_Address"]');
+      const panel = box.parentElement;
+      panel.innerHTML = panel.innerHTML.replace(/<span class="us-ob-address-tools"[\s\S]*?<\/span>/, '');
+    });
+    await page.waitForFunction(() => document.querySelector('[id$="_Address"]').nextElementSibling?.className === 'us-ob-address-tools');
 
     // Touch-sized icons on narrow windows.
     await page.setViewportSize({ width: 800, height: 800 });
     assert.equal(await page.$eval(`[id="${KEYS.core}"] .us-ob-copy`, node => node.getBoundingClientRect().width), 44);
+    assert.equal(await page.$eval('.us-ob-address-star', node => node.getBoundingClientRect().width), 44);
     await context.close();
   });
 
-  await t.test('IQA browser: the query star joins the group; pane lists queries', async () => {
+  await t.test('IQA browser: no star on query rows; Quick find keeps favourites', async () => {
     const { page, context } = await openPage(browser, {
       pagePath: '/UTNewTheme/AsiCommon/Controls/IQA/Default.aspx',
       prefix: 'ctl01_TemplateBody_ObjectBrowser1',
       rows: row(KEYS.core, 'Core', 'FOL', 'true') + row(KEYS.query, 'Case List', 'IQD', 'false'),
       saved: null,
       iqaFavourites: JSON.stringify([KEYS.query]),
-      scripts: []
+      scripts: ['Scripts/IQA-Finder.js', 'Scripts/ObjectBrowser-Bookmarks.js']
     });
-    await page.evaluate(([key]) => localStorage.setItem('unionsuite:iqa-finder:names', JSON.stringify({ [key]: ['Case List', '$/_i4u_/Core/Cases/Case List', 1] })), [KEYS.query]);
-    await page.reload();
-    await page.addScriptTag({ url: '/theme/Scripts/IQA-Finder.js' });
-    await page.addScriptTag({ url: '/theme/Scripts/ObjectBrowser-Bookmarks.js' });
-    await page.waitForSelector(`[id="${KEYS.query}"] .us-iqa-finder__star`, { state: 'attached' });
+    await page.waitForSelector('.us-ob-bookmarks__empty');
+    await page.waitForFunction(() => window.UnionSuiteIqaFinder?.favourites().length === 1);
     const group = await page.$$eval(`[id="${KEYS.query}"] .us-ob-actions > button`, buttons => buttons.map(b => b.className));
-    assert.deepEqual(group, ['us-copy us-ob-copy', 'us-iqa-finder__star']);
-    await page.waitForSelector('.us-ob-bookmarks__go .ti-file-search', { state: 'attached' });
-    assert.deepEqual(await page.$$eval('.us-ob-bookmarks__name', names => names.map(name => name.textContent)), ['Case List']);
-    assert.equal(await page.textContent('.us-ob-bookmarks__path'), '$/_i4u_/Core/Cases');
+    assert.deepEqual(group, ['us-copy us-ob-copy']);
+    assert.equal(await page.$$eval('.us-iqa-finder__star', stars => stars.length), 0);
+    assert.match(await page.textContent('.us-ob-bookmarks__empty'), /star in the address box/);
     await context.close();
   });
 });

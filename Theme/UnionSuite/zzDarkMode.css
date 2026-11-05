@@ -720,8 +720,10 @@
     color: var(--text-strong);
   }
 
-  /* The "Copied" chip on a row lifts off the dark list. */
-  :root[data-us-color-scheme="dark"] .us-ob-actions > button.us-copy > .us-copy-label {
+  /* The "Copied" chip on a row or in the address box lifts off the dark
+     surface. */
+  :root[data-us-color-scheme="dark"] .us-ob-actions > button.us-copy > .us-copy-label,
+  :root[data-us-color-scheme="dark"] .us-ob-address-tools > button.us-copy > .us-copy-label {
     background: var(--bg-subtle);
     box-shadow: var(--shadow-md);
   }
