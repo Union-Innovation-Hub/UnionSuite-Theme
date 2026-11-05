@@ -21156,35 +21156,8 @@ a[data-us-comms-log-held] {
   --size: .42px;
 }
 
-/* The star on a query row in the folder list: shown on a starred query, and
-   on hover, focus or selection for the others. */
-/* Held to the vertical middle of the row, clear of the query's name. */
-.us-iqa-finder__row > td {
-  position: relative;
-  padding-right: 40px;
-}
-
-.us-iqa-finder__row .us-iqa-finder__star {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  width: 26px;
-  height: 26px;
-  margin: 0;
-  color: inherit;
-  opacity: 0;
-  transform: translateY(-50%);
-}
-
-.us-iqa-finder__row:is(:hover, :focus-within, .selected) .us-iqa-finder__star,
-.us-iqa-finder__row .us-iqa-finder__star[aria-pressed="true"],
-.us-iqa-finder__row .us-iqa-finder__star:focus-visible {
-  opacity: 1;
-}
-
-.us-iqa-finder__row:not(.selected) .us-iqa-finder__star[aria-pressed="true"] {
-  color: var(--accent);
-}
+/* The star on a query row in the folder list sits in the row's icon group,
+   styled with the folder star in US-OB-BOOKMARKS. */
 
 @media (prefers-reduced-motion: reduce) {
   .us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"],
@@ -21205,6 +21178,326 @@ a[data-us-comms-log-held] {
   }
 }
 /* US-IQA-FINDER:END */
+
+/* US-OB-BOOKMARKS:START — the iMIS object browser (IQA browser, content
+   designer, document browser): Copy path and bookmark icons on the list rows,
+   and the Bookmarks pane above the folder tree
+   (Scripts/ObjectBrowser-Bookmarks.js). */
+
+/* Room at the row's right end for the icons, held to its vertical middle. */
+.us-ob-row > td {
+  position: relative;
+  padding-right: 76px;
+}
+
+.us-ob-actions {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+  transform: translateY(-50%);
+}
+
+/* Shown on the selected row, on keyboard focus, and always on a starred
+   item; hidden ones take no clicks (visibility turns after the fade). */
+.us-ob-actions > button.us-copy,
+.us-ob-actions > .us-ob-star,
+.us-ob-actions > .us-iqa-finder__star {
+  --copy-colour: currentColor;
+  --copy-hover: rgb(255 255 255 / 15%);
+  --copy-hover-colour: currentColor;
+  --copy-success: currentColor;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font-size: 17px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 150ms cubic-bezier(.2, 0, 0, 1),
+    visibility 0s linear 150ms,
+    background-color 120ms,
+    color 120ms;
+}
+
+.us-ob-row:is(.selected, :focus-within) .us-ob-actions > button,
+.us-ob-actions > button[aria-pressed="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+@media (min-width: 951px) {
+  .us-ob-row:hover .us-ob-actions > button {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+}
+
+.us-ob-actions > :is(.us-ob-star, .us-iqa-finder__star):hover {
+  background: rgb(255 255 255 / 15%);
+  color: inherit;
+}
+
+.us-ob-actions > :is(.us-ob-star, .us-iqa-finder__star):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+/* A starred item off the selected row keeps the accent star. */
+.us-ob-row:not(.selected) .us-ob-actions > [aria-pressed="true"] {
+  color: var(--accent);
+}
+
+/* "Copied" sits left of the button as a small chip, clear of the star. */
+.us-ob-actions > button.us-copy > .us-copy-label {
+  inset-inline-start: auto;
+  inset-inline-end: calc(100% + 4px);
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-strong);
+}
+
+/* The pane above the folder tree. */
+.us-ob-bookmarks {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-base);
+  font: 13px/1.4 var(--font-ui);
+}
+
+.us-ob-bookmarks__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 0;
+  background: var(--bg-subtle);
+  color: var(--text-strong);
+  font: 600 13px/1.3 var(--font-ui);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+
+.us-ob-bookmarks__toggle:hover {
+  background: var(--icon-hover-bg);
+}
+
+.us-ob-bookmarks__toggle:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.us-ob-bookmarks__chevron {
+  color: var(--text-muted);
+  font-size: 15px;
+  transition: transform 180ms cubic-bezier(.2, 0, 0, 1);
+}
+
+.us-ob-bookmarks__toggle[aria-expanded="false"] .us-ob-bookmarks__chevron {
+  transform: rotate(-90deg);
+}
+
+.us-ob-bookmarks__count {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.us-ob-bookmarks__body {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.us-ob-bookmarks__heading {
+  margin: 0;
+  padding: 8px 10px 2px;
+  color: var(--text-muted);
+  font: 600 11px/1.4 var(--font-ui);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.us-ob-bookmarks__list {
+  margin: 0;
+  padding: 2px 0 4px;
+  list-style: none;
+}
+
+.us-ob-bookmarks__item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 4px;
+}
+
+.us-ob-bookmarks__go {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 18px minmax(0, 1fr);
+  column-gap: 6px;
+  align-items: center;
+  min-width: 0;
+  padding: 4px 6px 4px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-base);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+
+.us-ob-bookmarks__go:hover {
+  background: var(--icon-hover-bg);
+  color: var(--text-strong);
+}
+
+.us-ob-bookmarks__go:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.us-ob-bookmarks__go > .ti {
+  grid-row: 1 / span 2;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.us-ob-bookmarks__name,
+.us-ob-bookmarks__path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.us-ob-bookmarks__name {
+  color: var(--text-strong);
+}
+
+.us-ob-bookmarks__path {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.us-ob-bookmarks__path:empty {
+  display: none;
+}
+
+/* The folder open now. */
+.us-ob-bookmarks__go[aria-current] {
+  background: var(--icon-hover-bg);
+}
+
+.us-ob-bookmarks__go[aria-current] > .ti,
+.us-ob-bookmarks__go[aria-current] .us-ob-bookmarks__name {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.us-ob-bookmarks__star {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--accent);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+
+.us-ob-bookmarks__star:hover {
+  background: var(--icon-hover-bg);
+}
+
+.us-ob-bookmarks__star:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.us-ob-bookmarks__empty {
+  margin: 0;
+  padding: 8px 10px 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.us-ob-bookmarks__empty--warning {
+  color: var(--danger);
+}
+
+/* Touch-sized rows, icons and pane controls on narrow windows. */
+@media (max-width: 950px) {
+  .us-ob-row > td {
+    height: 44px;
+    padding-right: 100px;
+    vertical-align: middle;
+  }
+
+  .us-ob-actions > button.us-copy,
+  .us-ob-actions > .us-ob-star,
+  .us-ob-actions > .us-iqa-finder__star {
+    width: 44px;
+    height: 44px;
+  }
+
+  .us-ob-bookmarks__toggle,
+  .us-ob-bookmarks__go {
+    min-height: 44px;
+  }
+
+  .us-ob-bookmarks__star {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .us-ob-actions > button,
+  .us-ob-bookmarks__toggle,
+  .us-ob-bookmarks__chevron,
+  .us-ob-bookmarks__go,
+  .us-ob-bookmarks__star {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .us-ob-actions > [aria-pressed="true"],
+  .us-ob-bookmarks__star,
+  .us-ob-bookmarks__go[aria-current] .us-ob-bookmarks__name {
+    color: Highlight;
+  }
+}
+/* US-OB-BOOKMARKS:END */
 
 /* US-INLINE-COMPOSER:START — the in-place add form (UnionSuiteComposers in
    zUnionSuite.js). Theme tokens only; zzDarkMode.css keeps two details

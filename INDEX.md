@@ -48,7 +48,7 @@ Git tracked this folder as `THeme` until 30 October 2026; older commits use that
 | `Theme/UnionSuite/zUnionSuite.js` | Shared behaviour: reports, banners, composers, actions, loaders |
 | `Theme/UnionSuite/zzDarkMode.css` | All dark-mode palette and overrides; loads last |
 | `Theme/UnionSuite/zzClientSpecific.css` | Client overrides in the shared package |
-| `Theme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane, with the Case help chat), `UnionSuiteHelpMatch.js` (its staff help matcher), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
+| `Theme/UnionSuite/Scripts/` | Larger feature scripts: `ActionDefinitions.js` (unified actions), `IQA-Enhancements.js`, `IQA-Finder.js`, `IQA-WhereUsed.js`, `ObjectBrowser-Bookmarks.js` (Copy path and folder bookmarks on the IQA, content and document browsers), `UnionSuiteTaskbar*.js`, `UnionSuiteSidePane.js` (taskbar side pane, with the Case help chat), `UnionSuiteHelpMatch.js` (its staff help matcher), `BO-Enhancements.js`, `HtmlSourceEditor.js`, `SignInPage.js` |
 | `Theme/UnionSuite/Forms/` | Theme-built popup forms (task form) |
 | `Theme/UnionSuite/Tabler/`, `Tabler.css`, `images/` | Bundled icon font and images |
 | `Theme/UnionSuite/*.skin`, `ThemeSettings.xml`, `index.js` | iMIS theme package files |

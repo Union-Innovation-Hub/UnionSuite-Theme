@@ -40,7 +40,7 @@
   // stable URLs, so this is what invalidates them. Bump it when a child file
   // changes; changing this loader alone does not need it, because the entry
   // URL refreshes itself. Bumping needlessly re-downloads every child.
-  const RELEASE = '1.0.18';
+  const RELEASE = '1.0.19';
   const LOAD_TIMEOUT_MS = 20000;
 
   /* Load graph.
@@ -153,6 +153,21 @@
       when: () => /\/AsiCommon\/Controls\/IQA\/Default\.aspx$|\/QueryBuilder\/Design\.aspx$/i.test(location.pathname),
       critical: false,
       ready: () => typeof window.UnionSuiteIqaFinder?.search === 'function'
+    },
+    {
+      id: 'object-browser-bookmarks',
+      path: 'Scripts/ObjectBrowser-Bookmarks.js',
+      // The three screens built on the native object browser: the IQA
+      // browser, the content designer and the document browser. Copy path
+      // and bookmark icons on list rows, and a Bookmarks pane above the
+      // folder tree. Copy path is the shared US-COPY button, so it follows
+      // core. Not after 'iqa-finder', which is gated out on two of the three
+      // screens: the IQA browser's pane picks up starred queries from the
+      // finder's 'unionsuite:iqa-favourites' event whenever it loads.
+      after: ['core'],
+      when: () => /\/AsiCommon\/Controls\/IQA\/Default\.aspx$|\/ContentManagement\/ContentDesigner\.aspx$|\/AsiCommon\/Controls\/BSA\/DocumentBrowser\.aspx$/i.test(location.pathname),
+      critical: false,
+      ready: () => typeof window.UnionSuiteFolderBookmarks?.toggle === 'function'
     },
     {
       id: 'bo',

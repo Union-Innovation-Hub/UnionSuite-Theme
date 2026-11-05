@@ -705,6 +705,27 @@
     box-shadow: var(--shadow-lg);
   }
 
+  /* Object browser bookmarks pane: the object browser's own dark hover and
+     selection surfaces, so the open folder reads as the tree's selection. */
+  :root[data-us-color-scheme="dark"] .us-ob-bookmarks {
+    --icon-hover-bg: var(--dm-hover);
+  }
+
+  :root[data-us-color-scheme="dark"] .us-ob-bookmarks__go[aria-current] {
+    background: var(--dm-selected);
+  }
+
+  :root[data-us-color-scheme="dark"] .us-ob-bookmarks__go[aria-current] > .ti,
+  :root[data-us-color-scheme="dark"] .us-ob-bookmarks__go[aria-current] .us-ob-bookmarks__name {
+    color: var(--text-strong);
+  }
+
+  /* The "Copied" chip on a row lifts off the dark list. */
+  :root[data-us-color-scheme="dark"] .us-ob-actions > button.us-copy > .us-copy-label {
+    background: var(--bg-subtle);
+    box-shadow: var(--shadow-md);
+  }
+
   /* Classic RadWindow uses table cells as resize rails, not just an outer border.
      Scope to its own table so nested content tables/windows retain their styles. */
   :root[data-us-color-scheme="dark"] .RadWindow.RadWindow_Bootstrap:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
