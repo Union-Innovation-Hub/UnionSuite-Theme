@@ -22,7 +22,8 @@
  * the page's own address box and Go button.
  *
  * Bookmarks are saved to the user's i4u_UT_UserSettings row (SettingsKey
- * Folder-Bookmarks) as [[key, path], …], so they follow the user. A copy in
+ * Folder-Bookmarks) as [[key, path, display name], …], so they follow the
+ * user. A copy in
  * this browser draws the pane at once while the saved row loads.
  *
  * The core functions need no page; tools/test-object-browser-bookmarks.cjs
@@ -49,7 +50,8 @@
   const rootOf = path => String(path || '').charAt(0);
   const samePath = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase();
 
-  // A saved value: [[key, path], …]. Anything else is dropped.
+  // A saved value: [[key, path, display name], …], the display name only
+  // when it differs. Anything else is dropped.
   function parseBookmarks(value) {
     let parsed;
     try {
@@ -60,34 +62,51 @@
     if (!Array.isArray(parsed)) return [];
     const seen = new Set();
     return parsed
-      .map(item => Array.isArray(item) ? { k: String(item[0] || '').toLowerCase(), p: String(item[1] || '') } : null)
+      .map(item => Array.isArray(item) ? bookmark(item[0], item[1], item[2]) : null)
       .filter(item => item && GUID.test(item.k) && /^[$@]\/?/.test(item.p) && !seen.has(item.k) && seen.add(item.k));
   }
 
-  const serialise = list => JSON.stringify(list.map(item => [item.k, item.p]));
+  // k: the folder's document key; p: its path, of document names
+  // (Manage-Case); t: its display name (Manage Case), kept only when it
+  // differs from the last part of the path, to save room.
+  function bookmark(key, path, title) {
+    const entry = { k: String(key || '').toLowerCase(), p: String(path || '') };
+    const name = String(title || '').trim();
+    if (name && name !== nameOf(entry.p)) entry.t = name;
+    return entry;
+  }
+
+  const serialise = list => JSON.stringify(list.map(item => item.t ? [item.k, item.p, item.t] : [item.k, item.p]));
+
+  // The name shown for a bookmark: its display name, else its path's last part.
+  const titleOf = item => item.t || nameOf(item.p);
 
   // Newest first; a second toggle removes it.
   function toggleIn(list, entry) {
     const key = String(entry.k || '').toLowerCase();
     if (list.some(item => item.k === key)) return list.filter(item => item.k !== key);
-    return [{ k: key, p: entry.p }].concat(list);
+    return [bookmark(key, entry.p, entry.t)].concat(list);
   }
 
-  // A folder seen at a new path (moved or renamed) keeps its bookmark.
-  function renameIn(list, key, path) {
+  // A folder found at a new path (moved, renamed, or saved with display
+  // names before 6 November 2026) keeps its bookmark. A display name given
+  // replaces the old one.
+  function renameIn(list, key, path, title) {
     const lower = String(key || '').toLowerCase();
     let changed = false;
     const next = list.map(item => {
-      if (item.k !== lower || item.p === path) return item;
+      if (item.k !== lower) return item;
+      const updated = bookmark(item.k, path, title === undefined ? item.t : title);
+      if (updated.p === item.p && updated.t === item.t) return item;
       changed = true;
-      return { k: item.k, p: path };
+      return updated;
     });
     return changed ? next : list;
   }
 
   const forRoot = (list, root) => list.filter(item => rootOf(item.p) === root);
 
-  const core = Object.freeze({ joinPath, nameOf, parentOf, rootOf, parseBookmarks, serialise, toggleIn, renameIn, forRoot });
+  const core = Object.freeze({ joinPath, nameOf, parentOf, rootOf, parseBookmarks, serialise, titleOf, toggleIn, renameIn, forRoot });
   if (typeof module === 'object' && module.exports) module.exports = core;
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
   if (window.UnionSuiteFolderBookmarks) return;
@@ -158,14 +177,42 @@
     return prefix ? document.getElementById(prefix + suffix) : null;
   };
 
-  // The open folder's path: the tree's selected node, else the address box.
-  function currentFolder() {
+  function selectedNode() {
     const tree = byId('_RadTreeView1');
     try {
-      let node = tree && window.$find?.(tree.id)?.get_selectedNode();
+      return (tree && window.$find?.(tree.id)?.get_selectedNode()) || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // A tree node's document name (Manage-Case). Its text is the display
+  // name (Manage Case), which a path cannot use.
+  function documentName(node) {
+    try {
+      return String(node.get_attributes?.()?.getAttribute?.('data-DocumentName') || node.get_text() || '');
+    } catch (_) {
+      return '';
+    }
+  }
+
+  // The open folder's display name, from the tree.
+  function currentTitle() {
+    try {
+      return String(selectedNode()?.get_text() || '').trim();
+    } catch (_) {
+      return '';
+    }
+  }
+
+  // The open folder's path, of document names: the tree's selected node and
+  // its parents, else the address box.
+  function currentFolder() {
+    try {
+      let node = selectedNode();
       const parts = [];
       while (node && typeof node.get_text === 'function') {
-        parts.unshift(node.get_text());
+        parts.unshift(documentName(node));
         node = node.get_parent();
       }
       if (parts.length && /^[$@]$/.test(parts[0])) return parts.join('/');
@@ -254,7 +301,7 @@
 
   function setList(list) {
     state.list = list;
-    writeLocal(CACHE_KEY, list.map(item => [item.k, item.p]));
+    writeLocal(CACHE_KEY, JSON.parse(serialise(list)));
   }
 
   async function load() {
@@ -413,7 +460,7 @@
         void star.offsetWidth;
         star.classList.add('us-ob-address-star--pop');
       }
-      toggle({ k: key, p: path });
+      toggle({ k: key, p: path, t: currentTitle() });
     });
     star.addEventListener('animationend', () => star.classList.remove('us-ob-address-star--pop'));
 
@@ -451,12 +498,42 @@
     // bookmark. Only trusted when the tree and the address box agree.
     const typed = String(address.value || '').trim().replace(/\/+$/, '');
     if (on && samePath(path, typed)) {
-      const healed = renameIn(state.list, key, path);
+      const healed = renameIn(state.list, key, path, currentTitle());
       if (healed !== state.list) {
         setList(healed);
         save();
       }
     }
+  }
+
+  // A bookmark's folder, wherever it is now: its path and display name looked
+  // up by key (about 150ms), so a folder moved or renamed since, or a
+  // bookmark saved with display names, still goes to the right place and
+  // is put right. If the lookup fails or is slow, the saved path is used.
+  async function goToBookmark(entry, button) {
+    if (button.getAttribute('aria-busy') === 'true') return;
+    button.setAttribute('aria-busy', 'true');
+    let path = entry.p;
+    try {
+      const lookup = api('GET', 'DocumentSummary?DocumentVersionId=' + encodeURIComponent(entry.k) + '&Limit=5');
+      const late = new Promise(resolve => setTimeout(() => resolve(null), 2000));
+      const data = await Promise.race([lookup, late]);
+      const status = each => String(scalar(each?.Status?.Name ?? each?.Status) || '');
+      const row = (data?.Items?.$values || []).find(each => /^[$@]\//.test(String(scalar(each?.Path) || '')) && !/archiv|recycl|delet/i.test(status(each)));
+      const found = String(scalar(row?.Path) || '').replace(/\/+$/, '');
+      if (found) {
+        path = found;
+        const healed = renameIn(state.list, entry.k, found, String(scalar(row?.AlternateName) || '').trim() || undefined);
+        if (healed !== state.list) {
+          setList(healed);
+          save();
+        }
+      }
+    } catch (error) {
+      console.warn('[UnionSuiteFolderBookmarks] lookup', error);
+    }
+    button.removeAttribute('aria-busy');
+    goToFolder(path);
   }
 
   /* ===========================================================================
@@ -475,16 +552,16 @@
     go.title = entry.p;
     go.append(
       icon('ti-folder'),
-      element('span', 'us-ob-bookmarks__name', nameOf(entry.p)),
+      element('span', 'us-ob-bookmarks__name', titleOf(entry)),
       element('span', 'us-ob-bookmarks__path', parentOf(entry.p))
     );
     if (samePath(entry.p, currentFolder())) go.setAttribute('aria-current', 'location');
-    go.addEventListener('click', () => goToFolder(entry.p));
+    go.addEventListener('click', () => goToBookmark(entry, go));
 
     const remove = element('button', 'us-ob-bookmarks__star');
     remove.type = 'button';
     remove.setAttribute('aria-pressed', 'true');
-    remove.setAttribute('aria-label', 'Remove ' + nameOf(entry.p) + ' from bookmarks');
+    remove.setAttribute('aria-label', 'Remove ' + titleOf(entry) + ' from bookmarks');
     remove.title = 'Remove bookmark';
     remove.append(icon('ti-star-filled'));
     remove.addEventListener('click', () => {
@@ -608,12 +685,13 @@
   }
 
   window.UnionSuiteFolderBookmarks = Object.freeze(Object.assign({
-    version: '1.1',
+    version: '1.2',
     list: () => state.list.slice(),
     isBookmarked,
     toggle,
     currentFolder,
     currentKey,
+    currentTitle,
     refresh
   }, core));
 

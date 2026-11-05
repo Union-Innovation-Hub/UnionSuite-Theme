@@ -58,6 +58,23 @@ test('toggling adds newest first and removes; renaming keeps the bookmark', () =
   assert.equal(core.renameIn(list, a.k, '$/A'), list, 'unchanged list is the same list');
 });
 
+test('display names: kept only when they differ from the path, and saved third', () => {
+  const key = '11111111-2222-3333-4444-555555555555';
+  let list = core.toggleIn([], { k: key, p: '@/_i4u_/Core/Cases/UnionSuite/Manage-Case', t: 'Manage Case' });
+  assert.equal(core.titleOf(list[0]), 'Manage Case');
+  assert.equal(core.serialise(list), JSON.stringify([[key, '@/_i4u_/Core/Cases/UnionSuite/Manage-Case', 'Manage Case']]));
+  assert.deepEqual(core.parseBookmarks(core.serialise(list)), list);
+  const plain = core.toggleIn([], { k: key, p: '$/_i4u_/Core', t: 'Core' });
+  assert.equal(plain[0].t, undefined);
+  assert.equal(core.titleOf(plain[0]), 'Core');
+  // A bookmark saved with display names in its path is put right, and its
+  // display name kept unless a new one is given.
+  list = core.parseBookmarks(JSON.stringify([[key, '@/_i4u_/Core/Cases/UnionSuite/Manage Case']]));
+  list = core.renameIn(list, key, '@/_i4u_/Core/Cases/UnionSuite/Manage-Case', 'Manage Case');
+  assert.deepEqual(list, [{ k: key, p: '@/_i4u_/Core/Cases/UnionSuite/Manage-Case', t: 'Manage Case' }]);
+  assert.equal(core.renameIn(list, key, '@/_i4u_/Core/Cases/UnionSuite/Manage-Case'), list);
+});
+
 /* ---------------------------------------------------------------------------
  * In the browser
  * ------------------------------------------------------------------------ */
@@ -89,12 +106,14 @@ function fixture(prefix, rows) {
 <script>
   window.__rowEvents = [];
   window.__go = [];
+  // The tree shows display names; a path is made of document names.
   const path = ['$', '_i4u_'];
+  const shown = ['$', 'i4u Folder'];
   const keys = ['${KEYS.root}', '${KEYS.open}'];
   const node = i => i < 0 ? null : {
-    get_text: () => path[i],
+    get_text: () => shown[i],
     get_parent: () => node(i - 1),
-    get_attributes: () => ({ getAttribute: name => name === 'DocumentVersionKey' ? keys[i] : null })
+    get_attributes: () => ({ getAttribute: name => name === 'DocumentVersionKey' ? keys[i] : name === 'data-DocumentName' ? path[i] : null })
   };
   window.$find = () => ({ get_selectedNode: () => node(path.length - 1) });
 </script></head><body>
@@ -135,6 +154,13 @@ async function openPage(browser, { pagePath, prefix, rows, saved, scripts, iqaFa
     if (url.pathname.startsWith('/theme/')) {
       const file = path.join(THEME, decodeURIComponent(url.pathname.slice('/theme/'.length)));
       return route.fulfill({ contentType: file.endsWith('.css') ? 'text/css' : 'text/javascript', body: fs.readFileSync(file, 'utf8') });
+    }
+    // A bookmarked folder renamed since it was saved.
+    if (url.pathname === '/api/DocumentSummary') {
+      const moved = url.searchParams.get('DocumentVersionId') === KEYS.client
+        ? [{ Path: '$/_i4u_/Client-Files', FolderPath: '$/_i4u_', Name: 'Client-Files', AlternateName: 'Client Files', Status: 'Published' }]
+        : [];
+      return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ Items: { $values: moved } }) });
     }
     if (url.pathname.startsWith('/api/i4u_UT_UserSettings')) {
       requests.push({ method, url: url.pathname + url.search, body: route.request().postData() });
@@ -241,11 +267,16 @@ test('object browser rows, the address box and the Bookmarks pane', async t => {
     assert.ok(put, 'saved with PUT to the existing row');
     assert.match(put.url, /i4u_UT_UserSettings\/100\/7$/);
     const value = JSON.parse(put.body).Properties.$values.find(entry => entry.Name === 'Value').Value;
-    assert.deepEqual(JSON.parse(value), [[KEYS.open, '$/_i4u_'], [KEYS.client, '$/_i4u_/Client'], [KEYS.content, '@/_i4u_/Pages']]);
+    // The path of document names; the tree's display name kept beside it.
+    assert.deepEqual(JSON.parse(value), [[KEYS.open, '$/_i4u_', 'i4u Folder'], [KEYS.client, '$/_i4u_/Client'], [KEYS.content, '@/_i4u_/Pages']]);
+    assert.equal(await page.textContent('.us-ob-bookmarks__go[aria-current] .us-ob-bookmarks__name'), 'i4u Folder');
 
-    // Choosing a bookmark uses the address box and Go.
+    // Choosing a bookmark looks up where its folder is now (renamed here),
+    // puts the bookmark right and goes there with the address box and Go.
     await page.click('.us-ob-bookmarks__go[title="$/_i4u_/Client"]');
-    assert.deepEqual(await page.evaluate(() => window.__go), ['$/_i4u_/Client']);
+    await page.waitForFunction(() => window.__go.length === 1);
+    assert.deepEqual(await page.evaluate(() => window.__go), ['$/_i4u_/Client-Files']);
+    assert.deepEqual(await page.evaluate(key => JSON.parse(localStorage.getItem('unionsuite:folder-bookmarks')).find(item => item[0] === key), KEYS.client), [KEYS.client, '$/_i4u_/Client-Files', 'Client Files']);
     await page.fill('[id$="_Address"]', '$/_i4u_');
 
     // Collapse and reopen; remembered in this browser.
