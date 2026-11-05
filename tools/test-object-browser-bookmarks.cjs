@@ -103,7 +103,7 @@ function fixture(prefix, rows) {
 <div class="ObjectBrowserWrapper">
   <div id="${prefix}_AddressUpdatePanel" style="display:block;overflow:hidden">
     <input type="text" class="InputXLarge" id="${prefix}_Address" value="$/_i4u_" style="float:left;box-sizing:border-box;width:400px;height:33px;padding:0 10px;border:1px solid #999">
-    <input type="button" id="${prefix}_AddressGoButton" value="Go" style="float:left;height:36px" onclick="window.__go.push(document.getElementById('${prefix}_Address').value)">
+    <input type="button" id="${prefix}_AddressGoButton" value="Go" style="float:left;height:33px" onclick="window.__go.push(document.getElementById('${prefix}_Address').value)">
   </div>
   <div class="QuickFindWrapper"><input type="text" id="${prefix}_ObjectQuickFindTextBox"></div>
   <table><tr>
@@ -199,15 +199,21 @@ test('object browser rows, the address box and the Bookmarks pane', async t => {
     await page.click(`[id="${KEYS.doc}"] .us-ob-copy`);
     await page.waitForFunction(() => window.__copied.includes('$/_i4u_/Case List'));
 
-    // The address box: Copy path then the star, straight after the box and
-    // inside its right end.
-    const tools = await page.$eval('[id$="_Address"]', box => {
-      const next = box.nextElementSibling;
-      const a = box.getBoundingClientRect();
+    // The address row: Copy path then the star, straight after Go, on its
+    // line and clear of the box.
+    const tools = await page.$eval('[id$="_AddressGoButton"]', go => {
+      const next = go.nextElementSibling;
+      const box = document.querySelector('[id$="_Address"]').getBoundingClientRect();
+      const g = go.getBoundingClientRect();
       const b = next.getBoundingClientRect();
-      return { className: next.className, buttons: [...next.children].map(c => c.className), inside: b.left >= a.left && b.right <= a.right + 1 };
+      return {
+        className: next.className,
+        buttons: [...next.children].map(c => c.className),
+        afterGo: b.left >= g.right && b.left >= box.right,
+        sameLine: Math.abs(b.top - box.top) < 2 && Math.round(b.height) === Math.round(box.height)
+      };
     });
-    assert.deepEqual(tools, { className: 'us-ob-address-tools', buttons: ['us-copy us-ob-address-copy', 'us-ob-address-star'], inside: true });
+    assert.deepEqual(tools, { className: 'us-ob-address-tools', buttons: ['us-copy us-ob-address-copy', 'us-ob-address-star'], afterGo: true, sameLine: true });
 
     // Address Copy path copies the open folder (even with other text typed)
     // and flashes the box.
@@ -253,13 +259,13 @@ test('object browser rows, the address box and the Bookmarks pane', async t => {
     await page.click(`.us-ob-bookmarks__item[data-key="${KEYS.open}"] .us-ob-bookmarks__star`);
     await page.waitForFunction(() => document.querySelector('.us-ob-address-star').getAttribute('aria-pressed') === 'false');
 
-    // A partial postback redraws the address box; the tools come back.
+    // A partial postback redraws the address box and Go; the tools come back.
     await page.evaluate(() => {
       const box = document.querySelector('[id$="_Address"]');
       const panel = box.parentElement;
       panel.innerHTML = panel.innerHTML.replace(/<span class="us-ob-address-tools"[\s\S]*?<\/span>/, '');
     });
-    await page.waitForFunction(() => document.querySelector('[id$="_Address"]').nextElementSibling?.className === 'us-ob-address-tools');
+    await page.waitForFunction(() => document.querySelector('[id$="_AddressGoButton"]').nextElementSibling?.className === 'us-ob-address-tools');
 
     // Touch-sized icons on narrow windows.
     await page.setViewportSize({ width: 800, height: 800 });
@@ -275,14 +281,14 @@ test('object browser rows, the address box and the Bookmarks pane', async t => {
       rows: row(KEYS.core, 'Core', 'FOL', 'true') + row(KEYS.query, 'Case List', 'IQD', 'false'),
       saved: null,
       iqaFavourites: JSON.stringify([KEYS.query]),
-      scripts: ['Scripts/IQA-Finder.js', 'Scripts/ObjectBrowser-Bookmarks.js']
+      scripts: ['Scripts/Document-Finder.js', 'Scripts/ObjectBrowser-Bookmarks.js']
     });
     await page.waitForSelector('.us-ob-bookmarks__empty');
-    await page.waitForFunction(() => window.UnionSuiteIqaFinder?.favourites().length === 1);
+    await page.waitForFunction(() => window.UnionSuiteDocumentFinder?.favourites().length === 1);
     const group = await page.$$eval(`[id="${KEYS.query}"] .us-ob-actions > button`, buttons => buttons.map(b => b.className));
     assert.deepEqual(group, ['us-copy us-ob-copy']);
-    assert.equal(await page.$$eval('.us-iqa-finder__star', stars => stars.length), 0);
-    assert.match(await page.textContent('.us-ob-bookmarks__empty'), /star in the address box/);
+    assert.equal(await page.$$eval('.us-doc-finder__star', stars => stars.length), 0);
+    assert.match(await page.textContent('.us-ob-bookmarks__empty'), /star beside Go/);
     await context.close();
   });
 });

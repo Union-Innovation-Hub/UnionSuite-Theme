@@ -40,7 +40,7 @@
   // stable URLs, so this is what invalidates them. Bump it when a child file
   // changes; changing this loader alone does not need it, because the entry
   // URL refreshes itself. Bumping needlessly re-downloads every child.
-  const RELEASE = '1.0.19';
+  const RELEASE = '1.0.20';
   const LOAD_TIMEOUT_MS = 20000;
 
   /* Load graph.
@@ -146,24 +146,25 @@
       ready: () => typeof window.UnionSuiteWhereUsed?.open === 'function'
     },
     {
-      id: 'iqa-finder',
-      path: 'Scripts/IQA-Finder.js',
-      // IQA browser: search every query, favourites and recent items from
-      // Quick find. IQA designer: records the open query as recently opened.
-      when: () => /\/AsiCommon\/Controls\/IQA\/Default\.aspx$|\/QueryBuilder\/Design\.aspx$/i.test(location.pathname),
+      id: 'document-finder',
+      path: 'Scripts/Document-Finder.js',
+      // Quick find on the IQA browser and the content designer: search every
+      // query, or every page and folder, with favourites and recent items.
+      // In their editors (the IQA designer, the content editor) it records
+      // the open document as recently opened. Was 'iqa-finder'
+      // (Scripts/IQA-Finder.js) until 5 November 2026.
+      when: () => /\/AsiCommon\/Controls\/IQA\/Default\.aspx$|\/QueryBuilder\/Design\.aspx$|\/ContentManagement\/ContentDesigner\.aspx$|\/ContentManagement\/ContentDesigner\/ContentRecordEdit\.aspx$/i.test(location.pathname),
       critical: false,
-      ready: () => typeof window.UnionSuiteIqaFinder?.search === 'function'
+      ready: () => typeof window.UnionSuiteDocumentFinder?.search === 'function'
     },
     {
       id: 'object-browser-bookmarks',
       path: 'Scripts/ObjectBrowser-Bookmarks.js',
       // The three screens built on the native object browser: the IQA
-      // browser, the content designer and the document browser. Copy path
-      // and bookmark icons on list rows, and a Bookmarks pane above the
-      // folder tree. Copy path is the shared US-COPY button, so it follows
-      // core. Not after 'iqa-finder', which is gated out on two of the three
-      // screens: the IQA browser's pane picks up starred queries from the
-      // finder's 'unionsuite:iqa-favourites' event whenever it loads.
+      // browser, the content designer and the document browser. Copy path on
+      // list rows, Copy path and a bookmark star for the open folder after
+      // Go, and a Bookmarks pane above the folder tree. Copy path is the
+      // shared US-COPY button, so it follows core.
       after: ['core'],
       when: () => /\/AsiCommon\/Controls\/IQA\/Default\.aspx$|\/ContentManagement\/ContentDesigner\.aspx$|\/AsiCommon\/Controls\/BSA\/DocumentBrowser\.aspx$/i.test(location.pathname),
       critical: false,

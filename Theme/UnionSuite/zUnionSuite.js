@@ -22793,7 +22793,7 @@ SOFTWARE.
   }
 
   // While loading, the theme's spinning circles lead the message, as beside
-  // the IQA finder's "Searching…". An unchanged note is left alone, so the
+  // the document finder's "Searching…". An unchanged note is left alone, so the
   // spinner does not restart on every render.
   function setNote(note, message, loading) {
     const spinning = Boolean(note.querySelector(':scope > .section-loader-spinning-circles'));

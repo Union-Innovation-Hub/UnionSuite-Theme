@@ -1,6 +1,5 @@
 // Guide-only fixture: the object browser (IQA browser, content designer,
-// document browser) with Copy path and the bookmark star in the address
-// box, the Bookmarks pane above the folder tree and Copy path on the
+// document browser) with Copy path and the bookmark star after Go, the Bookmarks pane above the folder tree and Copy path on the
 // selected row. The markup mirrors what
 // Theme/UnionSuite/Scripts/ObjectBrowser-Bookmarks.js draws, styled by the
 // shared US-OB-BOOKMARKS and US-COPY CSS; paths come from the script's own
@@ -33,14 +32,15 @@ function row(name, { selected = false, folder = true } = {}) {
     <span class="us-ob-actions"><button type="button" class="us-copy us-ob-copy" title="Copy path" aria-label="Copy path of ${esc(name)}" data-us-copy-text="${esc(path)}"></button></span></td></tr>`;
 }
 
-// The address box as iMIS floats it, with the tools the script puts after it.
+// The address box and Go as iMIS floats them, with the tools the script
+// puts after Go.
 const address = `<div class="demo-address">
-  <input type="text" class="InputXLarge us-ob-address" value="${esc(OPEN)}" aria-label="Address">
+  <input type="text" class="InputXLarge" value="${esc(OPEN)}" aria-label="Address">
+  <input type="button" class="TextButton" value="Go">
   <span class="us-ob-address-tools">
     <button type="button" class="us-copy us-ob-address-copy" title="Copy this folder’s path" aria-label="Copy this folder’s path"></button>
     <button type="button" class="us-ob-address-star" aria-pressed="true" title="Remove this folder from bookmarks" aria-label="Remove Core from bookmarks"><i class="ti ti-star-filled" aria-hidden="true"></i></button>
   </span>
-  <input type="button" class="TextButton" value="Go">
 </div>`;
 
 exports.documentHtml = ({nativePreviewCss, theme, iconCss, branding}) => {
@@ -56,7 +56,7 @@ html{height:auto}
 body{height:auto;margin:0;padding:20px;background:var(--bg-page);font:14px/1.4 var(--font-ui)}
 .demo-browser{display:grid;grid-template-columns:minmax(200px,260px) minmax(0,1fr);max-width:760px;border:1px solid var(--border);background:var(--bg-surface)}
 .demo-address{grid-column:1/-1;display:flow-root;padding:8px 10px;border-bottom:1px solid var(--border)}
-.demo-address .InputXLarge{float:left;box-sizing:border-box;width:min(400px,calc(100% - 60px));height:33px;padding:0 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-base);font:14px/1 var(--font-ui)}
+.demo-address .InputXLarge{float:left;box-sizing:border-box;width:min(400px,calc(100% - 140px));height:33px;padding:0 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-base);font:14px/1 var(--font-ui)}
 .demo-address .TextButton{float:left;height:33px;margin-left:4px}
 .demo-tree-pane{border-right:1px solid var(--border)}
 .demo-tree{margin:0;padding:6px 10px;list-style:none;color:var(--text-base)}
@@ -74,5 +74,5 @@ figcaption{margin-top:8px;color:var(--text-muted);font:12px/1.5 var(--font-ui)}
   ${address}
   <div class="demo-tree-pane">${pane}<ul class="demo-tree">${tree}</ul></div>
   <table class="demo-list"><tbody>${rows}</tbody></table>
-</div><figcaption>The document browser open at <code>${esc(OPEN)}</code>, which is bookmarked: the star in the address box is filled and the pane marks it. The copy icon beside the star copies <code>${esc(OPEN)}</code>. <strong>Cases</strong> is selected: its copy icon copies <code>${esc(bookmarks.joinPath(OPEN, 'Cases'))}</code>.</figcaption></figure></body></html>`;
+</div><figcaption>The document browser open at <code>${esc(OPEN)}</code>, which is bookmarked: the star after Go is filled and the pane marks it. The copy icon beside it copies <code>${esc(OPEN)}</code>. <strong>Cases</strong> is selected: its copy icon copies <code>${esc(bookmarks.joinPath(OPEN, 'Cases'))}</code>.</figcaption></figure></body></html>`;
 };

@@ -143,13 +143,13 @@ a theme section, selector or a Show Usage passage it changes has moved.
 What goes in:
 
 - The theme's IQA scripts, unchanged: `Scripts/HtmlSourceEditor.js`,
-  `Scripts/IQA-Enhancements.js`, `Scripts/IQA-Finder.js`, and
+  `Scripts/IQA-Enhancements.js`, `Scripts/Document-Finder.js` (Quick find; was `IQA-Finder.js`), and
   `Scripts/IQA-WhereUsed.js` with its theme-scripts place left out and its
   results kept on the page when they cannot be saved.
 - From `zUnionSuite.js`: the `US-COPY` (copy buttons) and `US-RECORD-CARDS`
   (sliding fold) sections.
 - From `zUnionSuite.css`: the `US-COPY`, `US-HTML-SOURCE`, `US-WHERE-USED`
-  and `US-IQA-FINDER` sections (less banner rules), and the switch, spinner,
+  and `US-DOCUMENT-FINDER` sections (less banner rules), and the switch, spinner,
   busy-label, tab-loading and filter-condition rules.
 - `iqa-standalone.base.css`, and the 16 Tabler icons the scripts use, drawn as
   inline SVG masks instead of the 800KB icon font.

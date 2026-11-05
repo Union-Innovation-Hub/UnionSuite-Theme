@@ -12,8 +12,10 @@
  * copy button (US-COPY). It copies the item's full path, such as
  * $/_i4u_/Core/Cases/Case List, and never opens the IQA, page or document.
  *
- * The address box gets the same for the open folder, as a web browser's
- * address bar does: Copy path (the box flashes) and a bookmark star.
+ * The address row gets the same for the open folder, after Go: Copy path
+ * (the address box flashes) and a bookmark star, as a web browser's address
+ * bar has. The back, forward and up icons on the left move between folders;
+ * these act on the folder that is open, so they sit apart from them.
  *
  * A Bookmarks pane sits above the left folder tree. It lists the bookmarked
  * folders for this screen's tree ($ or @). Choosing one goes there through
@@ -381,7 +383,7 @@
   }
 
   /* ===========================================================================
-   * Copy path and the bookmark star for the open folder, in the address box
+   * Copy path and the bookmark star for the open folder, after Go
    * ======================================================================== */
   function addressTools(address) {
     const tools = element('span', 'us-ob-address-tools');
@@ -419,16 +421,16 @@
     return tools;
   }
 
-  // The address box sits in an update panel that partial postbacks redraw,
-  // so the tools are put back after the box whenever they are missing.
+  // The address box and Go sit in an update panel that partial postbacks
+  // redraw, so the tools are put back after Go whenever they are missing.
   function paintAddress() {
     const address = byId('_Address');
-    if (!address) return;
-    let tools = address.nextElementSibling?.classList.contains('us-ob-address-tools') ? address.nextElementSibling : null;
+    const go = byId('_AddressGoButton');
+    if (!address || !go) return;
+    let tools = go.nextElementSibling?.classList.contains('us-ob-address-tools') ? go.nextElementSibling : null;
     if (!tools) {
       tools = addressTools(address);
-      address.after(tools);
-      address.classList.add('us-ob-address');
+      go.after(tools);
     }
     const star = tools.querySelector('.us-ob-address-star');
 
@@ -510,7 +512,7 @@
     } else {
       const loaded = state.loaded || readLocal(CACHE_KEY, null) !== null;
       nodes.push(element('p', 'us-ob-bookmarks__empty', loaded
-        ? 'Open a folder and choose the star in the address box to keep it here.'
+        ? 'Open a folder and choose the star beside Go to keep it here.'
         : 'Loading bookmarks…'));
     }
     if (state.error) nodes.push(element('p', 'us-ob-bookmarks__empty us-ob-bookmarks__empty--warning', state.error));

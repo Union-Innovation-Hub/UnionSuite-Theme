@@ -148,7 +148,7 @@ allSources.push('Theme/UnionSuite-Guides/usage/build/report-icon-example.cjs');
 allSources.push(...require('./panel-title-icons-example.cjs').sources);
 allSources.push(...require('./where-used-example.cjs').sources);
 allSources.push(...require('./side-pane-example.cjs').sources);
-allSources.push(...require('./iqa-finder-example.cjs').sources);
+allSources.push(...require('./document-finder-example.cjs').sources);
 allSources.push(...require('./object-browser-bookmarks-example.cjs').sources);
 allSources.push(...require('./popup-forms-example.cjs').sources);
 allSources.push('Theme/UnionSuite-Guides/usage/build/popup-action-example.cjs');
@@ -281,7 +281,7 @@ const inserts = {
  REPORT_ICON_DEMO: iframe('report-icon-demo','Generated report icon actions',reportIconExample.documentHtml({nativePreviewCss,theme,themeJs,iconCss,branding:clientRoots}),true),
  POPUP_FORMS_ADD_DEMO: iframe('popup-forms-add-demo','Task form: adding a task to an agreement',require('./popup-forms-example.cjs').documentHtml({nativePreviewCss,theme,branding:clientRoots,variant:'add'}),true),
  POPUP_FORMS_EDIT_DEMO: iframe('popup-forms-edit-demo','Task form: editing a case task',require('./popup-forms-example.cjs').documentHtml({nativePreviewCss,theme,branding:clientRoots,variant:'edit'}),true),
- IQA_FINDER_DEMO: iframe('iqa-finder-demo','IQA browser: search, favourites and recent',require('./iqa-finder-example.cjs').documentHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
+ DOCUMENT_FINDER_DEMO: iframe('document-finder-demo','Document finder: Quick find on the IQA browser and content designer',require('./document-finder-example.cjs').documentHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
  OBJECT_BROWSER_BOOKMARKS_DEMO: iframe('object-browser-bookmarks-demo','Object browser: Copy path and folder bookmarks',require('./object-browser-bookmarks-example.cjs').documentHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
  SIDE_PANE_DEMO: iframe('side-pane-demo','Taskbar side pane: Case help on a case page',require('./side-pane-example.cjs').liveHtml({read,nativePreviewCss,theme,iconCss,branding:clientRoots}),true),
  SIDE_CHAT_DEMO: iframe('side-chat-demo','Side pane chat styles for help tabs',require('./side-pane-example.cjs').chatHtml({nativePreviewCss,theme,iconCss,branding:clientRoots}),true),

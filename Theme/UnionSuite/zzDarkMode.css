@@ -696,8 +696,8 @@
     color: var(--text-link);
   }
 
-  /* IQA finder: the taskbar quick search's dark hover, rules and icons. */
-  :root[data-us-color-scheme="dark"] .us-iqa-finder {
+  /* Document finder: the taskbar quick search's dark hover, rules and icons. */
+  :root[data-us-color-scheme="dark"] .us-doc-finder {
     --us-finder-hover: var(--dm-accent-bg);
     --us-finder-icon: var(--text-link);
     --border: var(--dm-border);

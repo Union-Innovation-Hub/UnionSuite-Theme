@@ -20929,17 +20929,18 @@ a[data-us-comms-log-held] {
 }
 /* US-SIDE-PANE:END */
 
-/* US-IQA-FINDER:START — IQA browser: search every query, favourites and
-   recent items from the native Quick find box (Scripts/IQA-Finder.js).
+/* US-DOCUMENT-FINDER:START — IQA browser and content designer: search every
+   query, or every page and folder, with favourites and recent items, from the
+   native Quick find box (Scripts/Document-Finder.js; was US-IQA-FINDER).
    Drawn as the taskbar's contact quick search (US-TASKBAR-COMPONENT): banded
    section headings, ruled rows and the same spinning circles while searching. */
-.us-iqa-finder-host {
+.us-doc-finder-host {
   position: relative;
 }
 
 /* The Quick find box, wide enough for its placeholder and a pasted path,
    drawn and focused as the theme's other fields. */
-.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"] {
+.us-doc-finder-host input[id$="_ObjectQuickFindTextBox"] {
   box-sizing: border-box;
   width: 360px;
   max-width: 100%;
@@ -20957,18 +20958,18 @@ a[data-us-comms-log-held] {
     box-shadow 150ms;
 }
 
-.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"]:hover {
+.us-doc-finder-host input[id$="_ObjectQuickFindTextBox"]:hover {
   border-color: var(--brand-600);
 }
 
-.us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"]:focus {
+.us-doc-finder-host input[id$="_ObjectQuickFindTextBox"]:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
   border-color: var(--field-focus-colour);
   box-shadow: var(--field-focus-glow);
 }
 
-.us-iqa-finder {
+.us-doc-finder {
   --us-finder-hover: var(--accent-100);
   --us-finder-icon: var(--brand-600);
   position: absolute;
@@ -20991,11 +20992,11 @@ a[data-us-comms-log-held] {
   text-align: left;
 }
 
-.us-iqa-finder[hidden] {
+.us-doc-finder[hidden] {
   display: none;
 }
 
-.us-iqa-finder__heading {
+.us-doc-finder__heading {
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -21010,13 +21011,13 @@ a[data-us-comms-log-held] {
   text-transform: uppercase;
 }
 
-.us-iqa-finder__list {
+.us-doc-finder__list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.us-iqa-finder__item {
+.us-doc-finder__item {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -21025,16 +21026,16 @@ a[data-us-comms-log-held] {
   transition: background-color 100ms;
 }
 
-.us-iqa-finder__section:last-child .us-iqa-finder__item:last-child {
+.us-doc-finder__section:last-child .us-doc-finder__item:last-child {
   border-bottom: 0;
 }
 
-.us-iqa-finder__item:hover {
+.us-doc-finder__item:hover {
   background: var(--us-finder-hover);
 }
 
-.us-iqa-finder__go,
-.us-iqa-finder__search {
+.us-doc-finder__go,
+.us-doc-finder__search {
   display: grid;
   flex: 1 1 auto;
   grid-template-columns: 18px minmax(0, 1fr);
@@ -21050,31 +21051,31 @@ a[data-us-comms-log-held] {
   cursor: pointer;
 }
 
-.us-iqa-finder__go > .ti,
-.us-iqa-finder__search > .ti {
+.us-doc-finder__go > .ti,
+.us-doc-finder__search > .ti {
   grid-row: span 2;
   color: var(--us-finder-icon);
   font-size: 18px;
 }
 
-.us-iqa-finder__go:focus-visible,
-.us-iqa-finder__search:focus-visible {
+.us-doc-finder__go:focus-visible,
+.us-doc-finder__search:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.us-iqa-finder__item:has(> :is(.us-iqa-finder__go, .us-iqa-finder__search):focus-visible) {
+.us-doc-finder__item:has(> :is(.us-doc-finder__go, .us-doc-finder__search):focus-visible) {
   background: var(--us-finder-hover);
 }
 
-.us-iqa-finder__open:focus-visible,
-.us-iqa-finder__star:focus-visible {
+.us-doc-finder__open:focus-visible,
+.us-doc-finder__star:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: 1px;
 }
 
-.us-iqa-finder__name,
-.us-iqa-finder__term {
+.us-doc-finder__name,
+.us-doc-finder__term {
   overflow: hidden;
   color: var(--text-strong);
   font: 600 13px/1.4 var(--font-ui);
@@ -21082,11 +21083,11 @@ a[data-us-comms-log-held] {
   white-space: nowrap;
 }
 
-.us-iqa-finder__term {
+.us-doc-finder__term {
   font-weight: 400;
 }
 
-.us-iqa-finder__path {
+.us-doc-finder__path {
   margin-top: 1px;
   overflow: hidden;
   color: var(--text-muted);
@@ -21095,8 +21096,8 @@ a[data-us-comms-log-held] {
   white-space: nowrap;
 }
 
-.us-iqa-finder__open,
-.us-iqa-finder__star {
+.us-doc-finder__open,
+.us-doc-finder__star {
   display: inline-grid;
   flex: none;
   place-items: center;
@@ -21115,18 +21116,18 @@ a[data-us-comms-log-held] {
     opacity 120ms;
 }
 
-.us-iqa-finder__open:hover,
-.us-iqa-finder__star:hover {
+.us-doc-finder__open:hover,
+.us-doc-finder__star:hover {
   background: var(--icon-hover-bg);
   color: var(--icon-hover-colour);
 }
 
-.us-iqa-finder__star[aria-pressed="true"] {
+.us-doc-finder__star[aria-pressed="true"] {
   color: var(--accent);
 }
 
-.us-iqa-finder__empty,
-.us-iqa-finder__status {
+.us-doc-finder__empty,
+.us-doc-finder__status {
   margin: 0;
   padding: 12px 14px;
   border-bottom: 1px solid var(--border);
@@ -21135,46 +21136,46 @@ a[data-us-comms-log-held] {
   text-align: center;
 }
 
-.us-iqa-finder__section:last-child .us-iqa-finder__empty,
-.us-iqa-finder__body > .us-iqa-finder__status:last-child {
+.us-doc-finder__section:last-child .us-doc-finder__empty,
+.us-doc-finder__body > .us-doc-finder__status:last-child {
   border-bottom: 0;
 }
 
-.us-iqa-finder__status--warning {
+.us-doc-finder__status--warning {
   color: var(--danger);
 }
 
 /* "Searching…" beside the theme's spinning circles, as in the taskbar. */
-.us-iqa-finder__loading {
+.us-doc-finder__loading {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-.us-iqa-finder__loading > .section-loader-spinning-circles {
+.us-doc-finder__loading > .section-loader-spinning-circles {
   --size: .42px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .us-iqa-finder-host input[id$="_ObjectQuickFindTextBox"],
-  .us-iqa-finder__item,
-  .us-iqa-finder__open,
-  .us-iqa-finder__star {
+  .us-doc-finder-host input[id$="_ObjectQuickFindTextBox"],
+  .us-doc-finder__item,
+  .us-doc-finder__open,
+  .us-doc-finder__star {
     transition: none;
   }
 }
 
 @media (forced-colors: active) {
-  .us-iqa-finder {
+  .us-doc-finder {
     border-color: CanvasText;
   }
 
-  .us-iqa-finder__star[aria-pressed="true"] {
+  .us-doc-finder__star[aria-pressed="true"] {
     color: Highlight;
   }
 }
-/* US-IQA-FINDER:END */
+/* US-DOCUMENT-FINDER:END */
 
 /* US-OB-BOOKMARKS:START — the iMIS object browser (IQA browser, content
    designer, document browser): Copy path on the list rows, Copy path and the
@@ -21240,28 +21241,22 @@ a[data-us-comms-log-held] {
   }
 }
 
-/* The open folder's Copy path and star, inside the address box's right end,
-   as a web browser's bookmark star. The box and the tools are floated
-   natively; the tools pull back over the box's padding. */
-input.us-ob-address {
-  padding-right: 66px;
-}
-
+/* The open folder's Copy path and star, after Go: the back, forward and up
+   icons on the left move between folders, these act on the open one. iMIS
+   floats the address box and Go, so the tools float after them, as tall as
+   the box (33px). */
 .us-ob-address-tools {
-  position: relative;
-  z-index: 1;
   display: flex;
   float: left;
   align-items: center;
   gap: 2px;
   height: 33px;
-  margin-left: -64px;
-  padding-right: 2px;
+  margin-left: 6px;
 }
 
 .us-ob-address-tools > button.us-copy {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
 }
 
 .us-ob-address-star {
@@ -21269,8 +21264,8 @@ input.us-ob-address {
   flex: none;
   place-items: center;
   box-sizing: border-box;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   margin: 0;
   padding: 0;
   border: 1px solid transparent;
@@ -21322,8 +21317,8 @@ input.us-ob-address {
   }
 }
 
-/* "Copied" sits left of the button as a small chip, clear of the star and
-   over the end of the path. */
+/* "Copied" as a small chip: left of a row's button, over the end of the
+   row; past the star in the address row, clear of Go. */
 .us-ob-actions > button.us-copy > .us-copy-label,
 .us-ob-address-tools > button.us-copy > .us-copy-label {
   inset-inline-start: auto;
@@ -21333,6 +21328,11 @@ input.us-ob-address {
   background: var(--bg-surface);
   box-shadow: var(--shadow-sm);
   color: var(--text-strong);
+}
+
+.us-ob-address-tools > button.us-copy > .us-copy-label {
+  inset-inline-start: calc(100% + 38px);
+  inset-inline-end: auto;
 }
 
 /* The pane above the folder tree. */
@@ -21530,21 +21530,18 @@ input.us-ob-address {
     height: 44px;
   }
 
-  /* The address box grows to the touch size so its tools fit inside. */
-  input.us-ob-address {
-    height: 44px;
-    padding-right: 94px;
-  }
-
   .us-ob-address-tools {
     height: 44px;
-    margin-left: -92px;
   }
 
   .us-ob-address-tools > button.us-copy,
   .us-ob-address-star {
     width: 44px;
     height: 44px;
+  }
+
+  .us-ob-address-tools > button.us-copy > .us-copy-label {
+    inset-inline-start: calc(100% + 50px);
   }
 
   .us-ob-bookmarks__toggle,

@@ -8,7 +8,7 @@
  *
  * The theme files are read, never written. The bundle holds:
  *   • the theme's IQA scripts, unchanged: HtmlSourceEditor.js,
- *     IQA-Enhancements.js, IQA-WhereUsed.js (Show Usage), IQA-Finder.js;
+ *     IQA-Enhancements.js, IQA-WhereUsed.js (Show Usage), Document-Finder.js;
  *   • the two zUnionSuite.js sections they lean on: US-COPY (the copy
  *     buttons) and US-RECORD-CARDS (the sliding fold);
  *   • their CSS from zUnionSuite.css, by section marker or by selector;
@@ -57,11 +57,11 @@ const SCRIPTS = [
   { name: 'Scripts/HtmlSourceEditor.js', text: () => read(path.join(THEME, 'Scripts', 'HtmlSourceEditor.js')) },
   { name: 'Scripts/IQA-Enhancements.js', text: () => read(path.join(THEME, 'Scripts', 'IQA-Enhancements.js')) },
   { name: 'Scripts/IQA-WhereUsed.js', text: () => whereUsedWithoutTheme(read(path.join(THEME, 'Scripts', 'IQA-WhereUsed.js'))) },
-  { name: 'Scripts/IQA-Finder.js', text: () => read(path.join(THEME, 'Scripts', 'IQA-Finder.js')) }
+  { name: 'Scripts/Document-Finder.js', text: () => read(path.join(THEME, 'Scripts', 'Document-Finder.js')) }
 ];
 
 // zUnionSuite.css sections taken whole (less any banner-only rules).
-const CSS_SECTIONS = ['US-COPY', 'US-HTML-SOURCE', 'US-WHERE-USED', 'US-IQA-FINDER'];
+const CSS_SECTIONS = ['US-COPY', 'US-HTML-SOURCE', 'US-WHERE-USED', 'US-DOCUMENT-FINDER'];
 
 // Single rules taken from anywhere in zUnionSuite.css, by selector. Each
 // pattern must match at least one rule, so a renamed class fails the build

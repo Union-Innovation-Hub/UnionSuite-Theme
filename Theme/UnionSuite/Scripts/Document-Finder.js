@@ -1,28 +1,41 @@
 /* =============================================================================
- * IQA finder — window.UnionSuiteIqaFinder
+ * Document finder — window.UnionSuiteDocumentFinder
  * -----------------------------------------------------------------------------
- * On the IQA browser (/AsiCommon/Controls/IQA/Default.aspx), the native
- * Quick find box keeps filtering the open folder and also opens a panel:
- *   • typing searches every IQA in every folder, by name or path;
+ * Quick find for two of the iMIS document screens built on the native object
+ * browser, each set up in SCREENS below:
+ *   • the IQA browser (/AsiCommon/Controls/IQA/Default.aspx): queries;
+ *   • the content designer (/ContentManagement/ContentDesigner.aspx): content
+ *     pages and content folders.
+ *
+ * The native Quick find box keeps filtering the open folder and also opens a
+ * panel:
+ *   • typing searches every folder, by name or path;
  *   • with the box empty it shows Favourites, Recently opened and Recent
  *     searches;
- *   • each result goes to its folder (selecting it there) or opens it in
- *     the designer, and has a star.
- * Query rows in the folder list have no star (owner, 5 November 2026: the
- * object browser bookmarks the open folder from the address box instead,
- * ObjectBrowser-Bookmarks.js); queries are starred here. Favourites are saved
- * to the user's i4u_UT_UserSettings row (SettingsKey IQA-Favourites), so
- * they follow the user; recent opens and searches stay in this browser.
+ *   • a query or page goes to its folder (selecting it there) or opens in its
+ *     editor, and has a star; a folder goes to that folder.
+ * Only queries and pages are starred here. Folders are bookmarked with the
+ * star after Go (ObjectBrowser-Bookmarks.js), and list rows have no star
+ * (owner, 5 November 2026). Favourites are saved to the user's
+ * i4u_UT_UserSettings row (SettingsKey IQA-Favourites or Content-Favourites),
+ * so they follow the user; recent opens and searches stay in this browser.
  *
- * In the IQA designer (/QueryBuilder/Design.aspx) it only records the open
- * IQA as recently opened, however it was opened.
+ * In each screen's editor (the IQA designer, /QueryBuilder/Design.aspx, and
+ * the content editor, /ContentManagement/ContentDesigner/ContentRecordEdit.aspx)
+ * it only records the open document as recently opened, however it was
+ * opened.
  *
- * Searching runs the Query Search IQA (SEARCH_QUERY below) through
- * /api/query with its "Document Path contains" filter set to the longest
- * word typed; the rows that come back are ranked here by every word.
- * Favourites and recent items are named from what searches return, or
- * looked up by key. The search functions need no page;
- * tools/test-iqa-finder.cjs loads this file in Node.
+ * Searching runs the screen's search IQA through /api/query with its
+ * "Document Path contains" filter set to the longest word typed; the rows
+ * that come back are ranked here by every word. Favourites and recent items
+ * are named from what searches return, or looked up by key.
+ *
+ * Renamed from IQA-Finder.js (window.UnionSuiteIqaFinder) on 5 November 2026,
+ * when it took on the content designer. The IQA browser keeps its old
+ * browser storage keys, so its recent lists carry over.
+ *
+ * The search functions need no page; tools/test-document-finder.cjs loads
+ * this file in Node.
  * ========================================================================== */
 (function () {
   'use strict';
@@ -30,7 +43,7 @@
   /* ===========================================================================
    * Core: search (no page needed)
    * ======================================================================== */
-  const fold = text => String(text || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  const fold = text => String(text || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
   const tokens = query => fold(query).split(/[\s/_\-.]+/).filter(Boolean);
 
   // Every word must appear in the name or the path. Names beat paths, a
@@ -68,21 +81,84 @@
   // The word the server filters on: the longest, so the fewest rows come back.
   const serverTerm = query => tokens(query).sort((a, b) => b.length - a.length)[0] || '';
 
-  const core = Object.freeze({ fold, tokens, score, search, folderOf, serverTerm });
+  // A search row's document type: CFL (content folder) and FOL (folder) are
+  // folders; Content, CON, IQD and anything else are documents.
+  const isFolderType = type => /^(CFL|FOL)$/i.test(String(type || '').trim());
+
+  const core = Object.freeze({ fold, tokens, score, search, folderOf, serverTerm, isFolderType });
   if (typeof module === 'object' && module.exports) module.exports = core;
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  if (window.UnionSuiteIqaFinder) return;
+  if (window.UnionSuiteDocumentFinder) return;
 
-  const ON_BROWSER = /\/AsiCommon\/Controls\/IQA\/Default\.aspx$/i.test(location.pathname);
-  const ON_DESIGNER = /\/QueryBuilder\/Design\.aspx$/i.test(location.pathname);
-  if (!ON_BROWSER && !ON_DESIGNER) return;
+  /* ===========================================================================
+   * Screens
+   * ======================================================================== */
+  const SCREENS = [
+    {
+      id: 'iqa',
+      browser: /\/AsiCommon\/Controls\/IQA\/Default\.aspx$/i,
+      editor: /\/QueryBuilder\/Design\.aspx$/i,
+      // Document Type Code IQD, an optional "Document Path contains" filter,
+      // and Document Version Key, Document Name, Document Path and Updated
+      // On (owner, 12 October 2026).
+      query: '$/_i4u_/Core/Admin/Query Search - IQA Document Tree Taskbar',
+      // The keys from before the rename, so recent lists carry over.
+      storage: 'unionsuite:iqa-finder',
+      favouritesKey: 'IQA-Favourites',
+      editorUrl: '/iMIS/QueryBuilder/Design.aspx?iMode=Edit&TemplateType=E&iUniformKey={key}&iOperation=Edit&DocumentTypeCode=IQD&IsPopup=true',
+      editorTitle: 'Edit IQA',
+      // The designer's Summary tab shows the path.
+      editorPath: () => document.querySelector('span[id$="_QueryPath"]')?.textContent.trim() || '',
+      text: {
+        placeholder: 'Quick find, or search all queries',
+        region: 'Search all queries',
+        go: 'Go to this query in its folder',
+        open: 'Open in the designer',
+        noMatch: 'No query names or paths match',
+        favouritesEmpty: 'Star a query to keep it here.',
+        openedEmpty: 'Queries you open in the designer appear here.'
+      },
+      icon: 'ti-file-search'
+    },
+    {
+      id: 'content',
+      browser: /\/ContentManagement\/ContentDesigner\.aspx$/i,
+      editor: /\/ContentManagement\/ContentDesigner\/ContentRecordEdit\.aspx$/i,
+      // Content pages and content folders, with the same filter and columns
+      // as the query search plus DocumentType: Content for a page, CFL for a
+      // folder (owner, 5 November 2026).
+      query: '$/_i4u_/Core/Admin/Content Search - CON Document Tree Taskbar',
+      storage: 'unionsuite:content-finder',
+      favouritesKey: 'Content-Favourites',
+      // As the taskbar opens a content page.
+      editorUrl: '/AsiCommon/Controls/ContentManagement/ContentDesigner/ContentRecordEdit.aspx?iMode=Edit&iUniformKey={key}&iOperation=Edit&TemplateType=E&DocumentTypeCode=CON&IsPopup=true',
+      editorTitle: 'Edit Content Page',
+      editorPath: () => '',
+      text: {
+        placeholder: 'Quick find, or search all pages',
+        region: 'Search all pages and folders',
+        go: 'Go to this page in its folder',
+        open: 'Open in the content editor',
+        noMatch: 'No page or folder names or paths match',
+        favouritesEmpty: 'Star a page to keep it here.',
+        openedEmpty: 'Pages you open in the content editor appear here.'
+      },
+      icon: 'ti-file-text'
+    }
+  ];
+
+  const SCREEN = SCREENS.find(screen => screen.browser.test(location.pathname) || screen.editor.test(location.pathname));
+  if (!SCREEN) return;
+  const ON_BROWSER = SCREEN.browser.test(location.pathname);
+  const TEXT = SCREEN.text;
 
   /* ===========================================================================
    * Browser storage: recent opens and searches
    * ======================================================================== */
-  const OPENED_KEY = 'unionsuite:iqa-finder:opened';
-  const SEARCHES_KEY = 'unionsuite:iqa-finder:searches';
-  const NAMES_KEY = 'unionsuite:iqa-finder:names';
+  const OPENED_KEY = SCREEN.storage + ':opened';
+  const SEARCHES_KEY = SCREEN.storage + ':searches';
+  const NAMES_KEY = SCREEN.storage + ':names';
+  const FILTER_KEY = SCREEN.storage + ':filter';
   const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   function readLocal(key, fallback) {
@@ -109,35 +185,36 @@
     writeLocal(SEARCHES_KEY, list.slice(0, 6));
   }
 
-  // Names and paths of queries seen, so favourites and recent items can be
-  // shown without asking the server. The 400 most recent are kept.
+  // Names, paths and folder flags of documents seen, so favourites and recent
+  // items can be shown without asking the server. The 400 most recent are
+  // kept, as [name, path, time, folder].
   function rememberNames(entries) {
     const names = readLocal(NAMES_KEY, {});
-    entries.forEach(entry => { if (entry?.k && entry.p) names[entry.k] = [entry.n, entry.p, Date.now()]; });
+    entries.forEach(entry => { if (entry?.k && entry.p) names[entry.k] = [entry.n, entry.p, Date.now(), entry.f ? 1 : 0]; });
     writeLocal(NAMES_KEY, Object.fromEntries(Object.entries(names).sort((a, b) => b[1][2] - a[1][2]).slice(0, 400)));
   }
 
   function knownEntry(key) {
     const known = readLocal(NAMES_KEY, {})[key];
-    return known ? { k: key, n: known[0], p: known[1] } : null;
+    return known ? { k: key, n: known[0], p: known[1], f: Boolean(known[3]) } : null;
   }
 
-  // The designer only records what is open.
-  if (ON_DESIGNER) {
+  // An editor only records what is open.
+  if (!ON_BROWSER) {
     const params = new Map([...new URLSearchParams(location.search)].map(([name, value]) => [name.toLowerCase(), value]));
-    const newQuery = /^(new|add|create)$/i.test(params.get('imode') || '') || /^(new|add|create)$/i.test(params.get('ioperation') || '');
+    const newDocument = /^(new|add|create)$/i.test(params.get('imode') || '') || /^(new|add|create)$/i.test(params.get('ioperation') || '');
     const key = String(params.get('iuniformkey') || '').toLowerCase();
-    if (!newQuery && GUID.test(key)) {
+    if (!newDocument && GUID.test(key)) {
       rememberOpened(key);
-      // The Summary tab shows the path; name the query from it when present.
+      // Name it from the editor's own path when it shows one.
       const name = () => {
-        const path = document.querySelector('span[id$="_QueryPath"]')?.textContent.trim() || '';
-        if (path.startsWith('$/')) rememberNames([{ k: key, n: path.split('/').pop(), p: path }]);
+        const path = SCREEN.editorPath();
+        if (/^[$@]\//.test(path)) rememberNames([{ k: key, n: path.split('/').pop(), p: path }]);
       };
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', name, { once: true });
       else name();
     }
-    window.UnionSuiteIqaFinder = Object.freeze(Object.assign({ version: '1.0' }, core));
+    window.UnionSuiteDocumentFinder = Object.freeze(Object.assign({ version: '2.0', screen: SCREEN.id }, core));
     return;
   }
 
@@ -205,14 +282,16 @@
     return folder && name ? folder + '/' + name : path;
   }
 
+  // The object browser's controls share an id prefix, such as
+  // ctl01_TemplateBody_ObjectBrowser1 or ctl01_TemplateBody_ContentItemBrowser.
+  const byId = suffix => {
+    const go = document.querySelector('input[id$="_AddressGoButton"]');
+    return go ? document.getElementById(go.id.slice(0, -'_AddressGoButton'.length) + suffix) : null;
+  };
+
   /* ===========================================================================
-   * Searching: the Query Search IQA, on the server
+   * Searching: the screen's search IQA, on the server
    * ======================================================================== */
-  // Document Type Code IQD, an optional "Document Path contains" filter, and
-  // Document Version Key, Document Name, Document Path and Updated On
-  // (owner, 12 October 2026).
-  const SEARCH_QUERY = '$/_i4u_/Core/Admin/Query Search - IQA Document Tree Taskbar';
-  const FILTER_KEY = 'unionsuite:iqa-finder:filter';
   const SERVER_LIMIT = 200;
 
   // The filter's name for /api/query, from QueryParameterDefinition once:
@@ -223,7 +302,7 @@
     if (filterNames) return filterNames;
     const found = [readLocal(FILTER_KEY, '')];
     try {
-      const data = await api('GET', 'QueryParameterDefinition?QueryPath=' + encodeURIComponent(SEARCH_QUERY));
+      const data = await api('GET', 'QueryParameterDefinition?QueryPath=' + encodeURIComponent(SCREEN.query));
       const prompts = data?.Items?.$values ?? data?.$values ?? (Array.isArray(data?.Items) ? data.Items : []);
       const prompt = prompts.find(each => /path/i.test(String(each?.PropertyName || each?.Prompt || ''))) || prompts[0];
       [prompt?.PropertyName, prompt?.Prompt].filter(Boolean).forEach(name => found.push(String(name), String(name).replace(/\s+/g, '')));
@@ -239,7 +318,8 @@
     const key = String(field(row, 'DocumentVersionKey', 'Document Version Key', 'DocumentVersionId')).toLowerCase();
     const path = String(field(row, 'DocumentPath', 'Document Path', 'Path'));
     const name = String(field(row, 'DocumentName', 'Document Name', 'Name') || path.split('/').pop());
-    return GUID.test(key) && path.startsWith('$/') ? { k: key, n: name, p: path } : null;
+    const folder = isFolderType(field(row, 'DocumentType', 'Document Type', 'DocumentTypeCode', 'Document Type Code'));
+    return GUID.test(key) && /^[$@]\//.test(path) ? { k: key, n: name, p: path, f: folder } : null;
   }
 
   async function searchServer(text, signal) {
@@ -247,7 +327,7 @@
     if (!term) return [];
     let lastError = null;
     for (const name of await filterCandidates()) {
-      const params = new URLSearchParams({ QueryName: SEARCH_QUERY, limit: String(SERVER_LIMIT) });
+      const params = new URLSearchParams({ QueryName: SCREEN.query, limit: String(SERVER_LIMIT) });
       params.set(name, term);
       try {
         const data = await api('GET', 'query?' + params, undefined, signal);
@@ -287,7 +367,7 @@
   /* ===========================================================================
    * Favourites: the user's i4u_UT_UserSettings row
    * ======================================================================== */
-  const SETTINGS = { entity: 'i4u_UT_UserSettings', key: 'IQA-Favourites', valueLimit: 3999 };
+  const SETTINGS = { entity: 'i4u_UT_UserSettings', key: SCREEN.favouritesKey, valueLimit: 3999 };
   const property = (name, value) => ({ $type: 'Asi.Soa.Core.DataContracts.GenericPropertyData, Asi.Contracts', Name: name, Value: value });
   const readProperty = (row, name) => scalar(row?.Properties?.$values?.find(entry => entry?.Name === name)?.Value);
   const partyId = () => {
@@ -319,7 +399,7 @@
       favourites.loaded = true;
     } catch (error) {
       favourites.error = 'Favourites couldn’t be loaded.';
-      console.error('[UnionSuiteIqaFinder] favourites', error);
+      console.error('[UnionSuiteDocumentFinder] favourites', error);
     }
     if (panel && !panel.hidden) renderPanel();
   }
@@ -360,7 +440,7 @@
         favourites.error = '';
       } catch (error) {
         favourites.error = 'The last change to favourites couldn’t be saved.';
-        console.error('[UnionSuiteIqaFinder] favourites', error);
+        console.error('[UnionSuiteDocumentFinder] favourites', error);
       }
       if (panel && !panel.hidden) renderPanel();
     }, 400);
@@ -376,24 +456,28 @@
     favourites.keys = isFavourite(lower) ? favourites.keys.filter(each => each !== lower) : [lower].concat(favourites.keys);
     saveFavourites();
     if (panel && !panel.hidden) renderPanel();
-    if (refocus) panel.querySelector('.us-iqa-finder__star[data-key="' + lower + '"]')?.focus();
+    if (refocus) panel.querySelector('.us-doc-finder__star[data-key="' + lower + '"]')?.focus();
   }
 
   /* ===========================================================================
-   * Actions: go to a query's folder, open it in the designer
+   * Actions: go to a document's folder or a folder, open in the editor
    * ======================================================================== */
   let pendingSelect = null;
 
+  function clearQuickFind() {
+    // The native Quick find filter would hide the row we are going to.
+    if (!input) return;
+    input.value = '';
+    if (typeof window.searchTable === 'function') window.searchTable('');
+  }
+
   function goTo(entry) {
-    const address = document.querySelector('[id$="_ObjectBrowser1_Address"]');
-    const go = document.querySelector('[id$="_ObjectBrowser1_AddressGoButton"]');
+    if (entry.f) { goToPath(entry.p); return; }
+    const address = byId('_Address');
+    const go = byId('_AddressGoButton');
     if (!address || !go) return;
     rememberSearch(input?.value);
-    // The native Quick find filter would hide the row we are going to.
-    if (input) {
-      input.value = '';
-      if (typeof window.searchTable === 'function') window.searchTable('');
-    }
+    clearQuickFind();
     closePanel();
     pendingSelect = entry.k;
     const folder = folderOf(entry.p);
@@ -403,28 +487,26 @@
   }
 
   // A pasted or typed path: a folder opens as the address box and Go would;
-  // a query's own path opens its folder with the query selected.
+  // a document's own path opens its folder with the document selected.
   function pathTarget(text) {
     const path = String(text || '').trim().replace(/\/+$/, '');
     return /^[$@]\/./.test(path) ? path : '';
   }
 
   function goToPath(path) {
-    const exact = (searchState.results || []).find(entry => entry.p.toLowerCase() === path.toLowerCase());
+    const exact = (searchState.results || []).find(entry => !entry.f && entry.p.toLowerCase() === path.toLowerCase());
     if (exact) { goTo(exact); return; }
-    const address = document.querySelector('[id$="_ObjectBrowser1_Address"]');
-    const go = document.querySelector('[id$="_ObjectBrowser1_AddressGoButton"]');
+    const address = byId('_Address');
+    const go = byId('_AddressGoButton');
     if (!address || !go) return;
-    if (input) {
-      input.value = '';
-      if (typeof window.searchTable === 'function') window.searchTable('');
-    }
+    rememberSearch(input?.value);
+    clearQuickFind();
     closePanel();
     address.value = path;
     go.click();
   }
 
-  // Selects a query row as a click would, so the summary pane follows.
+  // Selects a row as a click would, so the summary pane follows.
   function selectRow(key) {
     const row = document.getElementById(key) || [...document.querySelectorAll('tr.ObjectBrowserContentItem')].find(each => each.id.toLowerCase() === key);
     if (!row) return false;
@@ -440,12 +522,12 @@
     return true;
   }
 
-  function openInDesigner(entry) {
+  function openInEditor(entry) {
     rememberSearch(input?.value);
     rememberOpened(entry.k);
     closePanel();
-    const url = websiteUrl('/iMIS/QueryBuilder/Design.aspx?iMode=Edit&TemplateType=E&iUniformKey=' + encodeURIComponent(entry.k) + '&iOperation=Edit&DocumentTypeCode=IQD&IsPopup=true');
-    if (typeof window.ShowDialog_NoReturnValue === 'function') window.ShowDialog_NoReturnValue(url, null, '95%', '95%', 'Edit IQA', null, 'E');
+    const url = websiteUrl(SCREEN.editorUrl.replace('{key}', encodeURIComponent(entry.k)));
+    if (typeof window.ShowDialog_NoReturnValue === 'function') window.ShowDialog_NoReturnValue(url, null, '95%', '95%', SCREEN.editorTitle, null, 'E');
     else window.open(url, '_blank', 'noopener');
   }
 
@@ -456,7 +538,7 @@
     const on = isFavourite(key);
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'us-iqa-finder__star';
+    button.className = 'us-doc-finder__star';
     button.dataset.key = String(key).toLowerCase();
     button.setAttribute('aria-pressed', String(on));
     button.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + name + (on ? ' from favourites' : ' to favourites'));
@@ -465,8 +547,6 @@
     icon.className = 'ti ' + (on ? 'ti-star-filled' : 'ti-star');
     icon.setAttribute('aria-hidden', 'true');
     button.append(icon);
-    // Keep the row's own selection and double-click away from the star.
-    ['mousedown', 'dblclick', 'keydown'].forEach(type => button.addEventListener(type, event => event.stopPropagation()));
     button.addEventListener('click', event => {
       event.stopPropagation();
       event.preventDefault();
@@ -530,44 +610,53 @@
     return node;
   }
 
+  // A document: go to it in its folder, star it, open it. A folder: go into
+  // it (folders are bookmarked with the star after Go).
   function resultItem(entry) {
-    const item = element('li', 'us-iqa-finder__item');
-    const go = element('button', 'us-iqa-finder__go');
+    const item = element('li', 'us-doc-finder__item');
+    const go = element('button', 'us-doc-finder__go');
     go.type = 'button';
-    go.title = 'Go to this query in its folder';
-    go.append(icon('ti-file-search'), element('span', 'us-iqa-finder__name', entry.n), element('span', 'us-iqa-finder__path', folderOf(entry.p)));
+    if (entry.f) {
+      go.title = 'Go to this folder';
+      go.append(icon('ti-folder'), element('span', 'us-doc-finder__name', entry.n), element('span', 'us-doc-finder__path', folderOf(entry.p)));
+      go.addEventListener('click', () => goTo(entry));
+      item.append(go);
+      return item;
+    }
+    go.title = TEXT.go;
+    go.append(icon(SCREEN.icon), element('span', 'us-doc-finder__name', entry.n), element('span', 'us-doc-finder__path', folderOf(entry.p)));
     go.addEventListener('click', () => goTo(entry));
-    const open = element('button', 'us-iqa-finder__open');
+    const open = element('button', 'us-doc-finder__open');
     open.type = 'button';
-    open.title = 'Open in the designer';
-    open.setAttribute('aria-label', 'Open ' + entry.n + ' in the designer');
+    open.title = TEXT.open;
+    open.setAttribute('aria-label', TEXT.open + ': ' + entry.n);
     open.append(icon('ti-pencil'));
-    open.addEventListener('click', () => openInDesigner(entry));
+    open.addEventListener('click', () => openInEditor(entry));
     item.append(go, starButton(entry.k, entry.n), open);
     return item;
   }
 
   function section(title, entries, emptyText) {
-    const block = element('section', 'us-iqa-finder__section');
-    block.append(element('h3', 'us-iqa-finder__heading', title));
+    const block = element('section', 'us-doc-finder__section');
+    block.append(element('h3', 'us-doc-finder__heading', title));
     if (!entries.length) {
-      block.append(element('p', 'us-iqa-finder__empty', emptyText));
+      block.append(element('p', 'us-doc-finder__empty', emptyText));
       return block;
     }
-    const list = element('ul', 'us-iqa-finder__list');
+    const list = element('ul', 'us-doc-finder__list');
     entries.forEach(entry => list.append(resultItem(entry)));
     block.append(list);
     return block;
   }
 
   function locationSection(path) {
-    const block = element('section', 'us-iqa-finder__section');
-    block.append(element('h3', 'us-iqa-finder__heading', 'Location'));
-    const list = element('ul', 'us-iqa-finder__list');
-    const item = element('li', 'us-iqa-finder__item');
-    const go = element('button', 'us-iqa-finder__go');
+    const block = element('section', 'us-doc-finder__section');
+    block.append(element('h3', 'us-doc-finder__heading', 'Location'));
+    const list = element('ul', 'us-doc-finder__list');
+    const item = element('li', 'us-doc-finder__item');
+    const go = element('button', 'us-doc-finder__go');
     go.type = 'button';
-    go.append(icon('ti-folder'), element('span', 'us-iqa-finder__name', 'Go to this location'), element('span', 'us-iqa-finder__path', path));
+    go.append(icon('ti-folder'), element('span', 'us-doc-finder__name', 'Go to this location'), element('span', 'us-doc-finder__path', path));
     go.addEventListener('click', () => goToPath(path));
     item.append(go);
     list.append(item);
@@ -578,7 +667,7 @@
   function renderPanel() {
     if (!panel) return;
     const query = input.value.trim();
-    const body = element('div', 'us-iqa-finder__body');
+    const body = element('div', 'us-doc-finder__body');
 
     if (query) {
       const found = searchState.results;
@@ -587,36 +676,36 @@
       if (searchState.pending) {
         // As the taskbar's quick search: the spinning circles in place of
         // the results until the new ones arrive.
-        const status = element('p', 'us-iqa-finder__status us-iqa-finder__loading', 'Searching…');
+        const status = element('p', 'us-doc-finder__status us-doc-finder__loading', 'Searching…');
         status.setAttribute('role', 'status');
         const spinner = element('span', 'section-loader-spinning-circles');
         spinner.setAttribute('aria-hidden', 'true');
         status.prepend(spinner);
         body.append(status);
       } else if (searchState.error) {
-        body.append(element('p', 'us-iqa-finder__status us-iqa-finder__status--warning', 'The search couldn’t run. ' + searchState.error));
+        body.append(element('p', 'us-doc-finder__status us-doc-finder__status--warning', 'The search couldn’t run. ' + searchState.error));
       } else if (found) {
         body.append(section(found.length ? 'All folders · ' + found.length + (found.length === 40 ? '+' : '') + ' found' : 'All folders',
-          found, 'No query names or paths match “' + searchState.text + '”.'));
+          found, TEXT.noMatch + ' “' + searchState.text + '”.'));
       }
     } else {
       const openedKeys = readLocal(OPENED_KEY, []).map(item => item.k);
       resolveMissing(favourites.keys.concat(openedKeys));
       const favouriteEntries = favourites.keys.map(knownEntry).filter(Boolean);
       body.append(section('Favourites', favouriteEntries,
-        favourites.loaded ? 'Star a query to keep it here.' : 'Loading favourites…'));
+        favourites.loaded ? TEXT.favouritesEmpty : 'Loading favourites…'));
       const opened = openedKeys.map(knownEntry).filter(Boolean).slice(0, 8);
-      body.append(section('Recently opened', opened, 'Queries you open in the designer appear here.'));
+      body.append(section('Recently opened', opened, TEXT.openedEmpty));
       const searches = readLocal(SEARCHES_KEY, []);
       if (searches.length) {
-        const block = element('section', 'us-iqa-finder__section');
-        block.append(element('h3', 'us-iqa-finder__heading', 'Recent searches'));
-        const list = element('ul', 'us-iqa-finder__list');
+        const block = element('section', 'us-doc-finder__section');
+        block.append(element('h3', 'us-doc-finder__heading', 'Recent searches'));
+        const list = element('ul', 'us-doc-finder__list');
         searches.forEach(term => {
-          const item = element('li', 'us-iqa-finder__item');
-          const chip = element('button', 'us-iqa-finder__search');
+          const item = element('li', 'us-doc-finder__item');
+          const chip = element('button', 'us-doc-finder__search');
           chip.type = 'button';
-          chip.append(icon('ti-history'), element('span', 'us-iqa-finder__term', term));
+          chip.append(icon('ti-history'), element('span', 'us-doc-finder__term', term));
           chip.addEventListener('click', () => {
             input.value = term;
             input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -630,7 +719,7 @@
         body.append(block);
       }
     }
-    if (favourites.error) body.append(element('p', 'us-iqa-finder__status us-iqa-finder__status--warning', favourites.error));
+    if (favourites.error) body.append(element('p', 'us-doc-finder__status us-doc-finder__status--warning', favourites.error));
     panel.replaceChildren(body);
   }
 
@@ -658,19 +747,19 @@
   }
 
   function mount() {
-    const found = document.querySelector('[id$="_ObjectQuickFindTextBox"]');
+    const found = byId('_ObjectQuickFindTextBox') || document.querySelector('[id$="_ObjectQuickFindTextBox"]');
     if (!found || found === input) return;
     input = found;
     const wrapper = input.closest('.QuickFindWrapper') || input.parentElement;
-    wrapper.classList.add('us-iqa-finder-host');
-    input.placeholder = 'Quick find, or search all queries';
+    wrapper.classList.add('us-doc-finder-host');
+    input.placeholder = TEXT.placeholder;
     input.setAttribute('aria-expanded', 'false');
-    input.setAttribute('aria-controls', 'us-iqa-finder');
+    input.setAttribute('aria-controls', 'us-doc-finder');
     input.setAttribute('aria-haspopup', 'true');
-    panel = element('div', 'us-iqa-finder');
-    panel.id = 'us-iqa-finder';
+    panel = element('div', 'us-doc-finder');
+    panel.id = 'us-doc-finder';
     panel.setAttribute('role', 'region');
-    panel.setAttribute('aria-label', 'Search all queries');
+    panel.setAttribute('aria-label', TEXT.region);
     panel.hidden = true;
     wrapper.append(panel);
 
@@ -723,14 +812,15 @@
       /* No partial postbacks on this page. */
     }
     loadFavourites();
-    // Opens recorded in the designer popup show at once.
+    // Opens recorded in the editor popup show at once.
     window.addEventListener('storage', event => {
       if (event.key === OPENED_KEY && panel && !panel.hidden) renderPanel();
     });
   }
 
-  window.UnionSuiteIqaFinder = Object.freeze(Object.assign({
-    version: '1.0',
+  window.UnionSuiteDocumentFinder = Object.freeze(Object.assign({
+    version: '2.0',
+    screen: SCREEN.id,
     find: text => searchServer(text),
     favourites: () => favourites.keys.slice()
   }, core));

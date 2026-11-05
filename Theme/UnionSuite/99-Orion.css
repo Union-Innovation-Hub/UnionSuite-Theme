@@ -10334,6 +10334,14 @@ a.riUp {
   padding-bottom: 4.5px;
 }
 
+/* Go is as tall as the address box beside it (33px), not a standard
+   TextButton's 36px. */
+.ObjectBrowserWrapper input[id$="_AddressGoButton"] {
+  height: 33px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
 .ObjectBrowserContentList td {
   padding-top: 1px;
   padding-bottom: 0;
