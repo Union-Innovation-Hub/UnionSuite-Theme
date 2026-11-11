@@ -12,6 +12,9 @@
     // Keep the original configuration and storage names for existing clients.
     pipGreeting: true, // Client Config.js can set false to remove Biscuit and his reserved space.
     pipStoragePrefix: 'union-suite:pip-greeting:',
+    // The contact finder that "Select on behalf of" opens. '' keeps the
+    // native iMIS query ($/ContactManagement/DefaultSystem/Queries/Contacts).
+    onBehalfOfQuery: '$/_i4u_/Core/Admin/On Behalf Of Contact List',
     ...window.UnionSuiteTaskbarConfig
   });
   let currentInstance = null;
@@ -987,8 +990,36 @@ function appendSearchHistory(frag) {
     }};
   }
 
+  /* ── On behalf of: contact finder query ──────────────── */
+
+  // The header's "Select on behalf of" runs the page's inline
+  // TargetSelectOpenFinderAdder(), which opens the contact finder on a query
+  // path written into that function. The finder itself is opened by the
+  // shared OpenPartyFinderAdderWithQueryFilter(), so that is wrapped instead:
+  // it is defined once per page and survives the account area re-rendering.
+  // Only the on-behalf-of call is changed, recognised by its callback; every
+  // other contact finder keeps the query it asked for. The query must list
+  // contacts with the contact key as its key column, like the native one.
+  const ON_BEHALF_OF_PATH_ARGUMENT = 3; // (callback, single, documentKey, documentPath, …)
+  let onBehalfOfHooked = false;
+
+  function hookOnBehalfOfFinder() {
+    if (onBehalfOfHooked || !settings.onBehalfOfQuery) return;
+    const openFinder = window.OpenPartyFinderAdderWithQueryFilter;
+    if (typeof openFinder !== 'function') return; // Not loaded yet, or not a staff page.
+
+    window.OpenPartyFinderAdderWithQueryFilter = function (callback, ...rest) {
+      const forOnBehalfOf = typeof callback === 'function'
+        && callback === window.TargetFinderCallBackFunction;
+      if (forOnBehalfOf) rest[ON_BEHALF_OF_PATH_ARGUMENT - 1] = settings.onBehalfOfQuery;
+      return openFinder.call(this, callback, ...rest);
+    };
+    onBehalfOfHooked = true;
+  }
+
   function refresh() {
     if (stopped) return;
+    hookOnBehalfOfFinder();
     if (currentInstance && !currentInstance.bar.isConnected) {
       currentInstance.destroy(); currentInstance = null;
     }
