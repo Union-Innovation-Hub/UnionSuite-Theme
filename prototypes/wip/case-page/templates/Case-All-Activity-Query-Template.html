@@ -58,7 +58,7 @@
                     (owner, 21 October 2026): the audience, the subject
                     without its tag, "4 recipients · 4 sent", and opened,
                     the full subject and the send's results and recipients
-                    (data-comms-recipients: the agreement's details IQA,
+                    (data-comms-recipients: the shared details IQA,
                     which only needs the CommunicationLogKey).
        Emails Logged   type email: attached to the case through the Outlook
                     plugin, either direction, so each row's Direction says
@@ -81,14 +81,14 @@
      and Attachments (base), and Notes, Emails Sent, Emails Logged
      and Meetings Details (details); Activity-Feed-IQA-Build.md. -->
 <div class="us-activity-feed"
-  data-us-activity-folder="$/_i4u_/Core/Cases/Layouts v2/Activity Feed - Base"
+  data-us-activity-folder="$/_i4u_/Core/Cases/UnionSuite/Manage Case/Activity Feed - Base"
   data-us-activity-details-folder="$/_i4u_/Client/Cases - UnionSuite/Layouts/Activity Feed - Details"
   data-us-activity-filter="CaseNum" data-us-activity-value="{#query.Ordinal}"
   data-us-activity-days="0" data-us-activity-limit="10" data-us-activity-page="10"
   data-us-activity-load-all data-us-activity-filters-open>
   <ul class="us-activity__sources" hidden>
     <li data-source="notes" data-query="Notes" data-details="Notes Details" data-type="note" data-history="#notes" data-restricted="Restricted" data-record-popup="true"></li>
-    <li data-source="emails-sent" data-query="Emails Sent" data-details="Emails Sent Details" data-type="email" data-direction="out" data-comms-recipients="$/_i4u_/Core/CA/v2/API - Manage Agreement - Communications - Details"></li>
+    <li data-source="emails-sent" data-query="Emails Sent" data-details="Emails Sent Details" data-type="email" data-direction="out" data-comms-recipients="$/_i4u_/Core/Shared/API - Communication Details"></li>
     <li data-source="emails-logged" data-query="Emails Logged" data-details="Emails Logged Details" data-type="email" data-record-actions="agreements.view-attachment agreements.download-attachment"></li>
     <li data-source="meetings" data-query="Meetings" data-details="Meetings Details" data-detail-label="Description" data-type="meeting" data-history="#meetings" data-record-popup="true"></li>
     <li data-source="attachments" data-query="Attachments" data-type="attachment" data-record-actions="agreements.view-attachment agreements.download-attachment" data-label="Attachment added" data-plural="Attachments" data-section-link="case:attachments" data-section-tab="Attachments" data-section-label="View all attachments"></li>

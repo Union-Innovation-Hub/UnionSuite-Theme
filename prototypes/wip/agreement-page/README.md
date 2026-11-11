@@ -246,8 +246,9 @@ guide (templates, field definitions and component sections).
    swaps the meetings icon for history (owner, 3 October 2026: a ticked
    checkbox reads as "done", and meetings are past, not done). A theme
    option for the label and icon would be cleaner if more lists need it.
-8. **SandBox paths.** `$/_i4u_/SandBox/CA/ZenFileTags` and the other CA
-   IQAs move out of SandBox for production.
+8. **SandBox paths.** The CA IQAs move out of SandBox for production. The
+   attachment tags IQA went first, to `$/_i4u_/Core/Shared/API - Zen Attachment Tags`
+   (5 November 2026).
 9. **Notes layout** — decided: option 4, ledger rows (owner, 3 October
    2026). The agreement page now uses it. Still to do in iMIS: add the
    `CreatedTime` column to the Notes IQA, and promote N1 (CSS),

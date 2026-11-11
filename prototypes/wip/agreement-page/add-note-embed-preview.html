@@ -110,7 +110,7 @@
           return json(rows(childTags.filter(tag => wanted.includes(tag.ParentTagOrdinal))));
         }
         if (name.endsWith('Case Staff')) return json(rows(staff));
-        if (name.endsWith('ZenFileTags')) return json(rows(fileTags));
+        if (name.endsWith('API - Zen Attachment Tags')) return json(rows(fileTags));
         return json({}, 404);
       }
       if (url.host === 'cloudtoolz.example' && url.pathname === '/api/formz/fineUpload') {

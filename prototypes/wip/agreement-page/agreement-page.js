@@ -289,7 +289,7 @@
     if (target.pathname === '/api/query') {
       const name = target.searchParams.get('QueryName') || '';
       if (name.endsWith('/CloudToolzUrl')) return reply(items([{Description: cloudToolz + '/'}]));
-      if (name.endsWith('/ZenFileTags')) return reply(items(tags));
+      if (name.endsWith('/API - Zen Attachment Tags')) return reply(items(tags));
       // Client-editable banner details: Description, Additional-* facts and a
       // Tone-* badge colour, in the order the IQA returns them.
       // One contact, for the tile refresh after Edit contact (US-ROW-PATCH).

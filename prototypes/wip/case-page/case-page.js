@@ -84,7 +84,7 @@
   let caseWorkplaceId = '';
   let member, banner, rows, memberDetails, activity, activityDetails, changes, changeFields, lists, detailsFor, caseJob, caseMemberDetails, leadStaff, setLeadStaff;
   // The activity feeds' base and details IQAs (Activity-Feed-IQA-Build.md).
-  const activityFolder = '$/_i4u_/Core/Cases/Layouts v2/Activity Feed - Base/';
+  const activityFolder = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/Activity Feed - Base/';
   const activityDetailsFolder = '$/_i4u_/Client/Cases - UnionSuite/Layouts/Activity Feed - Details/';
   // Notes and tasks saved inline (C34, C35), kept across rebuilds. A note
   // with a follow-up is also a task (owner, 9 October 2026), so it adds a
@@ -645,7 +645,7 @@
     if (target.pathname === '/api/query') {
       const name = target.searchParams.get('QueryName') || '';
       if (name.endsWith('/CloudToolzUrl')) return reply(items([{Description: cloudToolz + '/'}]));
-      if (name.endsWith('/ZenFileTags')) return reply(items(tags));
+      if (name.endsWith('/API - Zen Attachment Tags')) return reply(items(tags));
       // The Overview attachments footer's count (US-QUERY-VALUE).
       if (name.endsWith('/API - Manage Case - Attachment Count')) return reply(items([{AttachmentCount: String(rows.attachments.length)}]));
       // The banner's second row: replaces the current page's Details block.
@@ -701,7 +701,7 @@
         return reply(items(details ? [details] : []), 200, 250);
       }
       // A sent email's recipients (data-comms-recipients), by its log key.
-      if (name.endsWith('/API - Manage Agreement - Communications - Details')) {
+      if (name.endsWith('/API - Communication Details')) {
         const recipients = {
           'log-503': [{Recipient: 'Northside HR', Address: 'hr@northside.example', Status: 'Open'}, {Recipient: 'Dani Sundara', Address: 'dsundara@union.example', Status: 'Delivered'}],
           'log-501': [{Recipient: 'Priya Natarajan', Address: 'priya.n@mailinator.com', Status: 'Delivered'}]

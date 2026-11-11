@@ -571,7 +571,7 @@
               "name": "IqaPath",
               "syntax": null,
               "expressions": {
-                "Literal": "$/_i4u_/SandBox/CA/Attachment Tags - By File Ordinal"
+                "Literal": "$/_i4u_/Core/Shared/API - Attachment Tags - By File Ordinal"
               }
             },
             {

@@ -69,7 +69,7 @@ Checked in the browser at 1280–1366px, light and dark, no console errors:
 - Any real CloudToolz call (`/ca/complete-task`, `/ca/update-attachment`,
   `/flowz/sharepoint/download`) and the ZenToken step.
 - `/api/query` against the real IQAs: CloudToolzUrl (`Description` column),
-  `ZenFileTags` (`Ordinal`, `TagName`) and the banner details IQA filter name.
+  `ZenFileTags` (now `$/_i4u_/Core/Shared/API - Zen Attachment Tags`; `Ordinal`, `TagName`) and the banner details IQA filter name.
 - Action context: `AgreementID` / `AgreementNum` read from the page URL; the
   native popup close callback and in-place Query Template refresh on the live
   page (needs stable `ste_container_ci…` IDs).

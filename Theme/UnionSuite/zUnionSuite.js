@@ -20623,9 +20623,9 @@ SOFTWARE.
   'use strict';
   if (window.UnionSuiteAttachments) return;
 
-  // Tag list for suggestions. The IQA path is the existing sandbox query;
-  // it moves with the other agreement IQAs for production.
-  const tagQuery = '$/_i4u_/SandBox/CA/ZenFileTags';
+  // Tag list for suggestions: the shared attachment tags IQA (moved out of
+  // SandBox on 5 November 2026; every module's attachments use it).
+  const tagQuery = '$/_i4u_/Core/Shared/API - Zen Attachment Tags';
   let tagCache = null;
 
   // /api/query rows are flat alias-keyed objects; older endpoints return

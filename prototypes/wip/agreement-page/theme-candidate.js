@@ -367,7 +367,7 @@
 
   // Tag list for suggestions. The IQA path is the existing sandbox query;
   // it moves with the other agreement IQAs for production.
-  const tagQuery = '$/_i4u_/SandBox/CA/ZenFileTags';
+  const tagQuery = '$/_i4u_/Core/Shared/API - Zen Attachment Tags';
   let tagCache = null;
 
   // /api/query rows are flat alias-keyed objects; older endpoints return

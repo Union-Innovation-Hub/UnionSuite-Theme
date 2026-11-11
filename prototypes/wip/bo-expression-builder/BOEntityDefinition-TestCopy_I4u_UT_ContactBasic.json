@@ -1,0 +1,987 @@
+{
+  "$type": "Asi.Soa.Core.DataContracts.BOEntityDefinitionData, Asi.Contracts",
+  "ObjectTypeName": "Standard",
+  "Description": "Used for reporting.\r\nKey information about records, created for ease of reporting",
+  "EntityTypeName": "TestCopy_I4u_UT_ContactBasic",
+  "PrimaryParentEntityTypeName": "Party",
+  "Properties": {
+    "$type": "Asi.Soa.Core.DataContracts.EntityPropertyDefinitionDataCollection, Asi.Contracts",
+    "$values": [
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 10,
+        "PropertyTypeName": "String",
+        "Name": "ID",
+        "Description": "",
+        "Caption": "Id",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "IsIdentity": true,
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "ID",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 5,
+        "PropertyTypeName": "String",
+        "Name": "MemberTypeCode",
+        "Description": "",
+        "Caption": "Member Type Code",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "Rule": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRuleQueryData, Asi.Contracts",
+          "Query": {
+            "$type": "Asi.Soa.Core.DataContracts.QueryData, Asi.Contracts",
+            "Criteria": {
+              "$type": "Asi.Soa.Core.DataContracts.CriteriaDataCollection, Asi.Contracts",
+              "$values": [
+                {
+                  "$type": "Asi.Soa.Core.DataContracts.CriteriaData, Asi.Contracts",
+                  "Operation": 3,
+                  "PropertyName": "QueryName",
+                  "Values": {
+                    "$type": "System.Collections.ObjectModel.Collection`1[[System.String, mscorlib]], mscorlib",
+                    "$values": [
+                      "$/_i4u_/Core/ValueLists/i4u Value List - Member Type"
+                    ]
+                  }
+                }
+              ]
+            },
+            "EntityTypeName": "IQA"
+          },
+          "DescriptionPropertyName": "Desc_MType",
+          "ValuePropertyName": "Code_MType"
+        },
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MemberTypeCode",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 20,
+        "PropertyTypeName": "String",
+        "Name": "MemberTypeDescription",
+        "Description": "",
+        "Caption": "Member Type",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "Rule": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRuleQueryData, Asi.Contracts",
+          "Query": {
+            "$type": "Asi.Soa.Core.DataContracts.QueryData, Asi.Contracts",
+            "Criteria": {
+              "$type": "Asi.Soa.Core.DataContracts.CriteriaDataCollection, Asi.Contracts",
+              "$values": [
+                {
+                  "$type": "Asi.Soa.Core.DataContracts.CriteriaData, Asi.Contracts",
+                  "Operation": 3,
+                  "PropertyName": "QueryName",
+                  "Values": {
+                    "$type": "System.Collections.ObjectModel.Collection`1[[System.String, mscorlib]], mscorlib",
+                    "$values": [
+                      "$/_i4u_/Core/ValueLists/i4u Value List - Member Type"
+                    ]
+                  }
+                }
+              ]
+            },
+            "EntityTypeName": "IQA"
+          },
+          "DescriptionPropertyName": "Desc_MType",
+          "ValuePropertyName": "Desc_MType"
+        },
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MemberTypeDescription",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 5,
+        "PropertyTypeName": "String",
+        "Name": "CategoryCode",
+        "Description": "",
+        "Caption": "Category Code",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "Rule": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRuleQueryData, Asi.Contracts",
+          "Query": {
+            "$type": "Asi.Soa.Core.DataContracts.QueryData, Asi.Contracts",
+            "Criteria": {
+              "$type": "Asi.Soa.Core.DataContracts.CriteriaDataCollection, Asi.Contracts",
+              "$values": [
+                {
+                  "$type": "Asi.Soa.Core.DataContracts.CriteriaData, Asi.Contracts",
+                  "Operation": 3,
+                  "PropertyName": "QueryName",
+                  "Values": {
+                    "$type": "System.Collections.ObjectModel.Collection`1[[System.String, mscorlib]], mscorlib",
+                    "$values": [
+                      "$/_i4u_/Core/ValueLists/i4u Value List - Category"
+                    ]
+                  }
+                }
+              ]
+            },
+            "EntityTypeName": "IQA"
+          },
+          "DescriptionPropertyName": "CatDesc",
+          "ValuePropertyName": "CatCode"
+        },
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "CategoryCode",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 5,
+        "PropertyTypeName": "String",
+        "Name": "StatusCode",
+        "Description": "",
+        "Caption": "Status Code",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "Rule": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRuleQueryData, Asi.Contracts",
+          "Query": {
+            "$type": "Asi.Soa.Core.DataContracts.QueryData, Asi.Contracts",
+            "Criteria": {
+              "$type": "Asi.Soa.Core.DataContracts.CriteriaDataCollection, Asi.Contracts",
+              "$values": [
+                {
+                  "$type": "Asi.Soa.Core.DataContracts.CriteriaData, Asi.Contracts",
+                  "Operation": 3,
+                  "PropertyName": "QueryName",
+                  "Values": {
+                    "$type": "System.Collections.ObjectModel.Collection`1[[System.String, mscorlib]], mscorlib",
+                    "$values": [
+                      "$/_i4u_/Core/ValueLists/i4u Value List - Member Status"
+                    ]
+                  }
+                }
+              ]
+            },
+            "EntityTypeName": "IQA"
+          },
+          "DescriptionPropertyName": "Desc_MStatus",
+          "ValuePropertyName": "Code_MStatus"
+        },
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "StatusCode",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 10,
+        "PropertyTypeName": "String",
+        "Name": "CO_ID",
+        "Description": "",
+        "Caption": "Co Id",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "CO_ID",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 150,
+        "PropertyTypeName": "String",
+        "Name": "COMPANY",
+        "Description": "",
+        "Caption": "Company",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "COMPANY",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 25,
+        "PropertyTypeName": "String",
+        "Name": "PREFIX",
+        "Description": "",
+        "Caption": "Prefix",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "PREFIX",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 50,
+        "PropertyTypeName": "String",
+        "Name": "INFORMAL",
+        "Description": "",
+        "Caption": "Informal",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "INFORMAL",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 50,
+        "PropertyTypeName": "String",
+        "Name": "FIRST_NAME",
+        "Description": "",
+        "Caption": "First Name",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "FIRST_NAME",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 50,
+        "PropertyTypeName": "String",
+        "Name": "LAST_NAME",
+        "Description": "",
+        "Caption": "Last Name",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "LAST_NAME",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 50,
+        "PropertyTypeName": "String",
+        "Name": "MIDDLE_NAME",
+        "Description": "",
+        "Caption": "Middle Name",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MIDDLE_NAME",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 300,
+        "PropertyTypeName": "String",
+        "Name": "FULL_NAME",
+        "Description": "",
+        "Caption": "Full Name",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "FULL_NAME",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 40,
+        "PropertyTypeName": "String",
+        "Name": "Suburb",
+        "Description": "",
+        "Caption": "Suburb",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "Suburb",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeBooleanData, Asi.Contracts",
+        "PropertyTypeName": "Boolean",
+        "Name": "COMPANY_RECORD",
+        "Description": "",
+        "Caption": "Company Record",
+        "DefaultValue": {
+          "$type": "System.Boolean",
+          "$value": false
+        },
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 1
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "COMPANY_RECORD",
+          "DbDataType": "Bit"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeBooleanData, Asi.Contracts",
+        "PropertyTypeName": "Boolean",
+        "Name": "MEMBER_RECORD",
+        "Description": "",
+        "Caption": "Member Record",
+        "DefaultValue": {
+          "$type": "System.Boolean",
+          "$value": false
+        },
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 1
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MEMBER_RECORD",
+          "DbDataType": "Bit"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 5,
+        "PropertyTypeName": "String",
+        "Name": "ORG_CODE",
+        "Description": "",
+        "Caption": "Org Code",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "ORG_CODE",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 50,
+        "PropertyTypeName": "String",
+        "Name": "State",
+        "Description": "",
+        "Caption": "State",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "State",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 10,
+        "PropertyTypeName": "String",
+        "Name": "Postcode",
+        "Description": "",
+        "Caption": "Postcode",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "Postcode",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 255,
+        "PropertyTypeName": "String",
+        "Name": "PreferredEmail",
+        "Description": "",
+        "Caption": "Preferred Email",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "PreferredEmail",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 255,
+        "PropertyTypeName": "String",
+        "Name": "FULL_ADDRESS",
+        "Description": "",
+        "Caption": "Full Address",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "FULL_ADDRESS",
+          "DbDataType": "NVarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 25,
+        "PropertyTypeName": "String",
+        "Name": "PreferredMobile",
+        "Description": "",
+        "Caption": "Preferred Mobile",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "PreferredMobile",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeDateTimeData, Asi.Contracts",
+        "DateTimeDataType": 0,
+        "PropertyTypeName": "Date",
+        "Name": "PAID_THRU",
+        "Description": "",
+        "Caption": "Paid Thru",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 12
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "PAID_THRU",
+          "IsNullable": true,
+          "DbDataType": "DateTime"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeBooleanData, Asi.Contracts",
+        "PropertyTypeName": "Boolean",
+        "Name": "ActiveMember",
+        "Description": "",
+        "Caption": "Active Member",
+        "DefaultValue": {
+          "$type": "System.Boolean",
+          "$value": false
+        },
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 4
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "ActiveMember",
+          "IsReadOnly": true,
+          "DbDataType": "Bit"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": -1,
+        "PropertyTypeName": "String",
+        "Name": "Name",
+        "Description": "",
+        "Caption": "Name",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 4
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "Name",
+          "IsReadOnly": true,
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 255,
+        "PropertyTypeName": "String",
+        "Name": "CategoryDescription",
+        "Description": "",
+        "Caption": "Category",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "CategoryDescription",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 250,
+        "PropertyTypeName": "String",
+        "Name": "SearchString",
+        "Description": "",
+        "Caption": "SearchString",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 4
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "SearchString",
+          "IsReadOnly": true,
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeDateTimeData, Asi.Contracts",
+        "DateTimeDataType": 0,
+        "PropertyTypeName": "Date",
+        "Name": "BIRTH_DATE",
+        "Description": "",
+        "Caption": "Birth Date",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 12
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "BIRTH_DATE",
+          "IsNullable": true,
+          "DbDataType": "DateTime"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 15,
+        "PropertyTypeName": "String",
+        "Name": "MAJOR_KEY",
+        "Description": "",
+        "Caption": "Major Key",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Required": true,
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MAJOR_KEY",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": -1,
+        "PropertyTypeName": "String",
+        "Name": "MemberTypeCode_Person",
+        "Description": "",
+        "Caption": "Member Type Code - Person",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 4
+        },
+        "Visible": true,
+        "Rule": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRuleQueryData, Asi.Contracts",
+          "Query": {
+            "$type": "Asi.Soa.Core.DataContracts.QueryData, Asi.Contracts",
+            "Criteria": {
+              "$type": "Asi.Soa.Core.DataContracts.CriteriaDataCollection, Asi.Contracts",
+              "$values": [
+                {
+                  "$type": "Asi.Soa.Core.DataContracts.CriteriaData, Asi.Contracts",
+                  "Operation": 3,
+                  "PropertyName": "QueryName",
+                  "Values": {
+                    "$type": "System.Collections.ObjectModel.Collection`1[[System.String, mscorlib]], mscorlib",
+                    "$values": [
+                      "$/_i4u_/Core/ValueLists/i4u Value List - Member Type (Person)"
+                    ]
+                  }
+                }
+              ]
+            },
+            "EntityTypeName": "IQA"
+          },
+          "DescriptionPropertyName": "Desc_MTypeP",
+          "ValuePropertyName": "Code_MTypeP"
+        },
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MemberTypeCode_Person",
+          "IsReadOnly": true,
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": -1,
+        "PropertyTypeName": "String",
+        "Name": "MemberTypeCode_Company",
+        "Description": "",
+        "Caption": "Member Type Code - Company",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 4
+        },
+        "Visible": true,
+        "Rule": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRuleQueryData, Asi.Contracts",
+          "Query": {
+            "$type": "Asi.Soa.Core.DataContracts.QueryData, Asi.Contracts",
+            "Criteria": {
+              "$type": "Asi.Soa.Core.DataContracts.CriteriaDataCollection, Asi.Contracts",
+              "$values": [
+                {
+                  "$type": "Asi.Soa.Core.DataContracts.CriteriaData, Asi.Contracts",
+                  "Operation": 3,
+                  "PropertyName": "QueryName",
+                  "Values": {
+                    "$type": "System.Collections.ObjectModel.Collection`1[[System.String, mscorlib]], mscorlib",
+                    "$values": [
+                      "$/_i4u_/Core/ValueLists/i4u Value List - Member Type (Company)"
+                    ]
+                  }
+                }
+              ]
+            },
+            "EntityTypeName": "IQA"
+          },
+          "DescriptionPropertyName": "Desc_MTypeC",
+          "ValuePropertyName": "Code_MTypeC"
+        },
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "MemberTypeCode_Company",
+          "IsReadOnly": true,
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 255,
+        "PropertyTypeName": "String",
+        "Name": "StatusDescription",
+        "Description": "",
+        "Caption": "Status",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "StatusDescription",
+          "DbDataType": "VarChar"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeDateTimeData, Asi.Contracts",
+        "DateTimeDataType": 0,
+        "PropertyTypeName": "Date",
+        "Name": "JOIN_DATE",
+        "Description": "",
+        "Caption": "Join Date",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 12
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "JOIN_DATE",
+          "IsNullable": true,
+          "DbDataType": "DateTime"
+        }
+      },
+      {
+        "$type": "Asi.Soa.Core.DataContracts.PropertyTypeStringData, Asi.Contracts",
+        "MaxLength": 20,
+        "PropertyTypeName": "String",
+        "Name": "GENDER",
+        "Description": "",
+        "Caption": "Gender",
+        "DefaultValue": "",
+        "DisplayMask": "",
+        "RenderingInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.PropertyRenderingInformationData, Asi.Contracts",
+          "HelpText": "",
+          "ToolTip": "",
+          "WatermarkText": "",
+          "ControlType": 7
+        },
+        "Visible": true,
+        "ExtendedPropertyInformation": {
+          "$type": "Asi.Soa.Core.DataContracts.ExtendedPropertyInformationData, Asi.Contracts",
+          "DatabaseColumnName": "GENDER",
+          "DbDataType": "NVarChar"
+        }
+      }
+    ]
+  },
+  "RelatedEntities": {
+    "$type": "Asi.Soa.Core.DataContracts.RelatedEntityDataCollection, Asi.Contracts",
+    "$values": []
+  },
+  "Indexes": {
+    "$type": "Asi.Soa.Core.DataContracts.IndexDataCollection, Asi.Contracts",
+    "$values": []
+  }
+}

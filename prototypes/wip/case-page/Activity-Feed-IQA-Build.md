@@ -14,7 +14,7 @@ in `case-page.js` follow it.
 
 | Folder | Holds | Who changes it |
 | --- | --- | --- |
-| `$/_i4u_/Core/Cases/Layouts v2/Activity Feed - Base` | The base IQAs: Notes, Emails Sent, Emails Logged, Meetings, Attachments. One row per record, in the feed's fixed columns. | Fixed: the theme reads these columns by name. |
+| `$/_i4u_/Core/Cases/UnionSuite/Manage Case/Activity Feed - Base` | The base IQAs: Notes, Emails Sent, Emails Logged, Meetings, Attachments. One row per record, in the feed's fixed columns. | Fixed: the theme reads these columns by name. |
 | `$/_i4u_/Client/Cases - UnionSuite/Layouts/Activity Feed - Details` | The details IQAs: Notes Details, Emails Sent Details, Emails Logged Details, Meetings Details. One row per record, read when its card first opens. | The client: add or remove `Additional-*` columns freely. |
 
 The templates point at them with `data-us-activity-folder` (base) and

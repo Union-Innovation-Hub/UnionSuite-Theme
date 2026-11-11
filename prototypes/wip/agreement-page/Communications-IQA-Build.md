@@ -15,7 +15,7 @@ by US-COMMS-LOG). Reference codes and the status tone rules are in that note.
 IQAs (owner, 5 October 2026):
 
 - Summary: `$/_i4u_/Core/CA/v2/Query Template - Manage Agreement - Communications - Summary`
-- Details: `$/_i4u_/Core/CA/v2/API - Manage Agreement - Communications - Details`
+- Details: `$/_i4u_/Core/Shared/API - Communication Details (shared; was `$/_i4u_/Core/CA/v2/API - Manage Agreement - Communications - Details` until 5 November 2026)`
 
 ## 1. Summary (Query Template base): one row per send
 

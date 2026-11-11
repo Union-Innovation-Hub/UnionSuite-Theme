@@ -4,7 +4,7 @@
      (field list and expressions in Communications-IQA-Build.md). The card is
      the record card (US-RECORD-CARDS), as the activity feed renders an email.
      Opening a staff send's card loads its recipients from
-     $/_i4u_/Core/CA/v2/API - Manage Agreement - Communications - Details
+     $/_i4u_/Core/Shared/API - Communication Details
      into .us-comms-recipients, filtered on the send's CommunicationLogKey;
      a member send shows the summary only.
 
@@ -57,7 +57,7 @@
         <div><dt>Type</dt><dd>{#query.Category}</dd></div>
       </dl>
       <div class="us-comms-recipients"
-        data-us-comms-query="$/_i4u_/Core/CA/v2/API - Manage Agreement - Communications - Details"
+        data-us-comms-query="$/_i4u_/Core/Shared/API - Communication Details"
         data-us-comms-key="{#query.CommunicationLogKey}" data-us-comms-audience="{#query.Audience}"
         data-us-comms-recipients="{#query.Recipients}" data-us-comms-delivered="{#query.Delivered}"
         data-us-comms-not-sent="{#query.NotSent}"></div>

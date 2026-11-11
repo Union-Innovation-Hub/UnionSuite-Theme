@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BO expression builder mock-up</title>
+<style>
+  /* Values copied from the designer on the dev tenant (11 November 2026), so
+     the mock-up reads like the real popup without loading the theme. */
+  :root {
+    --text-base: #545962;
+    --text-strong: #1d1f22;
+    --text-faint: #767b84;
+    --border: #e5e6e8;
+    --border-strong: #cccccc;
+    --bg-page: #eceef1;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f8f8f9;
+    --brand: #06065b;
+    --brand-900: #03032e;
+    --accent: #ff9947;
+    --accent-100: #ffe8d6;
+    --radius: 8px;
+    --radius-sm: 5px;
+    --font-body: "Open Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-ui: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    --ease: cubic-bezier(.2, 0, 0, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    background: var(--bg-page);
+    color: var(--text-base);
+    font: 15px/1.5 var(--font-body);
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* ---- mock-up chrome (not part of the design) ---- */
+  .mock-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    margin-bottom: 16px;
+  }
+
+  .mock-bar h1 {
+    margin: 0 auto 0 0;
+    color: var(--text-strong);
+    font: 600 18px/1.25 var(--font-ui);
+  }
+
+  .view-switch {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: #dcdfe4;
+  }
+
+  .view-switch label {
+    position: relative;
+    padding: 6px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font: 600 13px/1.4 var(--font-ui);
+    transition: background-color 180ms var(--ease), color 180ms var(--ease);
+  }
+
+  .view-switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .view-switch label:has(input:checked) {
+    background: var(--brand-900);
+    color: #fff;
+  }
+
+  .view-switch label:has(input:focus-visible) {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  /* ---- designer popup replica ---- */
+  .popup {
+    border-radius: 10px;
+    background: var(--bg-surface);
+    box-shadow: 0 8px 20px rgba(0, 27, 35, .16);
+    overflow: hidden;
+  }
+
+  .popup-title {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font: 13px/1.4 var(--font-ui);
+  }
+
+  .popup-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px 8px;
+  }
+
+  .popup-head h2 {
+    margin: 0 auto 0 0;
+    color: var(--text-strong);
+    font: 500 18px/1.25 var(--font-ui);
+  }
+
+  .fake-btn {
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--brand-900);
+    color: #fff;
+    font: 600 13px/1.4 var(--font-ui);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tabs span {
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: var(--bg-subtle);
+    font: 600 13px/1.4 var(--font-ui);
+  }
+
+  .tabs .is-selected {
+    border-top: 2px solid var(--accent);
+    background: var(--bg-surface);
+    color: var(--brand-900);
+  }
+
+  .grid-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 12px 24px 0;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+    font-size: 14px;
+  }
+
+  .tabs.is-inner {
+    margin-top: 14px;
+  }
+
+  /* The real popup shows about this much of the builder at once. */
+  .builder {
+    height: 470px;
+    padding: 12px 24px 16px;
+    overflow: auto;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  /* ---- native-looking controls, shared by both views ---- */
+  select,
+  input[type="text"],
+  input[type="search"] {
+    height: 33px;
+    padding: 4px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: #fff;
+  }
+
+  select:disabled {
+    background: #ececec;
+    color: #8a8f97;
+  }
+
+  /* ==== Stock view: how iMIS draws it today ==== */
+  .st-label {
+    margin: 0 0 6px;
+    color: var(--text-strong);
+    font-weight: 600;
+  }
+
+  .st-container {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .st-container > select,
+  .st-container > input {
+    margin: 0 2px 5px 0;
+  }
+
+  .st-wide {
+    width: 270px;
+  }
+
+  .st-op {
+    display: block;
+    margin: 0 0 5px;
+  }
+
+  .st-box {
+    position: relative;
+    margin: 0 0 5px;
+    padding: 10px 34px 5px 10px;
+    border: 1px solid #dddddd;
+    background: #fff;
+  }
+
+  .st-box.is-shaded {
+    background: #f5f5f5;
+  }
+
+  .st-chevron {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 9px;
+    height: 9px;
+    border: solid var(--text-base);
+    border-width: 2px 0 0 2px;
+    transform: translateY(4px) rotate(45deg);
+  }
+
+  .st-link {
+    display: inline-block;
+    margin: 0 12px 6px 0;
+    color: var(--brand);
+    font-size: 14px;
+  }
+
+  .st-link::before {
+    content: "+ ";
+    font-weight: 700;
+  }
+
+  .st-sql {
+    margin: 12px 0 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  /* ==== Proposed view ==== */
+  .ex-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin-bottom: 6px;
+  }
+
+  .ex-head h3 {
+    margin: 0;
+    color: var(--text-strong);
+    font: 600 15px/1.4 var(--font-ui);
+  }
+
+  .ex-head small {
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+
+  /* 1. Formula line */
+  .ex-formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 2px;
+    margin: 0 0 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-subtle);
+    font: 13px/1.5 var(--font-mono);
+  }
+
+  .ex-term {
+    padding: 2px 6px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 180ms var(--ease);
+  }
+
+  .ex-term:hover,
+  .ex-term.is-active {
+    background: var(--accent-100);
+  }
+
+  .ex-op {
+    color: var(--text-faint);
+  }
+
+  .tok-t {
+    color: #267f99;
+  }
+
+  .tok-c {
+    color: var(--text-strong);
+    font-weight: 600;
+  }
+
+  .tok-f {
+    color: #795e26;
+  }
+
+  .tok-k {
+    color: #0b57d0;
+    font-weight: 600;
+  }
+
+  .tok-s {
+    color: #a31515;
+  }
+
+  /* 2. Flat rows: one term per row, operator leading */
+  .ex-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .ex-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: var(--radius);
+    transition: background-color 180ms var(--ease);
+  }
+
+  .ex-row.is-active {
+    background: var(--accent-100);
+  }
+
+  .ex-lead {
+    flex: 0 0 52px;
+    display: flex;
+    align-items: center;
+    min-height: 33px;
+    color: var(--text-faint);
+    font: 600 12px/1 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .ex-lead select {
+    width: 52px;
+    padding: 4px 6px;
+    font: 600 15px/1 var(--font-mono);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .ex-parts {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    min-width: 0;
+  }
+
+  .ex-kind {
+    width: 120px;
+  }
+
+  /* 3. Searchable property dropdown */
+  .ex-prop {
+    display: inline-flex;
+    align-items: center;
+    width: 215px;
+    max-width: 100%;
+    height: 33px;
+    padding: 4px 30px 4px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%23526173' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center;
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ex-prop[aria-expanded="true"] {
+    border-color: var(--brand);
+  }
+
+  .ex-prop .tok-t,
+  .ss-list .tok-t {
+    color: var(--text-faint);
+  }
+
+  .ss-panel {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    max-height: 280px;
+    border: 1px solid #94a3b8;
+    border-radius: var(--radius-sm);
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 27, 35, .13);
+    font-size: 14px;
+  }
+
+  .ss-panel input {
+    flex: 0 0 auto;
+    margin: 6px;
+  }
+
+  .ss-list {
+    min-height: 0;
+    padding: 0 3px 3px;
+    overflow: auto;
+  }
+
+  .ss-list > div {
+    padding: 5px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .ss-list > div:hover {
+    background: #f1f5f9;
+  }
+
+  .ss-list > [aria-selected="true"] {
+    background: #dcedfc;
+  }
+
+  .ss-empty {
+    padding: 8px 10px;
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  /* 4. Quieter rows */
+  .ex-type {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #eef0f2;
+    color: var(--text-faint);
+    font: 12px/1.6 var(--font-ui);
+    white-space: nowrap;
+  }
+
+  .ex-ghost {
+    height: 33px;
+    padding: 4px 10px;
+    border: 1px dashed transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-faint);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 180ms var(--ease), color 180ms var(--ease);
+  }
+
+  .ex-ghost:hover,
+  .ex-ghost:focus-visible {
+    border-color: var(--border-strong);
+    color: var(--text-base);
+  }
+
+  .ex-word {
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+
+  .ex-arg {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .ex-arg input {
+    width: 100px;
+    font-family: var(--font-mono);
+  }
+
+  .ex-arg:has(span:not([hidden])) input {
+    padding-right: 58px;
+  }
+
+  /* Keeps a label with its box when the row wraps. */
+  .ex-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .ex-arg span {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #eef0f2;
+    color: var(--text-faint);
+    font: 11px/1.7 var(--font-ui);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* If / then / else stays a real block: it is real nesting */
+  .ex-if {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 2px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-subtle);
+  }
+
+  .ex-if .ex-row {
+    padding: 0;
+  }
+
+  .ex-if .ex-lead {
+    flex-basis: 40px;
+    color: #0b57d0;
+  }
+
+  .ex-add {
+    align-self: flex-start;
+    margin-left: 48px;
+    padding: 2px 6px;
+    border: 0;
+    background: transparent;
+    color: var(--brand);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ---- notes under the popup ---- */
+  .notes {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    background: var(--bg-surface);
+    font-size: 14px;
+  }
+
+  .notes h2 {
+    margin: 0 0 8px;
+    color: var(--text-strong);
+    font: 600 15px/1.4 var(--font-ui);
+  }
+
+  .notes ol {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .notes li {
+    margin: 4px 0;
+  }
+
+  .notes p {
+    margin: 10px 0 0;
+    color: var(--text-faint);
+  }
+
+  /* Touch sizes follow the window width (AGENTS.md: never the input device). */
+  @media (max-width: 950px) {
+    .builder {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    #proposed select,
+    #proposed input,
+    .ex-prop,
+    .ex-ghost,
+    .ex-term {
+      min-height: 44px;
+    }
+
+    .ex-lead {
+      min-height: 44px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="mock-bar">
+    <h1>Expression builder: stock and proposed</h1>
+    <div class="view-switch" role="radiogroup" aria-label="View">
+      <label><input type="radio" name="view" value="stock"> Stock iMIS</label>
+      <label><input type="radio" name="view" value="proposed" checked> Proposed</label>
+    </div>
+  </div>
+
+  <div class="popup">
+    <div class="popup-title">Business Object Designer</div>
+    <div class="popup-head">
+      <h2>_I4u_UT_ContactBasic</h2>
+      <span>Enhance</span>
+      <span class="fake-btn">Publish</span>
+    </div>
+    <div class="tabs">
+      <span>Definition</span>
+      <span class="is-selected">Properties</span>
+      <span>Database</span>
+      <span>Preview</span>
+    </div>
+    <div class="grid-row">
+      <span>SearchString</span>
+      <span>None</span>
+      <span>VarChar</span>
+      <span>250</span>
+    </div>
+    <div class="tabs is-inner">
+      <span>Definition</span>
+      <span>Display</span>
+      <span>Values</span>
+      <span class="is-selected">Expression builder</span>
+    </div>
+
+    <div class="builder">
+      <div id="stock" hidden></div>
+      <div id="proposed"></div>
+    </div>
+  </div>
+
+  <div class="notes" id="notes-proposed">
+    <h2>What changes</h2>
+    <ol>
+      <li><strong>Formula line.</strong> The whole expression in one readable line at the top, with the property's name. Click a term to find its row; hover a row to find its term. Stock iMIS shows raw SQL only, at the very bottom.</li>
+      <li><strong>Flat rows.</strong> A run of <code>+</code> is one term per row with the operator in front. The repeated "Calculation / No function" rows are gone. If / then / else keeps its own block because it is real nesting.</li>
+      <li><strong>Searchable properties.</strong> Click a property and type, for example <em>name city</em>. The table name is muted and the column is bold.</li>
+      <li><strong>Quieter rows.</strong> The data type is a badge, not a disabled dropdown. "Add function" stays faint until a function is set. Replace reads "find … with …" on one line and says when a box holds spaces or nothing.</li>
+    </ol>
+    <p>The controls work in this mock-up: change a property, an operator or a function and the formula line follows. In iMIS each change is still a server round trip.</p>
+  </div>
+
+  <div class="notes" id="notes-stock" hidden>
+    <h2>What iMIS draws today</h2>
+    <ol>
+      <li>Each <code>+</code> nests the rest of the expression in another box: six terms, six levels.</li>
+      <li>54 dropdowns on a panel about 1,300px tall. Scroll the panel: the popup shows about a third of it.</li>
+      <li>Every level repeats a "Calculation / No function" row.</li>
+      <li>Each property dropdown is a plain list of 127 entries, and each row carries a disabled data type dropdown.</li>
+      <li>The Replace "find" box looks empty but holds a space.</li>
+      <li>The only overview is the raw SQL at the very bottom.</li>
+    </ol>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---- lists as the designer offers them (dev tenant, 11 November 2026) ---- */
+  const KINDS = ['None', 'Calculation', 'Constant', 'If then else', 'Property', 'Today'];
+  const FUNCS = ['No function', 'Trim', 'Left', 'Right', 'Length', 'Lower', 'Upper', 'Left trim', 'Right trim',
+    'Reverse', 'Replicate', 'Char index', 'Replace', 'Substring'];
+  const OPS = ['+', '-', '*', '/', '%'];
+  const CONDS = ['Equal', 'Not Equal', 'Contains', 'Not Contains', 'Starts With', 'Ends With', 'Less', 'Less Equal',
+    'Greater', 'Greater Equal', 'Empty', 'Not Empty', 'In', 'Between'];
+  const CONST_TYPES = ['String', 'Integer', 'Decimal', 'Boolean', 'Date', 'Time', 'DateTime', 'Today'];
+  const TYPES = ['VarChar', 'NVarChar', 'Boolean', 'DBTimeStamp', 'Int'];
+
+  const NAME_COLUMNS = ('ADDRESS_NUM_1 ADDRESS_NUM_2 ADDRESS_NUM_3 BAR_CODE BILL_ADDRESS_NUM BIRTH_DATE BT_ID CATEGORY ' +
+    'CHAPTER CITY CO_ID CO_MEMBER_TYPE COMPANY COMPANY_RECORD COMPANY_SORT CONTACT_RANK COUNTRY COUNTY DATE_ADDED ' +
+    'DESIGNATION EMAIL FAX FIRST_NAME FULL_ADDRESS FULL_NAME FUNCTIONAL_TITLE GENDER HOME_PHONE ID INFORMAL JOIN_DATE ' +
+    'LAST_FIRST LAST_NAME LAST_UPDATED MAJOR_KEY MEMBER_RECORD MEMBER_STATUS MEMBER_TYPE MIDDLE_NAME MOBILE_PHONE ' +
+    'ORG_CODE PAID_THRU PREFIX STATE_PROVINCE STATUS SUFFIX TITLE TOLL_FREE WEBSITE WORK_PHONE ZIP').split(' ');
+  const PROPS = ['Member_Types.COMPANY_RECORD', 'Member_Types.DESCRIPTION', 'Member_Types.MEMBER_RECORD',
+    'Member_Types.MEMBER_TYPE']
+    .concat(NAME_COLUMNS.map((c) => 'Name.' + c))
+    .concat(['vBo_I4u_UT_Lookup_Category.Description', 'vBo_I4u_UT_Lookup_Status.Description']);
+  const KNOWN_TYPES = { 'Name.CITY': 'NVarChar', 'Name.COMPANY': 'NVarChar', 'Name.FULL_NAME': 'NVarChar',
+    'Name.COMPANY_RECORD': 'Boolean', 'Name.MEMBER_RECORD': 'Boolean', 'Name.BIRTH_DATE': 'DBTimeStamp',
+    'Name.JOIN_DATE': 'DBTimeStamp', 'Name.PAID_THRU': 'DBTimeStamp' };
+
+  /* ---- the example: _I4u_UT_ContactBasic.SearchString ---- */
+  const property = (name, fn) => ({ kind: 'Property', name, type: KNOWN_TYPES[name] || 'VarChar', fn: fn || null });
+  const terms = [
+    { op: null, node: property('Name.ID') },
+    { op: '+', node: property('Name.EMAIL') },
+    { op: '+', node: property('Name.MOBILE_PHONE', { name: 'Replace', find: ' ', replace: '' }) },
+    { op: '+', node: property('Name.CITY') },
+    { op: '+', node: property('Name.ZIP') },
+    { op: '+', node: {
+      kind: 'If then else',
+      when: { left: property('Name.COMPANY_RECORD'), cond: 'Equal', right: { kind: 'Constant', type: 'Boolean', value: 'True', fn: null } },
+      then: property('Name.COMPANY'),
+      otherwise: property('Name.FULL_NAME')
+    } }
+  ];
+
+  /* ---- small DOM helpers ---- */
+  function h(tag, attrs, ...children) {
+    const el = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs || {})) {
+      if (key === 'class') el.className = value;
+      else if (key.startsWith('on')) el.addEventListener(key.slice(2), value);
+      else if (value === true) el.setAttribute(key, '');
+      else if (value !== false && value != null) el.setAttribute(key, value);
+    }
+    el.append(...children.filter((c) => c != null));
+    return el;
+  }
+
+  function select(options, value, attrs, onChange) {
+    const el = h('select', attrs);
+    options.forEach((text) => el.append(h('option', { selected: text === value }, text)));
+    if (onChange) el.addEventListener('change', () => { onChange(el.value); renderProposed(); });
+    return el;
+  }
+
+  /* "Table.Column" with a muted table and a strong column. */
+  function qualified(name) {
+    const dot = name.lastIndexOf('.');
+    return [h('span', { class: 'tok-t' }, name.slice(0, dot + 1)), h('span', { class: 'tok-c' }, name.slice(dot + 1))];
+  }
+
+  /* ===========================================================================
+   * Stock view: the nested layout iMIS renders
+   * ======================================================================== */
+  function stockFunction(node) {
+    const parts = [select(FUNCS, node.fn ? node.fn.name : 'No function')];
+    if (node.fn && node.fn.name === 'Replace') {
+      parts.push(h('input', { type: 'text', value: node.fn.find, style: 'width:105px' }), ' with ',
+        h('input', { type: 'text', value: node.fn.replace, style: 'width:105px' }));
+    }
+    return parts;
+  }
+
+  function stockOperand(node, shaded) {
+    const box = h('div', { class: 'st-container' }, select(KINDS, node.kind));
+    if (node.kind === 'Property') {
+      box.append(select(PROPS, node.name, { class: 'st-wide' }), select(TYPES, node.type, { disabled: true }), ...stockFunction(node));
+    } else if (node.kind === 'Constant') {
+      box.append(select(CONST_TYPES, node.type), select(['True', 'False'], node.value), ...stockFunction(node));
+    } else if (node.kind === 'If then else') {
+      box.append(select(FUNCS, 'No function'),
+        h('div', { class: 'st-box' + (shaded ? ' is-shaded' : '') },
+          h('span', { class: 'st-chevron' }),
+          h('span', { class: 'st-link' }, 'Add condition'),
+          h('div', {}, 'IF'),
+          h('div', { class: 'st-box' + (shaded ? '' : ' is-shaded') },
+            h('span', { class: 'st-chevron' }),
+            stockOperand(node.when.left),
+            select(CONDS, node.when.cond, { class: 'st-op' }),
+            stockOperand(node.when.right),
+            h('span', { class: 'st-link' }, 'Add condition')),
+          stockOperand(node.then),
+          h('span', { class: 'st-link' }, 'Add else if'),
+          stockOperand(node.otherwise)));
+    }
+    return box;
+  }
+
+  /* a + (b + (c + ...)): each operator nests the rest of the chain. */
+  function stockChain(index, shaded) {
+    if (index === terms.length - 1) return stockOperand(terms[index].node, shaded);
+    return h('div', { class: 'st-container' },
+      select(KINDS, 'Calculation'), select(FUNCS, 'No function'),
+      h('div', { class: 'st-box' + (shaded ? ' is-shaded' : '') },
+        h('span', { class: 'st-chevron' }),
+        stockOperand(terms[index].node),
+        select(OPS, terms[index + 1].op, { class: 'st-op' }),
+        stockChain(index + 1, !shaded)));
+  }
+
+  function renderStock() {
+    document.getElementById('stock').replaceChildren(
+      h('p', { class: 'st-label' }, 'Expression'),
+      stockChain(0, true),
+      h('p', { class: 'st-sql' }, "(Name.[ID]) + ((Name.[EMAIL]) + ((REPLACE(Name.[MOBILE_PHONE],' ','')) + ((Name.[CITY]) + " +
+        "((Name.[ZIP]) + (CASE WHEN ((Name.[COMPANY_RECORD]) = (CAST('1' AS Bit))) THEN (Name.[COMPANY]) ELSE (Name.[FULL_NAME]) END)))))"));
+  }
+
+  /* ===========================================================================
+   * Proposed view
+   * ======================================================================== */
+
+  /* ---- 1. formula line ---- */
+  const tok = (cls, text) => h('span', { class: 'tok-' + cls }, text);
+  const quoted = (text) => tok('s', '"' + text + '"');
+
+  function formulaParts(node) {
+    let parts;
+    if (node.kind === 'Property') parts = qualified(node.name);
+    else if (node.kind === 'Constant') parts = [tok('k', node.value)];
+    else if (node.kind === 'Today') parts = [tok('k', 'Today')];
+    else if (node.kind === 'If then else') {
+      parts = [tok('k', 'If '), ...formulaParts(node.when.left), ' ' + conditionSymbol(node.when.cond) + ' ',
+        ...formulaParts(node.when.right), tok('k', ' then '), ...formulaParts(node.then),
+        tok('k', ' else '), ...formulaParts(node.otherwise)];
+    } else parts = [node.kind];
+    if (!node.fn) return parts;
+    const args = node.fn.name === 'Replace' ? [', ', quoted(node.fn.find), ', ', quoted(node.fn.replace)] : [];
+    return [tok('f', node.fn.name), '(', ...parts, ...args, ')'];
+  }
+
+  const conditionSymbol = (cond) => ({ 'Equal': '=', 'Not Equal': '<>', 'Less': '<', 'Less Equal': '<=',
+    'Greater': '>', 'Greater Equal': '>=' }[cond] || cond.toLowerCase());
+
+  function setActive(index, on) {
+    document.querySelectorAll('[data-term="' + index + '"]').forEach((el) => el.classList.toggle('is-active', on));
+  }
+
+  function formulaLine() {
+    const line = h('div', { class: 'ex-formula', 'aria-label': 'Expression as a formula' });
+    terms.forEach((term, index) => {
+      if (term.op) line.append(h('span', { class: 'ex-op' }, term.op));
+      line.append(h('button', {
+        type: 'button', class: 'ex-term', 'data-term': index, title: 'Show this term below',
+        onclick: () => {
+          const row = document.querySelector('.ex-row[data-term="' + index + '"]');
+          row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          setActive(index, true);
+          setTimeout(() => setActive(index, false), 1400);
+          row.querySelector('select, button').focus({ preventScroll: true });
+        }
+      }, ...formulaParts(term.node)));
+    });
+    return line;
+  }
+
+  /* ---- 3. searchable property dropdown (one shared panel) ---- */
+  let panel = null;
+  function closePanel() {
+    if (!panel) return;
+    panel.owner.setAttribute('aria-expanded', 'false');
+    panel.el.remove();
+    panel = null;
+  }
+
+  function openPanel(button, node) {
+    closePanel();
+    const search = h('input', { type: 'search', placeholder: 'Type to filter…', 'aria-label': 'Filter properties' });
+    const list = h('div', { class: 'ss-list', role: 'listbox' });
+    const el = h('div', { class: 'ss-panel' }, search, list);
+    const choose = (name) => {
+      node.name = name;
+      node.type = KNOWN_TYPES[name] || 'VarChar';
+      closePanel();
+      renderProposed();
+    };
+    const fill = () => {
+      const words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const hits = PROPS.filter((name) => words.every((word) => name.toLowerCase().includes(word)));
+      list.replaceChildren(...hits.map((name) => h('div', {
+        role: 'option', 'aria-selected': String(name === node.name), onclick: () => choose(name)
+      }, ...qualified(name))));
+      if (!hits.length) list.append(h('div', { class: 'ss-empty' }, 'No properties match'));
+      list.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+    };
+    search.addEventListener('input', fill);
+    search.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { closePanel(); button.focus(); }
+      if (event.key === 'Enter') list.querySelector('[role=option]')?.click();
+    });
+    document.body.append(el);
+    const box = button.getBoundingClientRect();
+    el.style.left = (box.left + window.scrollX) + 'px';
+    el.style.top = (box.bottom + window.scrollY + 2) + 'px';
+    button.setAttribute('aria-expanded', 'true');
+    panel = { el, owner: button };
+    fill();
+    search.focus();
+  }
+
+  document.addEventListener('pointerdown', (event) => {
+    if (panel && !panel.el.contains(event.target) && !panel.owner.contains(event.target)) closePanel();
+  });
+
+  /* ---- 4. quieter rows: type badge, faint function, labelled arguments ---- */
+  function argument(label, fn, key) {
+    const describe = (value) => (value === '' ? 'empty' : /^ +$/.test(value) ? value.length + ' space' + (value.length > 1 ? 's' : '') : '');
+    const note = h('span', {}, describe(fn[key]));
+    note.hidden = !note.textContent;
+    const input = h('input', { type: 'text', value: fn[key], 'aria-label': label });
+    input.addEventListener('input', () => {
+      fn[key] = input.value;
+      note.textContent = describe(input.value);
+      note.hidden = !note.textContent;
+      document.querySelector('.ex-formula').replaceWith(formulaLine());
+    });
+    return [h('span', { class: 'ex-pair' },
+      h('span', { class: 'ex-word' }, label), h('span', { class: 'ex-arg' }, input, note))];
+  }
+
+  function functionControl(node) {
+    if (!node.fn) {
+      return [h('button', { type: 'button', class: 'ex-ghost', onclick: () => { node.fn = { name: 'Trim' }; renderProposed(); } },
+        '+ Add function')];
+    }
+    const parts = [select(FUNCS, node.fn.name, { 'aria-label': 'Function' }, (name) => {
+      node.fn = name === 'No function' ? null : name === 'Replace' ? { name, find: '', replace: '' } : { name };
+    })];
+    if (node.fn.name === 'Replace') parts.push(...argument('find', node.fn, 'find'), ...argument('with', node.fn, 'replace'));
+    return parts;
+  }
+
+  function operand(node) {
+    const kind = select(KINDS, node.kind, { class: 'ex-kind', 'aria-label': 'Kind' }, (value) => { node.kind = value; });
+    if (node.kind === 'Property') {
+      const button = h('button', { type: 'button', class: 'ex-prop', 'aria-haspopup': 'listbox', 'aria-expanded': 'false',
+        title: node.name }, ...qualified(node.name));
+      button.addEventListener('click', () => (panel && panel.owner === button ? closePanel() : openPanel(button, node)));
+      return [kind, button, h('span', { class: 'ex-type', title: 'Data type' }, node.type), ...functionControl(node)];
+    }
+    if (node.kind === 'Constant') {
+      return [kind, select(CONST_TYPES, node.type, { 'aria-label': 'Constant type' }, (value) => { node.type = value; }),
+        select(['True', 'False'], node.value, { 'aria-label': 'Value' }, (value) => { node.value = value; }),
+        ...functionControl(node)];
+    }
+    if (node.kind === 'If then else') return [kind, ifBlock(node)];
+    return [kind];
+  }
+
+  const row = (lead, parts, index) => h('div', { class: 'ex-row', 'data-term': index },
+    h('div', { class: 'ex-lead' }, lead), h('div', { class: 'ex-parts' }, ...parts));
+
+  function ifBlock(node) {
+    const condition = select(CONDS, node.when.cond, { 'aria-label': 'Condition' }, (value) => { node.when.cond = value; });
+    return h('div', { class: 'ex-if' },
+      row('If', [...operand(node.when.left), condition, ...operand(node.when.right)]),
+      h('button', { type: 'button', class: 'ex-add' }, '+ Add condition'),
+      row('Then', operand(node.then)),
+      h('button', { type: 'button', class: 'ex-add' }, '+ Add else if'),
+      row('Else', operand(node.otherwise)));
+  }
+
+  /* ---- 2. flat rows ---- */
+  function renderProposed() {
+    closePanel();
+    const rows = h('div', { class: 'ex-rows' });
+    terms.forEach((term, index) => {
+      const lead = term.op
+        ? select(OPS, term.op, { 'aria-label': 'Operator' }, (value) => { term.op = value; })
+        : '';
+      const el = row(lead, operand(term.node), index);
+      el.addEventListener('pointerenter', () => setActive(index, true));
+      el.addEventListener('pointerleave', () => setActive(index, false));
+      rows.append(el);
+    });
+    document.getElementById('proposed').replaceChildren(
+      h('div', { class: 'ex-head' }, h('h3', {}, 'Expression for SearchString'), h('small', {}, 'VarChar, length 250')),
+      formulaLine(),
+      rows);
+  }
+
+  /* ---- view switch ---- */
+  function showView(view) {
+    closePanel();
+    ['stock', 'proposed'].forEach((name) => {
+      document.getElementById(name).hidden = name !== view;
+      document.getElementById('notes-' + name).hidden = name !== view;
+    });
+    document.querySelector('.builder').scrollTop = 0;
+  }
+  document.querySelectorAll('input[name="view"]').forEach((radio) =>
+    radio.addEventListener('change', () => showView(radio.value)));
+
+  renderStock();
+  renderProposed();
+})();
+</script>
+</body>
+</html>

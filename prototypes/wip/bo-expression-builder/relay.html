@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>BO enhancer relay</title>
+<!-- Test helper for trying the working copy of the BO enhancer in iMIS before
+     a theme upload, in a browser that will not let the iMIS page load a script
+     from localhost (the Claude browser pane). Serve the repo root locally and
+     open this page, then navigate the SAME tab to any page on the iMIS site:
+     window.name carries the script's text across. README.md has the steps. -->
+<p id="state">Reading the BO enhancer…</p>
+<script>
+  fetch('/Theme/UnionSuite/Scripts/BO-Enhancements.js?v=' + Date.now())
+    .then((response) => response.text())
+    .then((source) => {
+      window.name = 'BXSRC:' + source;
+      document.getElementById('state').textContent = 'Ready: ' + source.length + ' characters held in window.name.';
+    });
+</script>
