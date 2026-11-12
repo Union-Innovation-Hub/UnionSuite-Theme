@@ -15556,6 +15556,12 @@ html.us-taskbar-mounted #hd .search-dropdown {
    marks a stacked row data-us-columns="stacked" (US-CCO-COLUMNS). */
 .cco > .RadMultiPage .ContentWizardDisplay > div > .row[data-us-columns="stacked"]:has([data-us-case-member]):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   flex-direction: column;
+
+  /* Bootstrap's .row wraps. A wrapping column sizes itself before the
+     panels' late content settles, which left the member card's box 260px
+     taller than its panel: a blank band above Resolution (owner,
+     12 November 2026). One column never needs to wrap. */
+  flex-wrap: nowrap;
   margin-inline: 0;
 }
 
