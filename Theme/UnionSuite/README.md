@@ -191,7 +191,7 @@ No new icon element or `ti` class is needed for those rows.
 Home uses `ti-home`; Organising/Committees use `ti-users-group`; Cases uses
 `ti-briefcase`; Agreements uses `ti-contract`; Calls uses
 `ti-phone-outgoing`; Travel uses `ti-plane`; Integrations uses `ti-settings`.
-UnionPay uses `ti-currency-dollar` through the `UnionPayNav` class, which works
+UnionPay uses `ti-coin` through the `UnionPayNav` class, which works
 with or without `Nav-Icon`.
 Normal icons use `--brand-100`; hover, keyboard focus, selected and selected-child
 states use `--accent`. The font stays at weight 400 and occupies a 32px slot.

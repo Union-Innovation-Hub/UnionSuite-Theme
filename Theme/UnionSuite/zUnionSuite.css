@@ -4264,10 +4264,10 @@ table.DataDisplay .DataValue {
 
 /* ti-settings */
 .sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI > div.UnionPayNav-wrapper:not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
-  content: "\eb84";
+  content: "\eb82";
 }
 
-/* ti-currency-dollar */
+/* ti-coin (owner, 12 November 2026; was ti-currency-dollar) */
 .sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI:hover > div:is(.Nav-Icon-wrapper, .UnionPayNav-wrapper):is(
   .Home-wrapper,
   .Organising-wrapper,
