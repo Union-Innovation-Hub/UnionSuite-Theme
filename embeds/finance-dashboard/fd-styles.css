@@ -232,6 +232,18 @@
   grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
   gap: 12px;
 }
+/* Six cards sit 6 across, then 3 and 3, never 4 and 2. Below 1092px (six
+   172px cards plus five gaps) the minimum track becomes a third of the grid,
+   so exactly three fit; the 1px shave keeps rounding from dropping the third.
+   Under about 540px a third is narrower than 172px and the cards go 2 across.
+   Width is the grid's own, not the viewport's, because the iMIS sidebar takes
+   a varying share of the screen. */
+.fd-root .kpi-grid:has(> :nth-child(6)) {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(max(172px, clamp(0px, (1092px - 100%) * 999, (100% - 27px) / 3)), 1fr)
+  );
+}
 .fd-root .kpi-card {
   background: var(--surface);
   border: 1px solid var(--uih-hub-border-soft);

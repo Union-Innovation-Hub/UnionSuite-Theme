@@ -10,7 +10,11 @@
   var FD = window.FDCore;
   if (!FD || !FD.PAY_TYPES) return;
   var TYPE = {
-    dd:   ["#006f94", "#e4f0f4"],  /* teal-600  — brand, the biggest series */
+    /* Brand, the biggest series. These two are CSS variables, not hexes, so
+       they follow the tenant's branding (see the ramp at the top of
+       fd-theme-unionsuite.css). That works because every consumer writes the
+       value into an inline style; a canvas or SVG attribute would need a hex. */
+    dd:   ["var(--us-teal-600)", "var(--us-teal-50)"],
     cc:   ["#e07a1f", "#ffe8d6"],  /* accent-700 — readable orange on white */
     bpay: ["#3fb5d9", "#eef6f9"],  /* teal-400   — same family, lighter     */
     eft:  ["#6b7580", "#f1f3f5"],  /* neutral-500                            */
@@ -20,6 +24,6 @@
   FD.PAY_TYPES.forEach(function (t) {
     if (TYPE[t.id]) { t.color = TYPE[t.id][0]; t.pale = TYPE[t.id][1]; }
   });
-  var AREA = { dues: "#00506a", ins: "#3fb5d9", event: "#413d6b", addon: "#ff9947" };
+  var AREA = { dues: "var(--us-teal-700)", ins: "#3fb5d9", event: "#413d6b", addon: "#ff9947" };
   FD.PAY_AREAS.forEach(function (a) { if (AREA[a.id]) a.color = AREA[a.id]; });
 })();

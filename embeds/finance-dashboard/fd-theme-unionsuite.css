@@ -17,11 +17,26 @@
 
 /* ═════════ 1. Token swap — the whole palette in one block ═════════ */
 .fd-root {
-  /* Union Suite ramps (verbatim) */
-  --us-teal-900: #002632;  --us-teal-800: #003a4c;  --us-teal-700: #00506a;
-  --us-teal-600: #006f94;  --us-teal-500: #007ea8;  --us-teal-400: #3fb5d9;
-  --us-teal-300: #5acbf8;  --us-teal-100: #d0e4ea;  --us-teal-50:  #eef6f9;
-  --us-accent-700: #e07a1f; --us-accent-600: #ff9947;
+  /* Brand ramp. Inside iMIS the theme publishes --brand-* and --accent on
+     :root, already resolved to the tenant's branding, so the dashboard follows
+     whatever the tenant is branded as. The hex fallbacks are Union Suite's
+     default teal, used standalone (Pages, local preview) where no theme is
+     loaded. The theme has no 400 or 300 brand step, so those stay literal. */
+  --us-teal-900: var(--brand-900, #002632);
+  --us-teal-800: var(--brand-800, #003a4c);
+  --us-teal-700: var(--brand-700, #00506a);
+  --us-teal-600: var(--brand-600, #006f94);
+  --us-teal-500: var(--brand-500, #007ea8);
+  --us-teal-400: #3fb5d9;
+  --us-teal-300: #5acbf8;
+  --us-teal-100: var(--brand-100, #d0e4ea);
+  --us-teal-50:  var(--brand-50, #eef6f9);
+  /* Accent reads the theme's ramp steps, NOT its --accent / --accent-hover
+     semantics: fd-styles.css aliases --accent on .fd-root to --uih-accent,
+     which points back here, so var(--accent) would be a cycle and resolve to
+     nothing. */
+  --us-accent-700: var(--accent-700, #e07a1f);
+  --us-accent-600: var(--accent-600, #ff9947);
   --us-accent-500: #ff734f; --us-accent-100: #ffe8d6;
   --us-n-900: #1c2024; --us-n-800: #2b3036; --us-n-700: #3d434b;
   --us-n-600: #545962; --us-n-500: #6b7580; --us-n-400: #9aa1aa;
@@ -109,6 +124,20 @@
 .fd-root .kpi-value,
 .fd-root .stat-value,
 .fd-root .header-logo              { font-family: var(--uih-font-display); letter-spacing: -.01em; }
+
+/* ═════════ 5a. Header: the theme's banner surface ═════════
+   Same treatment as .us-banner__surface in zUnionSuite.css: the brand-800 to
+   brand-700 gradient under a 2px accent rule. border-box keeps the band at
+   its 52px, so nothing below it moves. */
+.fd-root header {
+  box-sizing: border-box;
+  border-top: 2px solid var(--us-accent-600);
+  background: var(--us-teal-800);
+  background-image: linear-gradient(115deg, var(--us-teal-700), var(--us-teal-800));
+  box-shadow: var(--uih-shadow);
+}
+.fd-root .header-logo              { font-size: 18px; }
+.fd-root .header-sub               { color: #fff; }
 
 /* ═════════ 6. Chart marks hardcoded in fd-dashboard.js ═════════
    The daily-volume SVG writes its colours as presentation attributes. CSS
