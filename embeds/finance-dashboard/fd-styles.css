@@ -735,7 +735,6 @@
 .fd-root .detail-hd {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--brand-light);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 15px 18px;
@@ -809,6 +808,20 @@
 /* ── Tables ──────────────────────────────────────────────── */
 /* No scroll container here: the sticky <th> must pin against .main-scroll */
 .fd-root .table-wrap { overflow: visible; }
+/* Set by FDCore.syncStuckTables() when the table is wider than its column.
+   The wrap becomes the table's own scroll box, in both directions, and takes
+   over the card's corners and shadow, which its clipping would otherwise cut
+   off the table. The height cap is what keeps it usable: without it the
+   sideways scrollbar sits under the last of 100 rows, and the header, now
+   sticky against the wrap, would never pin. 112px leaves the app header
+   (52px) and a strip of page visible, so it still reads as part of the page. */
+.fd-root .table-wrap.scroll-x {
+  overflow: auto;
+  max-height: calc(var(--fd-height, 90dvh) - 112px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.fd-root .table-wrap.scroll-x table.report-table { box-shadow: none; }
 .fd-root table.report-table {
   width: 100%;
   border-collapse: collapse;

@@ -179,6 +179,15 @@ window.FDCore = (function () {
      pins against .main-scroll instead. The .stuck class squares the header off
      and bleeds it to the gutters; it's re-queried each frame so it survives
      every re-render.
+
+     The exception is a table too wide for its column (narrow screens, or the
+     iMIS sidebar open): .main-scroll clips sideways, so the right-hand columns
+     were unreachable. Such a table's .table-wrap gets .scroll-x and becomes
+     the table's own scroll box (see fd-styles.css). The <th> then pins against
+     the wrap, not .main-scroll, so .stuck and its gutter bleed are switched
+     off for that table. This is measured,
+     not a media query, because the column's width depends on the host page
+     and not only on the viewport.
      ═══════════════════════════════════════════════════════════ */
   function syncStuckTables() {
     const sc = $("main-scroll");
@@ -186,8 +195,13 @@ window.FDCore = (function () {
     const rootTop = sc.getBoundingClientRect().top;
     document.querySelectorAll(".page:not([style*='display: none']):not([style*='display:none']) table.report-table")
       .forEach(t => {
+        const wrap = t.closest(".table-wrap");
+        // The table's own width, not wrap.scrollWidth: scrollWidth also counts
+        // the header's gutter bleed, which flipped this back on at full width.
+        const tooWide = !!wrap && t.offsetWidth > wrap.clientWidth + 1;
+        if (wrap) wrap.classList.toggle("scroll-x", tooWide);
         const r = t.getBoundingClientRect();
-        t.classList.toggle("stuck", r.top < rootTop && r.bottom > rootTop + 60);
+        t.classList.toggle("stuck", !tooWide && r.top < rootTop && r.bottom > rootTop + 60);
       });
   }
 
@@ -207,6 +221,8 @@ window.FDCore = (function () {
   function bindScrollSync() {
     const sc = $("main-scroll");
     if (sc) sc.addEventListener("scroll", () => requestAnimationFrame(syncStuckTables), { passive: true });
+    // Whether a table fits its column changes with the window, not with scroll.
+    window.addEventListener("resize", () => requestAnimationFrame(syncStuckTables), { passive: true });
   }
 
   /* Re-triggers the small fade used when a metric label set changes. */
