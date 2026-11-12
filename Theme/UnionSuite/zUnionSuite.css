@@ -4184,9 +4184,10 @@ table.DataDisplay .DataValue {
    Nav-Icon + module navigation classes; iMIS supplies their -wrapper forms.
    Tabler.css loads the bundled Tabler 3.31.0 font. Map the codepoints as well
    as the font: Font Awesome codepoints are not interchangeable with Tabler.
+   UnionPayNav is the one module class that also works without Nav-Icon.
    Scope to known root navigation items so native sprite icons, tree toggles,
    other Telerik trees and unknown custom icons retain their own rendering. */
-.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI > div.Nav-Icon-wrapper:is(
+.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI > div:is(.Nav-Icon-wrapper, .UnionPayNav-wrapper):is(
   .Home-wrapper,
   .Organising-wrapper,
   .Cases-wrapper,
@@ -4194,7 +4195,8 @@ table.DataDisplay .DataValue {
   .Calls-wrapper,
   .Committees-wrapper,
   .Travel-wrapper,
-  .Integrations-wrapper
+  .Integrations-wrapper,
+  .UnionPayNav-wrapper
 ):not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
   display: inline-flex;
   flex: 0 0 32px;
@@ -4261,7 +4263,12 @@ table.DataDisplay .DataValue {
 }
 
 /* ti-settings */
-.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI:hover > div.Nav-Icon-wrapper:is(
+.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI > div.UnionPayNav-wrapper:not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
+  content: "\eb84";
+}
+
+/* ti-currency-dollar */
+.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI:hover > div:is(.Nav-Icon-wrapper, .UnionPayNav-wrapper):is(
   .Home-wrapper,
   .Organising-wrapper,
   .Cases-wrapper,
@@ -4269,9 +4276,10 @@ table.DataDisplay .DataValue {
   .Calls-wrapper,
   .Committees-wrapper,
   .Travel-wrapper,
-  .Integrations-wrapper
+  .Integrations-wrapper,
+  .UnionPayNav-wrapper
 ):not(:where(.us-report-no-styling, .us-report-no-styling *))::before,
-.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI > div.Nav-Icon-wrapper:is(
+.sub-nav-body .RadTreeView_Orion > .rtUL > .rtLI > div:is(.Nav-Icon-wrapper, .UnionPayNav-wrapper):is(
   .Home-wrapper,
   .Organising-wrapper,
   .Cases-wrapper,
@@ -4279,7 +4287,8 @@ table.DataDisplay .DataValue {
   .Calls-wrapper,
   .Committees-wrapper,
   .Travel-wrapper,
-  .Integrations-wrapper
+  .Integrations-wrapper,
+  .UnionPayNav-wrapper
 ):is(:focus-within, .rtSelected, .child-is-selected-wrapper):not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
   /* Match the legacy UTStaff hover priority during migration. */
   color: var(--accent) !important;
@@ -13290,7 +13299,7 @@ tr[data-us-iqa-detail-hold] {
 }
 
 /* Font icons need colour only; native masked sprites use the accent background above. */
-#SideBarPanel .RadTreeView_Orion > .rtUL > .rtLI > div.Nav-Icon-wrapper:is(
+#SideBarPanel .RadTreeView_Orion > .rtUL > .rtLI > div:is(.Nav-Icon-wrapper, .UnionPayNav-wrapper):is(
   .Home-wrapper,
   .Organising-wrapper,
   .Cases-wrapper,
@@ -13298,7 +13307,8 @@ tr[data-us-iqa-detail-hold] {
   .Calls-wrapper,
   .Committees-wrapper,
   .Travel-wrapper,
-  .Integrations-wrapper
+  .Integrations-wrapper,
+  .UnionPayNav-wrapper
 ):not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
   background: none;
 }
