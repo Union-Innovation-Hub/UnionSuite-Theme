@@ -4666,7 +4666,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
     try {
       // Click first: disabling beforehand would suppress native validation/postback.
       save.click();
-      if (!clickEvent?.defaultPrevented && window.Page_IsValid !== false) showShortcutSaving(save);
+      // Only a click that reached the button and went ahead is a save. Another
+      // script can stop it before it gets there and ask first (the QA capture
+      // script's Save prompt does): showing Saving… then would disable the
+      // button that prompt's own Save clicks, and nothing would save.
+      const saving = clickEvent && !clickEvent.defaultPrevented && window.Page_IsValid !== false && !document.querySelector('dialog[open]');
+      if (saving) showShortcutSaving(save);
     } finally { save.removeEventListener('click', observe, true); }
   }
 
