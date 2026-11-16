@@ -45,16 +45,14 @@ Theme/**/*.zip
 !/.preview/*.py
 !/.preview/README.md
 
-# Minified upload copy of the theme; rebuild with tools/build-theme-dist.cjs
+# Built outputs: the minified theme upload (dist/UnionSuite, from
+# tools/build-theme-dist.cjs) and every import file for iMIS, BeyondFormz or
+# Flowz (dist/Imports, from each prototype's build-form.cjs or
+# build-flows.cjs)
 /dist/
 
 # Built paste-in embeds; rebuild with each embed's build script
 /embeds/finance-dashboard/dist/
-
-# Built BeyondFormz and Flowz exports; rebuild with the folder build scripts
-/prototypes/wip/case-create-form/*/dist/
-/prototypes/wip/add-edit-task-form/dist/
-/prototypes/wip/resolve-case-form/*/dist/
 
 # Built staff help pages and chatbot JSON; rebuild with tools/build-user-guide.cjs
 /docs/user-guide/dist/

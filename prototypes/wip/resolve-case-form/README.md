@@ -54,7 +54,7 @@ imported or run on iMIS.
 node prototypes/wip/resolve-case-form/beyondformz/build-form.cjs <BeyondFormz export.json>
 ```
 
-It writes `beyondformz/dist/Resolve-Case-Form.json` (ignored by Git).
+It writes `dist/Imports/Resolve-Case-Form.json` at the project root (ignored by Git).
 Import it over the form in BeyondFormz. The build keeps the export's form
 record, so take a fresh export first if the form changed since.
 
@@ -73,7 +73,7 @@ node prototypes/wip/resolve-case-form/flows/build-flows.cjs <Flowz export.json>
 
 It reads a Flowz export holding the two flows, keeps their definitionId and
 versionId (importing overwrites them) and changes only what the form needs.
-It writes `flows/dist/Resolve-Case-Flows.json` (ignored by Git), checked
+It writes `dist/Imports/Resolve-Case-Flows.json` (ignored by Git), checked
 with the Flowz builder's validator.
 
 - **`US Case Form Prefill: Resolve Case`** (`/Cases/US/Resolve/Prefill`).

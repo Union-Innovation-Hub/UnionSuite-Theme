@@ -23,7 +23,7 @@ the form (`beyondformz/form-inject.js`): its behaviour is this form's own.
 `node beyondformz/build-form.cjs <export.json> [output.json]` reads a
 BeyondFormz export of the form, keeps its form record and field
 properties, and writes the new field list and scripts (default output
-`beyondformz/dist/Create-Case-Staff-Form.json`, ignored by Git). Edit the
+`dist/Imports/Create-Case-Staff-Form.json` at the project root, ignored by Git). Edit the
 sources, never the export:
 
 | File | Goes into |
@@ -54,7 +54,7 @@ a step missing; its message links the case) keeps the form open.
 ## The flows (`flows/`)
 
 `node flows/build-flows.cjs <flowz-export.json> [output.json]` builds both
-into one Flowz export (default `flows/dist/Create-Case-Staff-Flows.json`,
+into one Flowz export (default `dist/Imports/Create-Case-Staff-Flows.json` at the project root,
 ignored by Git), from the owner's export of the two "UnionSuite Cases"
 copies (29 October 2026). It keeps their `definitionId` and `versionId`, so
 importing overwrites the copies. Edit the script, never the export.

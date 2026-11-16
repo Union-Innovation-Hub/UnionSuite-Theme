@@ -238,7 +238,7 @@
     }, 700);
   }
 
-  fetch('dist/Resolve-Case-Form.json')
+  fetch('../../../../dist/Imports/Resolve-Case-Form.json')
     .then(response => response.json())
     .then(exported => {
       const form = exported.forms[0];
@@ -258,5 +258,5 @@
       autoexecute.forEach(field => run(field, root));
       log('Rendered ' + form.fields.length + ' fields; prefill: ' + state.prefill + ', edit: ' + editing + ', save: ' + state.save);
     })
-    .catch(error => log('Could not load dist/Resolve-Case-Form.json: build it first. ' + error));
+    .catch(error => log('Could not load dist/Imports/Resolve-Case-Form.json: build it first. ' + error));
 })();

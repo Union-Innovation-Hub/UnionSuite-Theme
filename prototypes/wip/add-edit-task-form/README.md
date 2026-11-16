@@ -30,5 +30,5 @@ the form builder since:
 node prototypes/wip/add-edit-task-form/build-form.cjs <BeyondFormz export.json>
 ```
 
-It writes `dist/Add-Edit-Task-Form.json` (not tracked). Import that over
+It writes `dist/Imports/Add-Edit-Task-Form.json` at the project root (not tracked). Import that over
 the form in BeyondFormz.

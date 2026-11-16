@@ -24,7 +24,7 @@ Repo: `Union-Innovation-Hub/UnionSuite-Theme` on GitHub, branch `main` (commit s
 | [`experiments/`](experiments/) | Side explorations: Easter eggs, mascots, token tests, roster sample data | yes |
 | [`.preview/`](.preview/README.md) | Local preview harness and captures. Its `.cjs`/`.js`/`.py` helpers are tracked; output is not | partly |
 | `.impeccable/` | Config for the design-lint tool | yes |
-| `dist/` | The minified theme upload copy (`dist/UnionSuite`), from `node tools/build-theme-dist.cjs` | ignored |
+| `dist/` | The minified theme upload copy (`dist/UnionSuite`), from `node tools/build-theme-dist.cjs`; and every iMIS, BeyondFormz and Flowz import file (`dist/Imports`), from the prototypes' `build-form.cjs` and `build-flows.cjs` (AGENTS.md, Import files) | ignored |
 | `archive/` | Superseded research kept locally only | ignored |
 | `_onedrive-broken/` | OneDrive conflict copies set aside, kept until confirmed redundant | untracked |
 | `.tmp-iqa-integration/` | Local Node install of Playwright that the browser tests load | ignored |
@@ -114,6 +114,7 @@ Recents), `list-search-and-paging/`, `cco-inline-loading/`, `task-rows/`.
 | `agreement-page/` | WIP, not approved |
 | `case-page/` | WIP; parts are in the theme. Start with `HANDOVER.md` |
 | `case-create-form/` | Streamlined staff Create case BeyondFormz form: mock-up, the form's export build (`beyondformz/`, imported on dev) and its prefill and create flows (`flows/`, not yet imported). Its `us-bf-*` styles are in the theme (`US-BEYOND-FORMS`, 2 November 2026) |
+| `resolve-case-form/` | Resolve case and Edit resolution (one BeyondFormz form): the approved mock-up, the form's export build (`beyondformz/`, with a stand-in preview) and its two flows (`flows/`). Built to `dist/Imports`; not yet imported. Its `us-bf-affix` style is in the theme (16 November 2026) |
 | `contact-page-v3/` | Approved direction; paused, see its README handover |
 | `contact-page-v2/` | Earlier layout prototype; v3 is the approved direction |
 | `activity-cards/`, `dues-adjustments/`, `membership-stats-filters/`, `bulletin-markdown/`, `login-screen/`, `workplace-reassign/` | WIP mockups, not in the theme |

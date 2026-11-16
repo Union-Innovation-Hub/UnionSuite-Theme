@@ -10,8 +10,9 @@
    - the scripts from this folder (form-inject.js, prefill.js,
      resolve-button.js);
    - the fields in FIELDS below.
-   Writes to output.json, or dist/Resolve-Case-Form.json beside this script.
-   Import the output in BeyondFormz. */
+   Writes to output.json, or dist/Imports/Resolve-Case-Form.json at the
+   project root, where every import file goes. Import the output in
+   BeyondFormz. */
 
 'use strict';
 
@@ -19,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const here = __dirname;
-const [source, target = path.join(here, 'dist', 'Resolve-Case-Form.json')] = process.argv.slice(2);
+const [source, target = path.join(__dirname, '..', '..', '..', '..', 'dist', 'Imports', 'Resolve-Case-Form.json')] = process.argv.slice(2);
 
 if (!source) {
   console.error('Usage: node build-form.cjs <export.json> [output.json]');

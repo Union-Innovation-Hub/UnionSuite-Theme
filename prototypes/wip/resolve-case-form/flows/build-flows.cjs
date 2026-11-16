@@ -27,8 +27,8 @@
 
    Everything else, the emails and their configuration included, is kept as
    exported. New activities get IDs derived from their names, so a rebuild
-   keeps them. Writes output.json, or dist/Resolve-Case-Flows.json beside
-   this script. Edit this script, never the export. */
+   keeps them. Writes output.json, or dist/Imports/Resolve-Case-Flows.json
+   at the project root, where every import file goes. Edit this script, never the export. */
 
 'use strict';
 
@@ -36,7 +36,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const [source, target = path.join(__dirname, 'dist', 'Resolve-Case-Flows.json')] = process.argv.slice(2);
+const [source, target = path.join(__dirname, '..', '..', '..', '..', 'dist', 'Imports', 'Resolve-Case-Flows.json')] = process.argv.slice(2);
 
 if (!source) {
   console.error('Usage: node build-flows.cjs <flowz-export.json> [output.json]');

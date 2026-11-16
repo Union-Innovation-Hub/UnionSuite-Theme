@@ -4,7 +4,7 @@
    submit-button.js. Everything else in the export is left as it is.
 
    Usage: node prototypes/wip/add-edit-task-form/build-form.cjs <export.json>
-   Writes dist/Add-Edit-Task-Form.json beside this script. */
+   Writes dist/Imports/Add-Edit-Task-Form.json at the project root. */
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
@@ -33,7 +33,7 @@ if (buttons[0].executeFlow !== 'Interaction/AddEditTask') {
 
 buttons[0].javaScript = fs.readFileSync(path.join(__dirname, 'submit-button.js'), 'utf8');
 
-const out = path.join(__dirname, 'dist', 'Add-Edit-Task-Form.json');
+const out = path.join(__dirname, '..', '..', '..', 'dist', 'Imports', 'Add-Edit-Task-Form.json');
 fs.mkdirSync(path.dirname(out), {recursive: true});
 fs.writeFileSync(out, JSON.stringify(exported));
 console.log('Wrote ' + path.relative(process.cwd(), out));

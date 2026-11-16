@@ -263,7 +263,7 @@
     return new Promise(resolve => setTimeout(() => resolve(new Response(body, {status: 200})), 300));
   };
 
-  fetch('dist/Create-Case-Staff-Form.json')
+  fetch('../../../../dist/Imports/Create-Case-Staff-Form.json')
     .then(response => response.json())
     .then(exported => {
       const form = exported.forms[0];
@@ -283,5 +283,5 @@
       autoexecute.forEach(field => run(field, root));
       log('Rendered ' + form.fields.length + ' fields; prefill: ' + state.prefill + ', from: ' + state.from + ', save: ' + state.save);
     })
-    .catch(error => log('Could not load dist/Create-Case-Staff-Form.json: build it first. ' + error));
+    .catch(error => log('Could not load dist/Imports/Create-Case-Staff-Form.json: build it first. ' + error));
 })();

@@ -217,6 +217,22 @@ independent sources of truth and do not need to be committed.
   classified; never exclude the only maintained copy as generated output. Update
   generators and links when relocating pages.
 
+## Import files (`dist/Imports/`)
+
+- **Every file built to import into iMIS, BeyondFormz or Flowz goes in
+  `dist/Imports/` at the project root** (owner, 16 November 2026): a form or
+  flow export from a prototype's `build-form.cjs` or `build-flows.cjs`, and
+  any other import a script writes. Not in a `dist/` beside the script, and
+  not in `Downloads`. One flat folder, so the owner always knows where to
+  import from; name each file for what it holds (`Resolve-Case-Flows.json`).
+- A build script's default output is `dist/Imports/<Name>.json`; it may
+  still take an explicit output path as an argument. `dist/` is ignored by
+  Git, so the scripts and their sources are what is tracked: rebuild from a
+  fresh export rather than editing a built file.
+- Name the `dist/Imports/` file in the `DEPLOY.md` row that imports it, and
+  say which export it was built from.
+- The minified theme upload stays in `dist/UnionSuite/` (`tools/build-theme-dist.cjs`).
+
 ## Design lifecycle and research
 
 - **WIP:** create tracked current ideas under `prototypes/wip/<feature>/`. Record

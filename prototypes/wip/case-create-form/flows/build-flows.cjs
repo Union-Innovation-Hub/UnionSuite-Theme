@@ -15,8 +15,8 @@
    Each path matches the form's executeFlow exactly, case and all: the
    create flow answered 400 until its path did (owner, 29 October 2026).
 
-   Writes to output.json, or dist/Create-Case-Staff-Flows.json beside this
-   script. Activity IDs are derived from each activity's name, so a rebuild
+   Writes to output.json, or dist/Imports/Create-Case-Staff-Flows.json at
+   the project root, where every import file goes. Activity IDs are derived from each activity's name, so a rebuild
    keeps them. Edit this script, never the export. */
 
 'use strict';
@@ -25,7 +25,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const [source, target = path.join(__dirname, 'dist', 'Create-Case-Staff-Flows.json')] = process.argv.slice(2);
+const [source, target = path.join(__dirname, '..', '..', '..', '..', 'dist', 'Imports', 'Create-Case-Staff-Flows.json')] = process.argv.slice(2);
 
 if (!source) {
   console.error('Usage: node build-flows.cjs <flowz-export.json> [output.json]');
