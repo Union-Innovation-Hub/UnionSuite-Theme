@@ -10,7 +10,7 @@ asks:
   - who is working on this case
   - share a case with a colleague
 keywords: [staff, case team, organiser, delegate, colleague, add staff, assign, role, team]
-related: [change-the-lead-staff, who-can-see-a-case, add-a-party]
+related: [change-the-lead-staff, change-staff-role, remove-staff, who-can-see-a-case, add-a-party]
 ---
 1. On the **Overview**, find *Case team* and press **Add staff**.
 2. Search for the staff member and pick them.
@@ -18,5 +18,7 @@ related: [change-the-lead-staff, who-can-see-a-case, add-a-party]
 4. Press **Add**.
 
 The box stays open for the next person. People already on the case show as *On the case* and cannot be picked.
+
+To change someone's role later, see [Change someone's role on the case](#change-staff-role). To take them off, see [Remove someone from the case](#remove-staff).
 
 > **Tip:** On a case with Individual access, only staff on the case can open it. Adding someone gives them access.

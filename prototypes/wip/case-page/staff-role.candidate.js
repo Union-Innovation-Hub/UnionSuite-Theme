@@ -14,8 +14,8 @@
        <span class="us-case-staff__role-text">{#query.ContactRole}</span>
        <i class="ti ti-chevron-down" aria-hidden="true"></i></button>
 
-   The roles are the case staff types, ROLES (the Add staff composer's Role
-   list): value and label columns, read once for the page. The menu ticks
+   The roles are the case contact types, ROLES (the Add staff composer's
+   Role list; owner, 16 November 2026): value and label columns, read once for the page. The menu ticks
    the card's role by code (data-us-staff-role-code) or, without one, by
    name.
 
@@ -34,7 +34,7 @@
   'use strict';
   if (window.UnionSuiteCaseStaffRole) return;
 
-  const ROLES = '$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Get Case Staff Member Types';
+  const ROLES = '$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Case Value List - Case Contact Types';
   const SAVE = '/cases/quick-update/set-staff-role';
   const BUTTON = '.us-case-staff .us-case-staff__role';
   const CARD = '[data-us-contact-ordinal]';

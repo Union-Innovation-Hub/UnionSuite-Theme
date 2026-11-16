@@ -10,7 +10,7 @@ asks:
   - hand over a case
   - no lead staff assigned
 keywords: [lead staff, lead, responsible, reassign, hand over, handover, crown, owner, case manager]
-related: [add-staff, read-the-banner, who-can-see-a-case]
+related: [add-staff, remove-staff, read-the-banner, who-can-see-a-case]
 ---
 The lead staff member is responsible for the case. They have the amber crown on the *Case team*.
 
@@ -19,3 +19,5 @@ The lead staff member is responsible for the case. They have the amber crown on 
 3. Press the crown on their card: **Make lead staff**.
 
 Their card moves to the top, the crown moves to them, and the banner's **Lead staff** changes. You see *Lead staff updated.*
+
+If you [remove the lead](#remove-staff), the case has no lead until you choose another, and the banner says *No lead staff assigned*.

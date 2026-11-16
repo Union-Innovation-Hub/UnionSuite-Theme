@@ -10,7 +10,7 @@ asks:
 keywords: [technical, shortcut, shortcuts, popup, popups, form, forms, aspx, path, website]
 related: [case-page-parts, case-queries-and-endpoints]
 verify:
-  - Popups other than Create case and the no-access page open under the domain's default website, not the current one. Check this on a domain with more than one website.
+  - From theme 1.0.26 the popups' addresses carry the current website (`WebsiteKey`), so each website that runs the theme needs these shortcuts. Check them on UTNewTheme (dev) and UTStaff (clients).
 ---
 **Shortcuts** (each must exist on the site)
 
@@ -21,7 +21,8 @@ verify:
 | `Cases_NoAccess` | The no-access page |
 | `Cases_CreateNote`, `Cases_CreateTask`, `Cases_CreateMeeting` | **Add note**, **Add task** and **Add meeting**'s full forms |
 | `Cases_EditCase`, `Cases_ResolveCase` | **Update case details**, **Resolve case** and **Edit resolution** |
-| `Cases_ManageStaff`, `Cases_EditStaff` | **Add staff** and editing a staff member |
+| `Cases_ManageStaff` | **Add staff**'s full form |
+| `Cases_EditStaff` | Not needed once the role menu is live (C44): a staff member's role is changed on their card |
 | `Cases_ManageContacts` | **Add party** |
 | `Cases_EditMeeting` | Editing a meeting |
 
@@ -34,3 +35,5 @@ verify:
 | Note details | `/_i4u_/Core/Zidebar/NoteDetails.aspx` |
 
 A direct path breaks if its page moves. A shortcut only needs its target updated.
+
+Shortcuts belong to a website. The popups' addresses carry the current website's key (`WebsiteKey`), so a shortcut is looked up on the website being used, not the domain's default. Every website that runs the theme needs its own `Cases_` shortcuts.

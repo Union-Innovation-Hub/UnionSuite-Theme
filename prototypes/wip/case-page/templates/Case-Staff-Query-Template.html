@@ -1,5 +1,6 @@
-<!-- Case staff · Query Template Display on Get All Staff On Case By Case
-     Ordinal ($/_i4u_/Core/Cases/Edit/), as the agreement's grouped contact
+<!-- Case staff · Query Template Display on $/_i4u_/Core/Cases/UnionSuite/Manage
+     Case/Query Template - Manage Case - Case Staff (moved from
+     $/_i4u_/Core/Cases/Edit/ with the case IQAs), as the agreement's grouped contact
      tiles. Each person has a role and a type; a delegate or member
      representative can be assigned to assist (owner, 8 October 2026), and
      is listed under their own group.
@@ -16,7 +17,7 @@
      to the top while the others move down (no re-render), and reloads the
      banner's Lead staff fact.
      Both crowns are in every row; CSS shows the one that fits.
-     IQA sort: ContactGroupOrder, then ContactName. The lead is first in the
+     IQA sort: FirstLast (the person's name). The lead is first in the
      whole list, whatever their group (owner, 8 October 2026), through
      us-contacts-lead-first (US-LEAD-FIRST): an IQA cannot sort on the
      ContactIsLead expression (owner, 13 October 2026).
@@ -33,40 +34,50 @@
                              SQL expression (owner, 13 October 2026):
                              CASE WHEN [vBoi4u_UT_Cases].[LeadStaffID] =
                              <the staff row's contact ID> THEN 'true' ELSE 'false' END
-     ContactRole             the role on this case (Case manager, Support,
-                             Assisting …); the crown, not the role, marks the lead.
+     ContactRole             the role on this case: StaffType (Case manager,
+                             Support … from Case Value List - Case Contact
+                             Types, or the hard-coded Representative for a
+                             delegate); the crown, not the role, marks the lead.
                              It is the role menu's button (C44)
      ContactRoleCode         optional: the role's code in the case staff types
-                             list (Get Case Staff Member Types' value), so the
+                             list (Case Value List - Case Contact Types' value), so the
                              menu ticks the role by code; blank matches by name
-     ContactType             the staff type (Staff, Delegate, Member
-                             representative …); muted
-     ContactGroup            Case team | Delegates; the group heading only (the type already says it on the card)
-     ContactGroupOrder       1 for Case team, 2 for Delegates (sort only)
-     ContactGroupTone        info for Case team, success for Delegates
+     ContactGroup            Staff | Delegate ('Delegate' when StaffType is
+                             'Representative'): the group heading, and on
+                             the card's line after the role when the list has
+                             no headings (the theme hides it while headings show)
+     ContactGroupOrder       1 for Staff, 2 for Delegate
+     ContactGroupTone        info for Staff, success for Delegate
      ContactEmail, ContactPhone  as text; the icon copies; blank shows a dash
 
      Remove from case (C43, owner, 16 November 2026): the theme's trash icon
      (cases.remove-staff) checks the case as it is now (its own IQA, API -
-     Manage Case - Staff Removal Check, not this list), then asks on the
-     card, warning when it is the lead or the last staff member on an
-     Individual case; both are allowed.
+     Manage Case - Staff Removal Check, not this list). With nothing to warn
+     about, the card goes at once with Undo, and the removal saves when the
+     Undo runs out. Otherwise it asks on the card, warning when it is the
+     lead, the last staff member on an Individual case, or yourself; all
+     are allowed.
 
      Role on this case (C44, owner, 16 November 2026: option A of
      staff-edit-compare.html): the role is a button that opens the role
      menu (US-CASE-STAFF-ROLE, staff-role.candidate.js), as the Work label
      opens the jobs menu on the member card. Choosing a role saves it. There
-     is no Edit staff pencil: the role was the only thing it would edit. -->
+     is no Edit staff pencil: the role was the only thing it would edit.
+
+     Role and group only (owner, 16 November 2026: "remove contact type from
+     the card. we'll just go with group and role"). The person's type
+     (Industrial officer, Organiser …) is no longer shown or searched;
+     ContactType can be dropped from the IQA. -->
 <article class="us-contact-tile us-contact-tile--card" data-us-contact-id="{#query.ContactId}" data-us-contact-ordinal="{#query.Ordinal}" data-us-contact-name="{#query.ContactName}"
   data-us-contact-lead="{#query.ContactIsLead}" data-us-contact-group="{#query.ContactGroup}" data-us-contact-group-tone="{#query.ContactGroupTone}"
-  data-us-contact-role="{#query.ContactRole}" data-us-contact-type="{#query.ContactType}"
-  data-us-search="{#query.ContactName} {#query.ContactRole} {#query.ContactType} {#query.ContactGroup} {#query.ContactEmail} {#query.ContactPhone}">
+  data-us-contact-role="{#query.ContactRole}"
+  data-us-search="{#query.ContactName} {#query.ContactRole} {#query.ContactGroup} {#query.ContactEmail} {#query.ContactPhone}">
   <span class="us-avatar us-avatar--md" data-us-avatar-name="{#query.ContactName}" aria-hidden="true"></span>
   <div class="us-contact-tile__body">
     <p class="us-contact-tile__name"><a href="{#query.ContactUrl}">{#query.ContactName}</a></p>
     <p class="us-contact-tile__meta us-contact-tile__meta--inline">
       <button type="button" class="us-contact-tile__role us-case-staff__role" data-ordinal="{#query.Ordinal}" data-us-staff-role-code="{#query.ContactRoleCode}" aria-haspopup="menu" aria-expanded="false"><span class="us-case-staff__role-text">{#query.ContactRole}</span><i class="ti ti-chevron-down" aria-hidden="true"></i></button>
-      <span class="us-contact-tile__type">{#query.ContactType}</span>
+      <span class="us-contact-tile__group">{#query.ContactGroup}</span>
     </p>
     <p class="us-contact-tile__reach">
       <span class="us-contact-tile__email"><button type="button" class="us-contact-tile__copy" aria-label="Copy email address" title="Copy email address"><i class="ti ti-mail" aria-hidden="true"></i></button><span class="us-contact-tile__value">{#query.ContactEmail}</span></span>

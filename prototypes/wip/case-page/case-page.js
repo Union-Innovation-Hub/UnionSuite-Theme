@@ -127,7 +127,7 @@
   ];
   // The open case's status, as the quick status change saves it.
   let openStatus = 'Open';
-  // The case staff member types value list: value is the code saved,
+  // The case contact types value list: value is the code saved,
   // label what shows.
   const staffTypes = [
     {value: 'SUP', label: 'Support'},
@@ -703,8 +703,9 @@
           'Member Type': contact.MemberType, 'Member Category': contact.MemberStatus
         }))), 200, 200);
       }
-      // The add staff composer's Role list (case staff member types).
-      if (name.endsWith('/Get Case Staff Member Types')) return reply(items(staffTypes), 200, 200);
+      // The add staff composer's Role list and the role menu (C44): the
+      // case contact types.
+      if (name.endsWith('/Case Value List - Case Contact Types')) return reply(items(staffTypes), 200, 200);
       // The banner's status menu (C23).
       if (name.endsWith('/API - Value List - Case Status')) return reply(items(caseStatuses), 200, 200);
       // The member card's IQA (the case's primary party, C42).

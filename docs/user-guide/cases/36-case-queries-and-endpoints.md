@@ -12,6 +12,8 @@ keywords: [technical, IQA, api, query, endpoint, endpoints, CloudToolz, flow, fl
 related: [case-page-parts, case-shortcuts-and-popups, where-case-settings-live]
 verify:
   - Re-list these after any theme change that adds a case lookup or save.
+  - The staff removal check, set-staff-role and remove-staff are proposed (case page mockup, C43 and C44); mark them built once they are.
+  - Check that a keepalive removal sent as the page closes reaches CloudToolz through the theme's call.
 ---
 **IQAs the theme runs by path** (`GET /api/query`), all in `$/_i4u_/Core/Cases/UnionSuite/Manage Case` unless noted
 
@@ -22,7 +24,8 @@ verify:
 | `API - Value List - Case Status` | The status menu (`Code`, `Description`, `Closed Status`) |
 | `API - Communication Recipient List - Parties` | **Email parties**' recipients |
 | `API - Case Email Logs` | Matching a sent email to the case |
-| `$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Get Case Staff Member Types` | **Add staff**'s roles |
+| `$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Case Value List - Case Contact Types` | **Add staff**'s roles, and the role menu on a staff card (`value`, `label`; was `Get Case Staff Member Types`) |
+| `API - Manage Case - Staff Removal Check` (proposed) | **Remove from case**'s check: one row per staff member, prompt `CaseNum`; `Ordinal`, `IsLead`, `CaseAccess` (Open, Team or Individual), optional `CanOpen` ('false' for a row that doesn't let that person open an Individual case) |
 | `$/_i4u_/Core/Shared/API - Communication Details` | A sent email's recipients on its activity card |
 | `$/_i4u_/Core/Shared/API - Zen Attachment Tags` | Attachment tag suggestions |
 
@@ -35,8 +38,12 @@ The client IQAs are in [Where a site's case settings live](#where-case-settings-
 | `/cases/quick-add/note`, `task`, `meeting`, `attachment`, `contact`, `staff` | The add forms' saves |
 | `/cases/quick-add/StaffList` | The case's staff, for pickers |
 | `/cases/quick-update/set-status`, `set-lead-staff`, `set-primary-party`, `set-primary-workplace` | Changes made in place |
+| `/cases/quick-update/set-staff-role` (proposed) | The role menu on a staff card: `{CaseID, CaseNum, StaffOrdinal, Role}`, logged as *Staff updated* |
+| `/cases/quick-update/remove-staff` (proposed) | **Remove from case**: `{CaseID, CaseNum, StaffID, StaffOrdinal}`; removes the row, clears the case's lead if it was this person, logs *Staff removed* |
 | `/cases/complete-task` | Ticking a task |
 | `/cases/reopen` | **Reopen case** |
 | `/cases/case-access`, `/cases/attachment-access` | Whether the user may see the case, or a restricted note or file |
+
+**How Remove from case's Undo works:** the theme checks the case first (the check IQA above), so changes made in another tab count. With nothing to warn about, the card is hidden and an Undo message shows; the remove request is only sent when the message runs out (6 seconds, paused while the pointer or focus is on it). **Undo** cancels the wait, so nothing is sent and nothing is logged: the change log can't be deleted from, so there is no remove-then-re-add. Leaving or hiding the page sends any waiting removal at once (`fetch` with `keepalive`). A send that fails brings the card back with an error. With a warning (the lead, the last staff on an Individual case, or removing yourself), the card asks first and **Remove** sends straight away.
 
 **Hooks:** none yet. A site can't add its own steps to these flows without changing them. Hooks are planned and will be listed here.

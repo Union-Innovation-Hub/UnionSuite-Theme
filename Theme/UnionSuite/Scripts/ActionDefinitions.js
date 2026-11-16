@@ -1098,7 +1098,8 @@
   // /cases/quick-add/StaffList?CaseNum= answers [{StaffID, StaffName}], read
   // once for the page from when Add staff is pressed, and searched here by
   // part of a name. The list opens when the field is clicked or typed in.
-  // The Role list is the case staff member types value list: its value
+  // The Role list is the case contact types value list (owner, 16 November
+  // 2026; was Get Case Staff Member Types): its value
   // column is the code saved, its label column what shows.
   const staffList = once(async () => {
     const caseNum = new URLSearchParams(location.search).get('CaseNum') || '';
@@ -1106,7 +1107,7 @@
     const data = await response.json();
     return Array.isArray(data) ? data : data?.Items?.$values || data?.Items || [];
   });
-  const staffTypes = once(async () => (await query('$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Get Case Staff Member Types', {limit: '100'}))
+  const staffTypes = once(async () => (await query('$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Case Value List - Case Contact Types', {limit: '100'}))
     .map(row => ({value: column(row, 'value') ?? '', label: column(row, 'label') ?? ''})));
 
   function staffMatching(people, term) {
