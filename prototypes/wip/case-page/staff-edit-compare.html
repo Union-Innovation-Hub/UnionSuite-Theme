@@ -1,0 +1,733 @@
+<!doctype html>
+<!--
+  Edit staff, four ways (C44 proposal; owner, 16 November 2026: "what
+  function does the edit serve now? popup to edit the staff's role + lead,
+  and any further details?"). Each option is the Overview's Case team panel
+  with the live theme CSS, Mary O'Conner (lead) and Dani Sundara. Every
+  control works: change a role, make someone lead. Nothing is saved.
+
+  What a case staff row holds that the card can change: the role on this
+  case (the case staff types list: Support, Assisting, Case manager, Legal
+  advice). The type under it (Industrial officer, Organiser, Delegate) is
+  the person's own and comes from their record. Lead staff is the case's,
+  set by the crown. Remove is the trash icon (C43).
+
+  A  The role is the control: "Support" with a chevron opens the role
+     menu, the workplace picker's (C42 F, the owner's pick: a clickable
+     label, the case's choice tinted with a leading bar). Choosing saves.
+     No pencil: the card keeps the crown and the trash.
+  B  The pencil edits on the card: the role, as a short list of choices,
+     appears under the details (the Remove question's place), with Cancel
+     and Save.
+  C  The pencil opens a popup form, Edit staff: role, lead staff, and the
+     details a popup would make room for (on the case since, a note on
+     their part). The proposed Cases_EditStaff page.
+  D  One menu per card ("More"): Role on this case, Make lead staff and
+     Remove from case together. The card shows only the crown on the lead.
+
+  The bar switches light and dark.
+
+  Serve the project root (static-node) and open
+  http://localhost:8778/prototypes/wip/case-page/staff-edit-compare.html
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit Staff Options</title>
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/Tabler/tabler-icons.min.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Client/Branding.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Client/Override.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zzDarkMode.css">
+  <link rel="stylesheet" href="case-page.candidate.css">
+  <link rel="stylesheet" href="case-page.css">
+  <style>
+    /* Comparison page only. */
+    .sem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+      gap: 32px 24px;
+      padding: 24px 20px 48px;
+    }
+
+    .sem-option {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 420px;
+    }
+
+    .sem-option > h2 {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 0;
+      color: var(--text-strong);
+      font: var(--fw-bold) var(--fs-base) / 1.3 var(--font-ui);
+    }
+
+    .sem-pick {
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--success) 14%, transparent);
+      color: var(--success);
+      font: var(--fw-semi) var(--fs-xs) / 18px var(--font-ui);
+    }
+
+    .sem-option > p {
+      margin: 0;
+      min-height: 4.5em;
+      color: var(--text-muted);
+      font-size: var(--fs-sm);
+      line-height: 1.5;
+    }
+
+    .sem-option .panel {
+      margin: 0;
+    }
+
+    .sem-cost {
+      margin: 0;
+      padding: 0 0 0 18px;
+      color: var(--text-muted);
+      font-size: var(--fs-xs);
+      line-height: 1.55;
+    }
+
+    /* ── Mocked controls (each option's candidate CSS) ─────────── */
+
+    /* A: the role is the control, as the workplace picker's Work label:
+       it keeps the line's look, and tints with a chevron on hover. */
+    .sem-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      margin: -2px -5px;
+      padding: 2px 5px;
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      transition: background-color .12s, color .12s;
+    }
+
+    .sem-role .ti {
+      color: var(--text-muted);
+      font-size: 13px;
+      transition: transform .18s cubic-bezier(.2, 0, 0, 1), color .12s;
+    }
+
+    .sem-role:is(:hover, [aria-expanded="true"]),
+    .sem-role:is(:hover, [aria-expanded="true"]) .ti {
+      background: var(--bg-sunken);
+      color: var(--text-link);
+    }
+
+    .sem-role[aria-expanded="true"] .ti {
+      transform: rotate(180deg);
+    }
+
+    .sem-role:focus-visible,
+    .sem-more:focus-visible {
+      outline: 0;
+      box-shadow: 0 0 0 2px var(--border-focus);
+    }
+
+    /* A quiet settle on the changed role: the text, not the card. */
+    .sem-settled {
+      animation: sem-settle 420ms cubic-bezier(.2, 0, 0, 1);
+    }
+
+    @keyframes sem-settle {
+      from {
+        opacity: .2;
+      }
+    }
+
+    /* B: the role choices on the card, in the Remove question's place. */
+    .sem-edit {
+      display: grid;
+      grid-column: 1 / -1;
+      gap: var(--space-3);
+      margin: var(--space-3) 0 0;
+      padding: var(--space-3) 0 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .sem-edit fieldset {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .sem-edit legend {
+      margin: 0 0 6px;
+      padding: 0;
+      color: var(--text-strong);
+      font: var(--fw-medium) var(--fs-sm) / 1.4 var(--font-ui);
+    }
+
+    .sem-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .sem-choice {
+      position: relative;
+    }
+
+    .sem-choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sem-choice span {
+      display: inline-block;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-surface);
+      color: var(--text-base);
+      font: var(--fw-medium) var(--fs-xs) / 18px var(--font-ui);
+      cursor: pointer;
+      transition: background-color .12s, border-color .12s, color .12s;
+    }
+
+    .sem-choice span:hover {
+      border-color: var(--text-link);
+      color: var(--text-link);
+    }
+
+    .sem-choice input:checked + span {
+      border-color: var(--text-link);
+      background: color-mix(in srgb, var(--text-link) 10%, transparent);
+      color: var(--text-strong);
+    }
+
+    .sem-choice input:focus-visible + span {
+      box-shadow: 0 0 0 2px var(--border-focus);
+    }
+
+    .sem-edit__buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-2);
+    }
+
+    /* The card being edited: a hint of the link colour on its outline. */
+    .us-case-staff .us-contact-tile[data-sem-editing] {
+      border-color: color-mix(in srgb, var(--text-link) 45%, var(--border));
+    }
+
+    /* C: the popup form (the theme dialog, the theme's buttons). */
+    .sem-dialog {
+      --us-dialog-width: 500px;
+    }
+
+    .sem-form {
+      display: grid;
+      gap: 16px;
+      padding: 20px 22px;
+    }
+
+    .sem-dialog__who {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sem-dialog__who strong {
+      display: block;
+      color: var(--text-strong);
+      font: var(--fw-semi) var(--fs-base) / 1.3 var(--font-ui);
+    }
+
+    .sem-dialog__who span {
+      color: var(--text-muted);
+      font-size: var(--fs-xs);
+    }
+
+    .sem-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .sem-label {
+      color: var(--text-strong);
+      font: var(--fw-medium) var(--fs-sm) / 1.4 var(--font-ui);
+    }
+
+    .sem-input {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-strong, var(--border));
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-base);
+      font: var(--fs-sm) / 1.4 var(--font-ui);
+    }
+
+    textarea.sem-input {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .sem-input:focus-visible,
+    .sem-check input:focus-visible {
+      outline: 0;
+      box-shadow: 0 0 0 2px var(--border-focus);
+    }
+
+    .sem-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-base);
+      font-size: var(--fs-sm);
+    }
+
+    .sem-check input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--text-link);
+    }
+
+    .sem-proposed {
+      margin-left: 6px;
+      color: var(--text-muted);
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-normal);
+    }
+
+    .sem-dialog__foot {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+
+    .sem-dialog__danger {
+      margin-right: auto;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--danger);
+      font: var(--fw-medium) var(--fs-sm) / 1.4 var(--font-ui);
+      cursor: pointer;
+    }
+
+    .sem-dialog__danger:hover {
+      text-decoration: underline;
+    }
+
+    /* D: one "More" button on the card. */
+    .sem-more {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .sem-more:is(:hover, [aria-expanded="true"]) {
+      background: var(--bg-sunken);
+      color: var(--text-link);
+    }
+
+    /* The menus: the workplace picker's (US-CASE-WORKPLACE) items, with a
+       danger item and a lead item for D. */
+    .us-case-workplace-menu__item.sem-menu-danger,
+    .us-case-workplace-menu__item.sem-menu-danger .us-case-workplace-menu__title {
+      color: var(--danger);
+    }
+
+    .sem-menu-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sem-menu-row .ti {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .sem-menu-danger .ti {
+      color: var(--danger);
+    }
+
+    .sem-menu-note {
+      padding: 2px 8px 6px;
+      color: var(--text-muted);
+      font-size: var(--fs-xs);
+      line-height: 16px;
+    }
+
+    @media (max-width: 950px) {
+      /* 44px to touch, pulled back so the line keeps its height. */
+      .sem-role {
+        min-height: 44px;
+        margin-block: -13px;
+      }
+
+      .sem-more {
+        width: 44px;
+        height: 44px;
+      }
+
+      .sem-choice span {
+        padding-block: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sem-settled,
+      .sem-role .ti {
+        animation: none;
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body class="cp-page">
+
+<div class="cp-toolbar" aria-label="Comparison controls">
+  <strong>Case team · edit staff</strong>
+  <span class="cp-tag">C44 proposal · four options · live theme CSS · every control works, nothing saves</span>
+  <span class="cp-toolbar__controls">
+    <button type="button" class="cp-toggle" id="sem-mode" aria-pressed="false">Mode: light</button>
+  </span>
+</div>
+
+<main class="sem-grid" id="sem-grid"></main>
+
+<dialog class="us-dialog sem-dialog" id="sem-dialog" aria-labelledby="sem-dialog-title"></dialog>
+
+<script>
+(() => {
+  'use strict';
+
+  const ROLES = ['Case manager', 'Support', 'Assisting', 'Legal advice'];
+  const PEOPLE = [
+    {ordinal: '701', name: "Mary O'Conner", initials: 'MO', role: 'Case manager', type: 'Industrial officer', lead: true,
+      email: 'moconner@mailinator.com', phone: '(917) 653-6240', since: '7 Oct 2026'},
+    {ordinal: '702', name: 'Dani Sundara', initials: 'DS', role: 'Support', type: 'Organiser', lead: false,
+      email: 'danisundara@mailinator.com', phone: '0400 123 457', since: '8 Oct 2026'}
+  ];
+
+  const ICON = {
+    pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m16 3 5 5-13 13H3v-5L16 3z M14 5l5 5"></path></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h18 M9 6V3h6v3 M5 6l1 15h12l1-15 M10 10v7 M14 10v7"></path></svg>'
+  };
+
+  const OPTIONS = [
+    {key: 'A', pick: true, title: 'A · The role is the control',
+      text: 'The role on the card opens the role menu, as the Work label opens the jobs menu on the member card. Choosing a role saves it. No pencil: the crown and the trash stay.',
+      cost: ['One small endpoint (set the role); no page, form or popup', 'Same pattern as the workplace picker (C42 F)', 'Lead stays on the crown, Remove on the trash']},
+    {key: 'B', title: 'B · The pencil edits on the card',
+      text: 'The pencil opens the role choices on the card itself, where Remove asks its question, with Cancel and Save.',
+      cost: ['The same endpoint as A', 'One more step than A (pencil, choose, Save)', 'Keeps a pencil for a single field']},
+    {key: 'C', title: 'C · The pencil opens a popup form',
+      text: 'Edit staff: role, lead staff, and room for more (on the case since, a note on their part). The proposed Cases_EditStaff page.',
+      cost: ['A page, a form and a flow to build, plus a shortcut on each website', 'A popup for what is today one field', 'Worth it only if staff rows gain details of their own']},
+    {key: 'D', title: 'D · One menu per card',
+      text: 'A single “More” button holds the role, Make lead staff and Remove from case. The card shows only the crown on the lead.',
+      cost: ['The same endpoint as A', 'The quietest cards, but every action is two clicks', 'Remove is no longer one press away']}
+  ];
+
+  const esc = value => String(value).replace(/[&<>"']/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[ch]));
+
+  // ── The Case team panel ──────────────────────────────────────
+  function roleHtml(key, person) {
+    if (key === 'A') {
+      return `<button type="button" class="sem-role us-contact-tile__role" data-sem-role aria-haspopup="menu" aria-expanded="false"
+        aria-label="Role on this case: ${esc(person.role)}. Change role"><span data-sem-role-text>${esc(person.role)}</span><i class="ti ti-chevron-down" aria-hidden="true"></i></button>`;
+    }
+    return `<span class="us-contact-tile__role" data-sem-role-text>${esc(person.role)}</span>`;
+  }
+
+  function actionsHtml(key, person) {
+    const crown = '<span class="us-case-staff__crown" role="img" aria-label="Lead staff member" title="Lead staff member"><i class="ti ti-crown" aria-hidden="true"></i></span>';
+    if (key === 'D') {
+      return crown + `<button type="button" class="sem-more" data-sem-more aria-haspopup="menu" aria-expanded="false" aria-label="More for ${esc(person.name)}" title="More"><i class="ti ti-dots" aria-hidden="true"></i></button>`;
+    }
+    const makeLead = `<button type="button" class="us-case-staff__make-lead us-command TextButton us-icon-button" data-sem-lead aria-label="Make lead staff" title="Make lead staff"><i class="ti ti-crown" aria-hidden="true"></i></button>`;
+    const pencil = key === 'A' ? '' : `<button type="button" class="us-contact-tile__edit us-command TextButton us-icon-button" data-sem-edit aria-label="Edit staff" title="Edit staff"${key === 'C' ? ' aria-haspopup="dialog"' : ''}>${ICON.pencil}</button>`;
+    const trash = `<button type="button" class="us-action-cases-remove-staff us-command TextButton us-icon-button" aria-label="Remove from case" title="Remove from case (C43; not in this comparison)" disabled>${ICON.trash}</button>`;
+    return crown + makeLead + pencil + trash;
+  }
+
+  function cardHtml(key, person) {
+    return `<section><div class="QueryTemplateItem"><article class="us-contact-tile us-contact-tile--card" data-us-contact-ordinal="${person.ordinal}"
+      data-us-contact-name="${esc(person.name)}" data-us-contact-lead="${person.lead}" data-us-contact-group="Case team" data-us-contact-group-tone="info">
+      <span class="us-avatar us-avatar--md" aria-hidden="true">${person.initials}</span>
+      <div class="us-contact-tile__body">
+        <p class="us-contact-tile__name"><a href="#" onclick="return false">${esc(person.name)}</a></p>
+        <p class="us-contact-tile__meta us-contact-tile__meta--inline">${roleHtml(key, person)}<span class="us-contact-tile__type">${esc(person.type)}</span></p>
+        <p class="us-contact-tile__reach">
+          <span class="us-contact-tile__email"><button type="button" class="us-contact-tile__copy" aria-label="Copy email address"><i class="ti ti-mail" aria-hidden="true"></i></button><span class="us-contact-tile__value">${esc(person.email)}</span></span>
+          <span class="us-contact-tile__phone"><button type="button" class="us-contact-tile__copy" aria-label="Copy phone number"><i class="ti ti-phone" aria-hidden="true"></i></button><span class="us-contact-tile__value">${esc(person.phone)}</span></span>
+        </p>
+      </div>
+      <div class="us-contact-tile__actions">${actionsHtml(key, person)}</div>
+    </article></div></section>`;
+  }
+
+  function panelHtml(key, people) {
+    return `<div class="ContentItemContainer"><div class="us-case-staff us-contacts-tiles us-contacts-grouped us-contacts-group-tone us-contacts-lead-first"><div class="panel">
+      <div class="panel-heading Distinguish"><h2 class="panel-title"><i class="ti ti-briefcase us-panel-title__icon" aria-hidden="true"></i>Case team</h2></div>
+      <div class="panel-body-container"><div class="panel-body"><div class="QueryTemplateSet" data-sem-list="${key}" aria-live="polite">
+        ${people.map(person => cardHtml(key, person)).join('')}
+      </div></div></div></div></div></div>`;
+  }
+
+  // Each option keeps its own people, so changes stay in that option.
+  const state = Object.fromEntries(OPTIONS.map(option => [option.key, PEOPLE.map(person => ({...person}))]));
+
+  function render(key) {
+    const option = OPTIONS.find(entry => entry.key === key);
+    const host = document.querySelector(`[data-sem-option="${key}"]`);
+    host.innerHTML = `<h2>${esc(option.title)}${option.pick ? '<span class="sem-pick">Recommended</span>' : ''}</h2>
+      <p>${esc(option.text)}</p>
+      ${panelHtml(key, state[key])}
+      <ul class="sem-cost">${option.cost.map(line => `<li>${esc(line)}</li>`).join('')}</ul>`;
+  }
+
+  const grid = document.getElementById('sem-grid');
+  grid.innerHTML = OPTIONS.map(option => `<section class="sem-option" data-sem-option="${option.key}"></section>`).join('');
+  OPTIONS.forEach(option => render(option.key));
+
+  const personOf = target => {
+    const key = target.closest('[data-sem-option]').dataset.semOption;
+    const ordinal = target.closest('[data-us-contact-ordinal]').dataset.usContactOrdinal;
+    return {key, person: state[key].find(entry => entry.ordinal === ordinal)};
+  };
+
+  function setRole(key, person, role) {
+    if (person.role === role) return;
+    person.role = role;
+    const card = document.querySelector(`[data-sem-option="${key}"] [data-us-contact-ordinal="${person.ordinal}"]`);
+    card.querySelectorAll('[data-sem-role-text]').forEach(node => {
+      node.textContent = role;
+      node.classList.remove('sem-settled');
+      void node.offsetWidth;
+      node.classList.add('sem-settled');
+    });
+    card.querySelector('[data-sem-role]')?.setAttribute('aria-label', `Role on this case: ${role}. Change role`);
+  }
+
+  function setLead(key, person) {
+    state[key].forEach(entry => { entry.lead = entry === person; });
+    state[key].sort((a, b) => b.lead - a.lead);
+    render(key);
+  }
+
+  // ── Menus (the workplace picker's) ───────────────────────────
+  let menu = null;
+  let opener = null;
+
+  function closeMenu({focus = true} = {}) {
+    if (!menu) return;
+    menu.remove();
+    menu = null;
+    if (opener) {
+      opener.setAttribute('aria-expanded', 'false');
+      if (focus && opener.isConnected) opener.focus({preventScroll: true});
+    }
+    opener = null;
+  }
+
+  // groups: [{heading?, note?, items: [{title, icon?, checked?, danger?, run}]}]
+  function openMenu(anchor, label, groups) {
+    closeMenu({focus: false});
+    opener = anchor;
+    menu = document.createElement('div');
+    menu.className = 'us-case-workplace-menu';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', label);
+    groups.forEach(group => {
+      const box = document.createElement('div');
+      box.className = 'us-case-workplace-menu__group';
+      box.setAttribute('role', 'group');
+      if (group.heading) {
+        const heading = document.createElement('div');
+        heading.className = 'us-case-workplace-menu__heading';
+        heading.textContent = group.heading;
+        box.append(heading);
+      }
+      group.items.forEach(item => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'us-case-workplace-menu__item' + (item.danger ? ' sem-menu-danger' : '');
+        button.setAttribute('role', item.checked == null ? 'menuitem' : 'menuitemradio');
+        if (item.checked != null) button.setAttribute('aria-checked', String(item.checked));
+        button.innerHTML = `<span class="sem-menu-row">${item.icon ? `<i class="ti ${item.icon}" aria-hidden="true"></i>` : ''}<span class="us-case-workplace-menu__title">${esc(item.title)}</span></span>`;
+        button.addEventListener('click', () => { closeMenu(); item.run(); });
+        box.append(button);
+      });
+      if (group.note) {
+        const note = document.createElement('div');
+        note.className = 'sem-menu-note';
+        note.textContent = group.note;
+        box.append(note);
+      }
+      menu.append(box);
+    });
+    document.body.append(menu);
+    const rect = anchor.getBoundingClientRect();
+    const width = menu.offsetWidth;
+    const left = Math.max(8, Math.min(rect.left, innerWidth - width - 8));
+    const below = rect.bottom + 4;
+    const top = below + menu.offsetHeight > innerHeight - 8 ? Math.max(8, rect.top - menu.offsetHeight - 4) : below;
+    Object.assign(menu.style, {left: left + 'px', top: top + 'px'});
+    anchor.setAttribute('aria-expanded', 'true');
+    const items = [...menu.querySelectorAll('[role^="menuitem"]')];
+    (items.find(item => item.getAttribute('aria-checked') === 'true') || items[0]).focus({preventScroll: true});
+    menu.addEventListener('keydown', event => {
+      const index = items.indexOf(document.activeElement);
+      if (event.key === 'Escape') { event.preventDefault(); closeMenu(); }
+      else if (event.key === 'ArrowDown') { event.preventDefault(); items[(index + 1) % items.length].focus(); }
+      else if (event.key === 'ArrowUp') { event.preventDefault(); items[(index - 1 + items.length) % items.length].focus(); }
+      else if (event.key === 'Home') { event.preventDefault(); items[0].focus(); }
+      else if (event.key === 'End') { event.preventDefault(); items[items.length - 1].focus(); }
+      else if (event.key === 'Tab') closeMenu({focus: false});
+    });
+  }
+
+  document.addEventListener('pointerdown', event => {
+    if (menu && !menu.contains(event.target) && !opener?.contains(event.target)) closeMenu({focus: false});
+  }, true);
+  addEventListener('resize', () => closeMenu({focus: false}));
+  addEventListener('scroll', () => closeMenu({focus: false}), true);
+
+  const roleItems = (key, person) => ROLES.map(role => ({title: role, checked: person.role === role, run: () => setRole(key, person, role)}));
+
+  // ── B: the role on the card ──────────────────────────────────
+  function editOnCard(key, person, trigger) {
+    const card = trigger.closest('[data-us-contact-ordinal]');
+    if (card.querySelector('.sem-edit')) return;
+    const name = 'sem-role-' + key + '-' + person.ordinal;
+    const box = document.createElement('form');
+    box.className = 'sem-edit';
+    box.setAttribute('aria-label', 'Edit ' + person.name);
+    box.innerHTML = `<fieldset><legend>Role on this case</legend><div class="sem-choices">
+        ${ROLES.map(role => `<label class="sem-choice"><input type="radio" name="${name}" value="${esc(role)}"${role === person.role ? ' checked' : ''}><span>${esc(role)}</span></label>`).join('')}
+      </div></fieldset>
+      <div class="sem-edit__buttons"><button type="button" class="TextButton us-outline-button" data-cancel>Cancel</button><button type="submit" class="TextButton PrimaryButton">Save</button></div>`;
+    const finish = () => {
+      box.remove();
+      card.removeAttribute('data-sem-editing');
+      trigger.focus({preventScroll: true});
+    };
+    box.querySelector('[data-cancel]').addEventListener('click', finish);
+    box.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); finish(); } });
+    box.addEventListener('submit', event => {
+      event.preventDefault();
+      const role = box.querySelector('input:checked')?.value;
+      finish();
+      if (role) setRole(key, person, role);
+    });
+    card.setAttribute('data-sem-editing', '');
+    card.append(box);
+    box.querySelector('input:checked')?.focus({preventScroll: true});
+    box.scrollIntoView({block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  }
+
+  // ── C: the popup form ────────────────────────────────────────
+  const dialog = document.getElementById('sem-dialog');
+  function editInPopup(key, person, trigger) {
+    dialog.innerHTML = `<div class="us-dialog__head"><h2 class="us-dialog__title" id="sem-dialog-title">Edit staff</h2></div>
+      <form method="dialog">
+        <div class="sem-form">
+          <div class="sem-dialog__who"><span class="us-avatar us-avatar--md" aria-hidden="true">${person.initials}</span>
+            <div><strong>${esc(person.name)}</strong><span>${esc(person.type)} · on the case since ${esc(person.since)}</span></div></div>
+          <div class="sem-field"><label class="sem-label" for="sem-c-role">Role on this case</label>
+            <select class="sem-input" id="sem-c-role">${ROLES.map(role => `<option${role === person.role ? ' selected' : ''}>${esc(role)}</option>`).join('')}</select></div>
+          <label class="sem-check"><input type="checkbox" id="sem-c-lead"${person.lead ? ' checked disabled' : ''}>
+            <span>Lead staff on this case${person.lead ? ' (make someone else lead to change it)' : ''}</span></label>
+          <div class="sem-field"><label class="sem-label" for="sem-c-note">Note on their part<span class="sem-proposed">proposed, not stored today</span></label>
+            <textarea class="sem-input" id="sem-c-note" placeholder="For example: handling the employer meeting only"></textarea></div>
+        </div>
+        <footer class="sem-dialog__foot">
+          <button type="button" class="sem-dialog__danger" data-remove>Remove from case</button>
+          <button type="button" class="TextButton us-outline-button" data-cancel>Cancel</button>
+          <button type="submit" class="TextButton PrimaryButton">Save</button>
+        </footer>
+      </form>`;
+    const close = () => { dialog.close(); trigger.focus({preventScroll: true}); };
+    dialog.querySelector('[data-cancel]').addEventListener('click', close);
+    dialog.querySelector('[data-remove]').addEventListener('click', close);
+    dialog.querySelector('form').addEventListener('submit', event => {
+      event.preventDefault();
+      const role = dialog.querySelector('#sem-c-role').value;
+      const lead = dialog.querySelector('#sem-c-lead').checked;
+      close();
+      setRole(key, person, role);
+      if (lead && !person.lead) setLead(key, person);
+    });
+    dialog.addEventListener('cancel', () => setTimeout(() => trigger.focus({preventScroll: true})), {once: true});
+    dialog.showModal();
+    dialog.querySelector('#sem-c-role').focus();
+  }
+
+  // ── Wiring ───────────────────────────────────────────────────
+  grid.addEventListener('click', event => {
+    const target = event.target.closest('button');
+    if (!target || !grid.contains(target)) return;
+    if (target.matches('[data-sem-role]')) {
+      const {key, person} = personOf(target);
+      if (target.getAttribute('aria-expanded') === 'true') return closeMenu();
+      openMenu(target, 'Role on this case', [{heading: 'Role on this case', items: roleItems(key, person)}]);
+    } else if (target.matches('[data-sem-lead]')) {
+      const {key, person} = personOf(target);
+      setLead(key, person);
+    } else if (target.matches('[data-sem-edit]')) {
+      const {key, person} = personOf(target);
+      if (key === 'B') editOnCard(key, person, target);
+      if (key === 'C') editInPopup(key, person, target);
+    } else if (target.matches('[data-sem-more]')) {
+      const {key, person} = personOf(target);
+      if (target.getAttribute('aria-expanded') === 'true') return closeMenu();
+      openMenu(target, 'More for ' + person.name, [
+        {heading: 'Role on this case', items: roleItems(key, person)},
+        {items: [
+          person.lead
+            ? {title: 'Lead staff on this case', icon: 'ti-crown', checked: true, run: () => {}}
+            : {title: 'Make lead staff', icon: 'ti-crown', run: () => setLead(key, person)}
+        ], note: person.lead ? 'Make someone else lead to change it.' : ''},
+        {items: [{title: 'Remove from case', icon: 'ti-trash', danger: true, run: () => {}}]}
+      ]);
+    }
+  });
+
+  document.getElementById('sem-mode').addEventListener('click', event => {
+    const dark = document.documentElement.getAttribute('data-us-color-scheme') !== 'dark';
+    document.documentElement.setAttribute('data-us-color-scheme', dark ? 'dark' : 'light');
+    event.currentTarget.textContent = dark ? 'Mode: dark' : 'Mode: light';
+    event.currentTarget.setAttribute('aria-pressed', String(dark));
+  });
+  document.documentElement.setAttribute('data-us-color-scheme', 'light');
+})();
+</script>
+</body>
+</html>

@@ -22,7 +22,8 @@
      ContactIsLead expression (owner, 13 October 2026).
 
      Fields:
-     Ordinal (required)      case staff row ordinal; the pencil opens it
+     Ordinal (required)      case staff row ordinal; the role menu, the crown
+                             and Remove act on it
      ContactId (required)    the person's iMIS ID
      ContactName (required)  name; also the avatar initials
      ContactUrl              their record; blank leaves the name as text
@@ -33,7 +34,11 @@
                              CASE WHEN [vBoi4u_UT_Cases].[LeadStaffID] =
                              <the staff row's contact ID> THEN 'true' ELSE 'false' END
      ContactRole             the role on this case (Case manager, Support,
-                             Assisting …); the crown, not the role, marks the lead
+                             Assisting …); the crown, not the role, marks the lead.
+                             It is the role menu's button (C44)
+     ContactRoleCode         optional: the role's code in the case staff types
+                             list (Get Case Staff Member Types' value), so the
+                             menu ticks the role by code; blank matches by name
      ContactType             the staff type (Staff, Delegate, Member
                              representative …); muted
      ContactGroup            Case team | Delegates; the group heading only (the type already says it on the card)
@@ -45,7 +50,13 @@
      (cases.remove-staff) checks the case as it is now (its own IQA, API -
      Manage Case - Staff Removal Check, not this list), then asks on the
      card, warning when it is the lead or the last staff member on an
-     Individual case; both are allowed. -->
+     Individual case; both are allowed.
+
+     Role on this case (C44, owner, 16 November 2026: option A of
+     staff-edit-compare.html): the role is a button that opens the role
+     menu (US-CASE-STAFF-ROLE, staff-role.candidate.js), as the Work label
+     opens the jobs menu on the member card. Choosing a role saves it. There
+     is no Edit staff pencil: the role was the only thing it would edit. -->
 <article class="us-contact-tile us-contact-tile--card" data-us-contact-id="{#query.ContactId}" data-us-contact-ordinal="{#query.Ordinal}" data-us-contact-name="{#query.ContactName}"
   data-us-contact-lead="{#query.ContactIsLead}" data-us-contact-group="{#query.ContactGroup}" data-us-contact-group-tone="{#query.ContactGroupTone}"
   data-us-contact-role="{#query.ContactRole}" data-us-contact-type="{#query.ContactType}"
@@ -54,7 +65,7 @@
   <div class="us-contact-tile__body">
     <p class="us-contact-tile__name"><a href="{#query.ContactUrl}">{#query.ContactName}</a></p>
     <p class="us-contact-tile__meta us-contact-tile__meta--inline">
-      <span class="us-contact-tile__role">{#query.ContactRole}</span>
+      <button type="button" class="us-contact-tile__role us-case-staff__role" data-ordinal="{#query.Ordinal}" data-us-staff-role-code="{#query.ContactRoleCode}" aria-haspopup="menu" aria-expanded="false"><span class="us-case-staff__role-text">{#query.ContactRole}</span><i class="ti ti-chevron-down" aria-hidden="true"></i></button>
       <span class="us-contact-tile__type">{#query.ContactType}</span>
     </p>
     <p class="us-contact-tile__reach">
@@ -65,7 +76,6 @@
   <div class="us-contact-tile__actions">
     <span class="us-case-staff__crown" role="img" aria-label="Lead staff member" title="Lead staff member"><i class="ti ti-crown" aria-hidden="true"></i></span>
     <button type="button" class="us-case-staff__make-lead us-action-cases-set-lead-staff" data-ordinal="{#query.Ordinal}">Make lead staff</button>
-    <button type="button" class="us-contact-tile__edit us-action-cases-edit-staff" data-ordinal="{#query.Ordinal}">Edit staff</button>
     <button type="button" class="us-action-cases-remove-staff" data-ordinal="{#query.Ordinal}">Remove from case</button>
   </div>
 </article>

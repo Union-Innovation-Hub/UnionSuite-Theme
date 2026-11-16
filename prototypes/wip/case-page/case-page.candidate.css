@@ -445,3 +445,76 @@
     padding-inline: 16px;
   }
 }
+
+/* C44 Role on this case (owner, 16 November 2026: option A of
+   staff-edit-compare.html): the role on a staff card is the button that
+   opens the role menu (US-CASE-STAFF-ROLE, staff-role.candidate.js), as the
+   Work label opens the jobs menu (US-CASE-WORKPLACE). It keeps the line's
+   look and tints, with its chevron, on hover. The menu is the workplace
+   picker's. Target: US-CONTACT-TILES, beside the us-case-staff rules. */
+.us-case-staff .us-case-staff__role {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: -2px -5px;
+  padding: 2px 5px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color .12s,
+    color .12s;
+}
+
+.us-case-staff .us-case-staff__role .ti {
+  color: var(--text-muted);
+  font-size: 13px;
+  transition:
+    transform .18s cubic-bezier(.2, 0, 0, 1),
+    color .12s;
+}
+
+.us-case-staff .us-case-staff__role:is(:hover, [aria-expanded="true"]),
+.us-case-staff .us-case-staff__role:is(:hover, [aria-expanded="true"]) .ti {
+  background: var(--bg-sunken);
+  color: var(--text-link);
+}
+
+.us-case-staff .us-case-staff__role[aria-expanded="true"] .ti {
+  transform: rotate(180deg);
+}
+
+.us-case-staff .us-case-staff__role:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 2px var(--border-focus);
+}
+
+.us-case-staff .us-case-staff__role[aria-busy="true"] {
+  cursor: progress;
+}
+
+/* A failed save, or roles that could not be read: one line under the
+   card's details, until the next press. */
+.us-case-staff__role-error {
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+}
+
+@media (max-width: 950px) {
+  /* 44px to touch, pulled back so the line keeps its height. */
+  .us-case-staff .us-case-staff__role {
+    min-height: 44px;
+    margin-block: -13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .us-case-staff .us-case-staff__role .ti {
+    transition: none;
+  }
+}

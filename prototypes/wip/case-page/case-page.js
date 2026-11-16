@@ -379,8 +379,9 @@
     // task joins the end of the outstanding ones (C40);
     // completed tasks stay after them.
     // Staff added inline (C38) join the case team or the delegates.
-    // Removed staff (C43) leave.
-    rows.staff = [...rows.staff, ...added.staff].filter(row => !removedStaff.has(row.Ordinal));
+    // Removed staff (C43) leave; each row carries its role's code (C44).
+    rows.staff = [...rows.staff, ...added.staff].filter(row => !removedStaff.has(row.Ordinal))
+      .map(row => ({ContactRoleCode: staffTypes.find(type => type.label === row.ContactRole)?.value || '', ...row}));
     // Attachments uploaded inline (C39), newest first.
     rows.attachments = [...added.attachments, ...rows.attachments];
     // Meetings saved inline (C37) join the list in date order.
@@ -886,6 +887,16 @@
         return reply({Ordinal: ordinal}, 200, 500);
       }
       if (target.pathname === '/cases/quick-update/set-lead-staff') setLeadStaff(JSON.parse(init.body || '{}').StaffOrdinal);
+      // Role on this case (C44): a known role, as the flow checks it.
+      if (target.pathname === '/cases/quick-update/set-staff-role') {
+        const body = JSON.parse(init.body || '{}');
+        const role = staffTypes.find(type => type.value === body.Role);
+        const row = rows.staff.find(entry => entry.Ordinal === String(body.StaffOrdinal));
+        if (!role || !row) return reply('Choose a role from the list.', 400, 300);
+        row.ContactRole = role.label;
+        row.ContactRoleCode = role.value;
+        return reply({}, 200, 600);
+      }
       // Remove from case (C43): the row goes, and the lead with it.
       if (target.pathname === '/cases/quick-update/remove-staff') {
         const ordinal = String(JSON.parse(init.body || '{}').StaffOrdinal || '');
