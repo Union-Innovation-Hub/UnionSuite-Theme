@@ -12,7 +12,7 @@ keywords: [technical, IQA, api, query, endpoint, endpoints, CloudToolz, flow, fl
 related: [case-page-parts, case-shortcuts-and-popups, where-case-settings-live]
 verify:
   - Re-list these after any theme change that adds a case lookup or save.
-  - The staff removal check, set-staff-role and remove-staff are proposed (case page mockup, C43 and C44); mark them built once they are.
+  - The staff removal check, set-staff-role and remove-staff are proposed: the theme calls them from 1.0.28, but they are not built yet. Mark them built once they are.
   - Check that a keepalive removal sent as the page closes reaches CloudToolz through the theme's call.
 ---
 **IQAs the theme runs by path** (`GET /api/query`), all in `$/_i4u_/Core/Cases/UnionSuite/Manage Case` unless noted

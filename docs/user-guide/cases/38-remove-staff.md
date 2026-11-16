@@ -13,7 +13,7 @@ asks:
 keywords: [remove, remove staff, take off, unassign, delete, bin, trash, case team, delegate, undo, wrong person]
 related: [add-staff, change-the-lead-staff, change-staff-role, who-can-see-a-case]
 verify:
-  - Built in the case page mockup only (C43). Confirm it is live (the remove save and the case check behind it) before staff rely on this topic.
+  - In the theme from 1.0.28, but its save (/cases/quick-update/remove-staff) and the case check behind it (API - Manage Case - Staff Removal Check) are not built yet. Confirm both work before staff rely on this topic.
 ---
 1. On the **Overview**, find *Case team*.
 2. On the person's card, press the bin: **Remove from case**.

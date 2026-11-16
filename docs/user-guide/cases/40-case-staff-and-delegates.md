@@ -13,7 +13,6 @@ keywords: [technical, delegate, delegates, representative, staff, case staff, ca
 related: [case-queries-and-endpoints, add-staff, change-staff-role, remove-staff]
 verify:
   - Confirm which save writes StaffType 'Representative' (the delegate add) and that no list offers it.
-  - Decide what the role menu does on a delegate (see below) before it is promoted to the theme.
   - Confirm whether a delegate on the case can open a case with Individual access (the remove check's CanOpen).
 ---
 **The IQA:** `$/_i4u_/Core/Cases/UnionSuite/Manage Case/Query Template - Manage Case - Case Staff`, the *Staff* Query Template Display on the **1.Overview** tab. Its template is the Case team card.
@@ -52,6 +51,6 @@ Filter: `CaseOrdinal` = `@url:CaseNum` (from the page address, not a prompt). So
 **What follows from one field**
 
 - **The role is the group's source too.** A delegate's role on the card reads *Representative*, and changing a row's `StaffType` moves it between Staff and Delegate.
-- **The role menu (C44, mockup only) lists only the Case Contact Types.** On a delegate it opens with nothing marked, and choosing a role would make them Staff. Before it is promoted, either show a delegate's role as plain text (no menu), or keep the menu and add *Representative* to it.
+- **The role menu (US-CASE-STAFF-ROLE, theme 1.0.28) lists only the Case Contact Types**, so a delegate's role is plain text: on a card whose `ContactGroup` is *Delegate* the role has no chevron and opens no menu (`aria-disabled`). A role from the list would otherwise turn the delegate into Staff.
 - **The IQA reads the case from the page address**, so it can't be called through `GET /api/query`. That is why **Remove from case** checks the case through its own IQA ([IQAs and endpoints](#case-queries-and-endpoints)).
 - **The group headings** read *Staff* and *Delegate*, the IQA's values. While headings show, the theme hides the group on each card.
