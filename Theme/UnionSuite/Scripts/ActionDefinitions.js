@@ -1843,10 +1843,11 @@
 
    2a. Nothing to warn about: the card closes up at once and a notice says
       "<name> removed from the case." with Undo. The save waits until the
-      notice runs out (UNDO_MS; the countdown pauses while the pointer or
-      focus is on the notice), so Undo only cancels the wait: nothing was
-      saved and nothing is logged (owner: change-log entries cannot be
-      deleted). Leaving or hiding the page saves anything still waiting at
+      notice runs out (UNDO_MS; the countdown pauses while the pointer is
+      on the notice or the user moves focus into it; the theme focusing
+      Undo when the notice opens doesn't count), so Undo only cancels the
+      wait: nothing was saved and nothing is logged (owner: change-log
+      entries cannot be deleted). Leaving or hiding the page saves anything still waiting at
       once (keepalive). A failed save brings the card back with an error.
 
    2b. Something to warn about, or the check failed: the card asks on
@@ -2114,14 +2115,27 @@
       current.querySelector('.us-action-cases-remove-staff')?.focus({preventScroll: true});
     };
     entry.notice = showNotice(name + ' removed from the case.', [{label: 'Undo', run: undo}]);
-    const restart = () => { clearTimeout(entry.timer); entry.timer = setTimeout(() => commit(ordinal), UNDO_MS); };
-    entry.notice.addEventListener('pointerenter', () => clearTimeout(entry.timer));
-    entry.notice.addEventListener('pointerleave', restart);
-    entry.notice.addEventListener('focusin', () => clearTimeout(entry.timer));
-    entry.notice.addEventListener('focusout', restart);
-    restart();
+
+    // The countdown pauses while the pointer is on the notice or someone
+    // moves focus into it, and starts again in full once neither holds it.
+    const holds = new Set();
+    const run = () => { clearTimeout(entry.timer); entry.timer = setTimeout(() => commit(ordinal), UNDO_MS); };
+    const hold = reason => { holds.add(reason); clearTimeout(entry.timer); };
+    const release = reason => { if (holds.delete(reason) && !holds.size) run(); };
+    let placingFocus = false;
+    entry.notice.addEventListener('pointerenter', () => hold('pointer'));
+    entry.notice.addEventListener('pointerleave', () => release('pointer'));
+    entry.notice.addEventListener('focusin', () => { if (!placingFocus) hold('focus'); });
+    entry.notice.addEventListener('focusout', event => {
+      if (!entry.notice.contains(event.relatedTarget)) release('focus');
+    });
+    run();
     // Focus would otherwise fall to the page: Undo is the next thing to do.
+    // Placing it there is the theme's move, not the user's, so it doesn't
+    // pause the countdown (it did, and the save waited until focus left).
+    placingFocus = true;
     entry.notice.querySelector('button')?.focus({preventScroll: true});
+    placingFocus = false;
   }
 
   // The card for an ordinal in the list now (the list may have re-rendered).
