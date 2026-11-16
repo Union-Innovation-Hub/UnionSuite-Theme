@@ -1,0 +1,102 @@
+﻿id,name,shortName,category,icon,url,keywords,isShortcut
+community.committees-manage-committees,Committees: Manage Committees,Committees,Community,users-group,/AsiCommon/Controls/CommitteeManagement/CommitteeListDisplay.aspx,,false
+community.communities,Communities,Communities,Community,building-community,/iCore/Communities/Communities.aspx,,false
+community.groups,Groups,Groups,Community,users,/iCore/Groups/Find_Groups.aspx,,false
+community.community-dashboard,Community Dashboard,Community Dashboard,Community,layout-dashboard,/StaffCommunityLanding,,true
+community.find-contacts,Find Contacts,Find Contacts,Community,user-search,/StaffFindContacts,search,true
+community.add-contact,Add Contact,Add Contact,Community,user-plus,/StaffAddContact,new,true
+community.volunteer-dashboard,Volunteer Dashboard,Volunteer Dashboard,Community,heart-handshake,/StaffVolunteersLanding,,true
+data.data-integrity-dashboard,Data Integrity Dashboard,Data Integrity Dashboard,Data,shield-check,/DataIntegrityDashboard,qa quality assurance,true
+events.browse-events,Browse Events,Browse Events,Events,calendar-search,/iCore/Events/Events_List.aspx,meeting,false
+events.find-event-registrants,Find Event Registrants,Find Event Registrants,Events,list-search,/iCore/Events/Registrations/Find-registrations.aspx,meeting event registrants attendees list report,false
+events.events-dashboard,Events Dashboard,Events Dashboard,Events,layout-dashboard,/StaffEventsLanding,,true
+events.events,Events,Events,Events,calendar-event,/StaffFindEvents,event search,true
+events.add-event,Add Event,Add Event,Events,calendar-plus,/iCore/Events/Manage/Event_Add.aspx,,false
+events.event-calendar,Event Calendar,Event Calendar,Events,calendar-month,/iCore/Events/Events_Calendar.aspx,,false
+events.issue-event-confirmations,Issue Event Confirmations,Issue Event Confirmations,Events,send,/iCore/Events/Manage/Issue_event_confirmations.aspx,issue confirmations,false
+events.manage-event-templates,Manage Event Templates,Manage Event Templates,Events,template,/iCore/Events/Manage/Manage_templates.aspx,event templates,false
+finance.finance-dashboard,Finance Dashboard,Finance Dashboard,Finance,report-money,/FinanceDashboard,,true
+membership.membership-dashboard,Membership Dashboard,Membership Dashboard,Membership,id-badge,/StaffMembershipLanding,,true
+rise.intelligent-query-architect,Intelligent Query Architect,Intelligent Query Architect,RiSE,file-search,/AsiCommon/Controls/IQA/Default.aspx,IQA builder,false
+rise.intelligent-query-architect-new-query,Intelligent Query Architect: New Query,Intelligent Query Architect,RiSE,file-plus,/iMIS/QueryBuilder/Design.aspx?iMode=New&iUniformKey=00000000-0000-0000-0000-000000000000&iOperation=New&iFolderHierarchyKey=d2c71101-e31c-4dcf-830f-8647236f99f2&DocumentTypeCode=IQD&CloseWindowOnCommit=true,IQA builder,false
+rise.business-object-designer,Business Object Designer,Business Object Designer,RiSE,database,/AsiCommon/Controls/BOA/Default.aspx?ShowDescription=True,bod biz,false
+rise.business-object-designer-new-business-object,Business Object Designer: New Business Object,Business Object Designer,RiSE,database-plus,/AsiCommon/Controls/BOA/Design.aspx?iMode=New&iOperation=New&iFolderHierarchyKey=1bd68892-ef47-4bc0-b873-3ce0134f9a9c&DocumentTypeCode=BOD,bod biz designer,false
+rise.document-system,Document System,Document System,RiSE,folders,/AsiCommon/Controls/BSA/DocumentBrowser.aspx?ExcludeAddTypes=ATH%2cBOD%2cCFL%2cCOM%2cCON%2cLAY%2cNAV%2cRCT%2cTCT%2cWEB%2cWSL%2cWST&ShowDescription=True,iqa query content everything,false
+rise.manage-sitemaps,Manage Sitemaps,Manage Sitemaps,RiSE,sitemap,/iMIS/ContentManagement/PerspectiveList.aspx,menu urls,false
+rise.manage-websites,Manage Websites,Manage Websites,RiSE,world,/iMIS/ContentManagement/WebsiteList.aspx,,false
+rise.manage-shortcuts,Manage Shortcuts,Manage Shortcuts,RiSE,link,/AsiCommon/Controls/ContentManagement/URLMapping.aspx,,false
+rise.communication-templates,Communication Templates,Communication Templates,RiSE,mail-opened,/AsiCommon/Controls/BSA/DocumentBrowser.aspx?TypeFilter=COM%2cFOL%2cIQD%2cSRT&iRootFolder=%24%2fCommon%2fCommunications&FolderHierarchyKey=356E5D86-93FE-430B-8F1C-0021B3C012BC,emails mass,false
+rise.communication-logs,Communication Logs,Communication Logs,RiSE,mail-check,/iCore/Communications/Communication_Logs.aspx,emails logs sent received delivered failed,false
+rise.manage-content,Manage Content,Manage Content,RiSE,layout,/iMIS/ContentManagement/ContentDesigner.aspx,,false
+rise.manage-layouts,Manage Layouts,Manage Layouts,RiSE,layout-columns,/iMIS/ContentManagement/ContentLayoutList.aspx,bootstrap,false
+rise.manage-themes,Manage Themes,Manage Themes,RiSE,palette,/AsiCommon/Controls/BSA/ObjectBrowser.aspx?DocumentPath=%24%2fContentManagement%2fDefaultSystem%2fThemes&iRootFolder=%24%2fContentManagement%2fDefaultSystem%2fThemes&AllowUpwardNavigation=False&ShowDescription=True&TypeFilter=ATH&DisallowDeletionOfRootFolder=False,branding css styles appearance,false
+rise.manage-images,Manage Images,Manage Images,RiSE,photo,/iMIS/ContentManagement/ImageManager.aspx,,false
+rise.manage-files,Manage Files,Manage Files,RiSE,files,/AsiCommon/Controls/BSA/ObjectBrowser.aspx?DocumentPath=%24%2fCommon%2fUploaded+files&iRootFolder=%24%2fCommon%2fUploaded+files&AllowUpwardNavigation=False&ShowDescription=True&ExcludeAddTypes=ATH%2cBOD%2cCFL%2cCOM%2cCON%2cEX0%2cEX2%2cEX3%2cEX4%2cEX5%2cEXP%2cIQD%2cLAY%2cMEP%2cNAV%2cOPP%2cRCT%2cRDL%2cRFM%2cRSP%2cTCT%2cWEB%2cWFD%2cWLT%2cWSL%2cWST,upload download attachments,false
+rise.website-templates,Website Templates,Website Templates,RiSE,browser,/iMIS/ContentManagement/WebsiteTemplateList.aspx,,false
+rise.website-layouts,Website Layouts,Website Layouts,RiSE,layout-grid,/iMIS/ContentManagement/WebsiteLayoutList.aspx,bootstrap,false
+rise.publishing-servers,Publishing Servers,Publishing Servers,RiSE,server,/iMIS/ContentManagement/PublishServerList.aspx,,false
+rise.panel-definitions,Panel Definitions,Panel Definitions,RiSE,layout-list,/iParts/Common/PanelEditor/PanelDefinitionList.aspx,,false
+rise.process-automation-browse,Process Automation: Browse,Process Automation,RiSE,settings-automation,/iParts/Common/PanelEditor/PanelDefinitionList.aspx,,false
+rise.process-automation-logs,Process Automation: Logs,Process Automation,RiSE,history,/iCore/Tasks/Process_automation.aspx,,false
+rise.process-automation-new-task-alert,Process Automation: New Task/Alert,Process Automation,RiSE,bell-plus,/iParts/Common/Tasks/TaskEditDialog.aspx,,false
+settings.committees-manage-committee-positions,Committees: Manage Committee Positions,Committees,Settings,briefcase,/iCore/System_Settings/Contacts/Committee_Positions.aspx,,false
+settings.committees-committee-minutes-configuration,Committees: Committee Minutes Configuration,Committees,Settings,notes,/iMIS/Setup/Customers/CommitteeMinutes.aspx,,false
+settings.about-imis,About iMIS,About iMIS,Settings,info-circle,/iMIS/Setup/AboutImis.aspx,"settings, purge system cache",false
+settings.organization,Organization,Organization,Settings,building,/Core/Admin/QuickSetup.aspx,default email customer type lower case date time export,false
+settings.openid-connect,OpenID Connect,OpenID Connect,Settings,key,/iParts/Internal/Setup/OpenIDProviderSetup.aspx,OIDC,false
+settings.general-lookup-tables,General Lookup Tables,General Lookup Tables,Settings,table,/iCore/System_Settings/General_Lookup_Tables.aspx,,false
+settings.contact-settings,Contact Settings,Contact Settings,Settings,user-cog,/iMIS/Setup/SystemConfigPage.aspx?PageName=ContactsGeneral,bill organization company administrator address verification service avs regex default country,false
+settings.contact-security,Contact Security,Contact Security,Settings,user-shield,/iMIS/Setup/Customers/ContactSecuritySettings.aspx,public directory access users members authenticated,false
+settings.communication-preferences-view-configuration,Communication Preferences: View Configuration,Communication Preferences,Settings,mail-cog,/iMIS/Setup/Customers/ContactSecuritySettings.aspx,marketing opt in opt out gdpr privacy,false
+settings.account-management,Account Management,Account Management,Settings,user-circle,/iMIS/Setup/SystemConfigPage.aspx?PageName=AccountManagementRiSE,password requirements timeout warning reset username recaptcha spam expiration reset token,false
+settings.authentication-password-configuration,Authentication & Password Configuration,Authentication & Password Configuration,Settings,lock,/iMIS/Setup/PasswordExpirationConfiguration.aspx,password requirements minimum length expiration reuse timeout length idle mfa multi factor,false
+settings.social-media-settings,Social Media Settings,Social Media Settings,Settings,share,/iCore/System_Settings/Authorization_Providers.aspx,,false
+settings.client-applications-single-sign-on,Client Applications & Single Sign On,Client Applications & Single Sign On,Settings,apps,/iParts/Common/SSO/ClientApplication.aspx,sso login redirect refresh token,false
+settings.customer-types,Customer Types,Customer Types,Settings,user-check,/imis/Setup/Customers/CustomerType.aspx,membertypes member types,false
+settings.activity-types-new-activity-type,Activity Types: New Activity Type,Activity Types,Settings,activity,/imis/Setup/Customers/ActivityTypeDialog.aspx,,false
+settings.relationships-view-relationship-types,Relationships: View Relationship Types,Relationships,Settings,affiliate,/iCore/System_Settings/Contacts/RelationshipTypes.aspx,,false
+settings.contacts-system-options,Contacts: System Options,Contacts,Settings,adjustments,/iMIS/Setup/Customers/Setup.aspx,chapter last id major key phone number format prefix sync address work phone home email fax flow down flow-down organization parent organization pricing,false
+settings.address-formats,Address Formats,Address Formats,Settings,address-book,/iCore/System_Settings/Addresses/Address_Formats.aspx,formula,false
+settings.address-configuration-states-provinces,Address Configuration: States & Provinces,Address Configuration,Settings,map-2,/iCore/Addresses/States-and-Provinces.aspx,,false
+settings.address-configuration-countries,Address Configuration: Countries,Address Configuration,Settings,flag,/iCore/System_Settings/Addresses/Countries.aspx,country,false
+settings.communities-settings,Communities: Settings,Communities,Settings,settings-2,/iMIS/Setup/SystemConfigPage.aspx?PageName=CommunitySettings,subject notification,false
+settings.membership-billing-configurations,Membership & Billing Configurations,Membership & Billing Configurations,Settings,id-badge,/imis/Setup/Billing/BillingSetup.aspx,cash accrual annual anniversary paid thru date interval balance start date fiscal year grace chapter administrator billing contact,false
+settings.fundraising-configuration,Fundraising Configuration,Fundraising Configuration,Settings,gift,/imis/Setup/Fundraising/Setup.aspx,receipt nummber financial entity premium order,false
+settings.fundraising-configuration-gift-aid-uk,Fundraising Configuration: Gift Aid (UK),Fundraising Configuration,Settings,gift,/iMIS/Setup/SystemConfigPage.aspx?PageName=GiftAidUK,HMRC gateway contact tax office,false
+settings.fundraising-configuration-tribute-types,Fundraising Configuration: Tribute Types,Fundraising Configuration,Settings,heart,/imis/Setup/Fundraising/TributeType.aspx,honor memory recognition IHO IMO,false
+settings.events-configuration,Events Configuration,Events Configuration,Settings,calendar-cog,/imis/Setup/Events/Setup.aspx,additional fields preferences invoices adjustments zoom integration,false
+settings.events-configuration-resource-types,Events Configuration: Resource Types,Events Configuration,Settings,box,/imis/Setup/Events/ResourceType.aspx,space speaker staff,false
+settings.commerce-configuration,Commerce Configuration,Commerce Configuration,Settings,shopping-cart,/iMIS/Setup/SystemConfigPage.aspx?PageName=CommerceGeneral,order confirmation communication template default order type cart nocharge,false
+settings.commerce-configuration-order-types,Commerce Configuration: Order Types,Commerce Configuration,Settings,receipt,/iMIS/Setup/Commerce/OrderTypes.aspx,,false
+settings.commerce-configuration-new-order-type,Commerce Configuration: New Order Type,Commerce Configuration,Settings,receipt,/imis/Setup/Commerce/OrderTypesDialog.aspx,,false
+settings.commerce-configuration-product-categories,Commerce Configuration: Product Categories,Commerce Configuration,Settings,category,/iMIS/Setup/Commerce/ProductCategories.aspx,category,false
+settings.commerce-configuration-new-product-category,Commerce Configuration: New Product Category,Commerce Configuration,Settings,category,/imis/Setup/Commerce/ProductCategoriesDialog.aspx,,false
+settings.commerce-configuration-shipping,Commerce Configuration: Shipping,Commerce Configuration,Settings,truck-delivery,/iMIS/Setup/Commerce/FreightRate.aspx,,false
+settings.commerce-configuration-zones,Commerce Configuration: Zones,Commerce Configuration,Settings,map-pin,/iMIS/Setup/Commerce/FreightZone.aspx,,false
+settings.commerce-configuration-new-zone,Commerce Configuration: New Zone,Commerce Configuration,Settings,map-pin,/iMIS/Setup/Commerce/FreightZoneDialog.aspx,,false
+settings.commerce-configuration-system-options,Commerce Configuration: System Options,Commerce Configuration,Settings,shopping-cart-cog,/iMIS/Setup/Commerce/Setup.aspx,default shipping add-on sales tax authority inventory gl default general ledger cogs cost of goods sold,false
+settings.finance-configuration,Finance Configuration,Finance Configuration,Settings,coin,/imis/Setup/Accounting/Setup.aspx,accounting settings default entity entities currency dollar fiscal year prepayment overpayment partial payment refund write-off batch control manual general ledger export gl interface csv file format 3d secure 3ds,false
+settings.finance-configuration-financial-entities,Finance Configuration: Financial Entities,Finance Configuration,Settings,building-bank,/imis/Setup/Accounting/FinancialEntities.aspx,entity,false
+settings.finance-configuration-new-financial-entity,Finance Configuration: New Financial Entity,Finance Configuration,Settings,building-bank,/imis/Setup/Accounting/FinancialEntityCreator.aspx,entity,false
+settings.finance-configuration-due-to-due-from,Finance Configuration: Due To/Due From,Finance Configuration,Settings,arrows-exchange,/imis/Setup/Accounting/DueToDueFrom.aspx,dtdf,false
+settings.finance-configuration-general-ledger-accounts,Finance Configuration: General Ledger Accounts,Finance Configuration,Settings,book,/iCore/System_Settings/Finance/General-ledger-accounts.aspx,GL,false
+settings.finance-configuration-pay-central-settings,Finance Configuration: Pay Central Settings,Finance Configuration,Settings,credit-card,/iCore/System_Settings/Finance/Pay-Central-settings.aspx,GL,false
+settings.finance-configuration-tax-categories,Finance Configuration: Tax Categories,Finance Configuration,Settings,receipt-tax,/iCore/System_Settings/Finance/TaxCategories.aspx,category,false
+settings.finance-configuration-tax-codes,Finance Configuration: Tax Codes,Finance Configuration,Settings,receipt-tax,/imis/Setup/Accounting/TaxAuthority.aspx,authority,false
+settings.finance-configuration-tax-by-zip-code,Finance Configuration: Tax by Zip Code,Finance Configuration,Settings,map-pin,/iCore/Contacts/Zip-codes.aspx?mode=Tax,postal,false
+settings.finance-configuration-vat-exception-rules,Finance Configuration: VAT Exception Rules,Finance Configuration,Settings,receipt-refund,/imis/Setup/Accounting/VATExceptionRules.aspx,value-added added tax,false
+settings.finance-configuration-terms,Finance Configuration: Terms,Finance Configuration,Settings,file-text,/iCore/System_Settings/Finance/Terms.aspx,,false
+settings.finance-configuration-aging,Finance Configuration: Aging,Finance Configuration,Settings,clock-dollar,/imis/Setup/Accounting/Aging.aspx,Dunning Terms,false
+settings.rise-configuration-quick-setup,RiSE Configuration: Quick Setup,RiSE Configuration,Settings,rocket,/iMIS/Setup/SystemConfigPage.aspx?PageName=ContentManager.QuickSetup,panel source prefix google maps api attachment files types cookies subdomains domains canonical,false
+settings.rise-configuration-email-settings,RiSE Configuration: Email Settings,RiSE Configuration,Settings,mail-cog,/iMIS/Setup/SystemConfigPage.aspx?PageName=SMTP.EmailSettings,smtp host port SSL,false
+settings.rise-configuration-page-builder-configuration,RiSE Configuration: Page Builder Configuration,RiSE Configuration,Settings,layout-board,/iMIS/Setup/SystemConfigPage.aspx?PageName=SMTP.EmailSettings,attachment publishing server cache duration maintenance mode,false
+settings.rise-configuration-search-settings,RiSE Configuration: Search Settings,RiSE Configuration,Settings,search,/iMIS/Setup/SystemConfigPage.aspx?PageName=Search,keyword,false
+settings.rise-configuration-indexing-preferences,RiSE Configuration: Indexing Preferences,RiSE Configuration,Settings,list-details,/iCore/System_Settings/Indexing_Preferences.aspx,rebuild,false
+settings.rise-configuration-process-automation,RiSE Configuration: Process Automation,RiSE Configuration,Settings,settings-automation,/iMIS/Setup/SystemConfigPage.aspx?PageName=ProcessAutomation,logs pa+,false
+settings.rise-configuration-workflow-configuration,RiSE Configuration: Workflow Configuration,RiSE Configuration,Settings,route,/iMIS/Setup/SystemConfigPage.aspx?PageName=ContentWorkflow,expiration,false
+settings.rise-configuration-report-formats,RiSE Configuration: Report Formats,RiSE Configuration,Settings,file-report,/iMIS/Setup/SystemConfigPage.aspx?PageName=SSRSFormats,ssrs,false
+settings.rise-configuration-recent-history,RiSE Configuration: Recent History,RiSE Configuration,Settings,history,/iMIS/Setup/SystemConfigPage.aspx?PageName=RecentHistory,,false
+users.manage-duplicates,Manage Duplicates,Manage Duplicates,Users,copy,/iCore/Contacts/Manage_Duplicates.aspx,remove dupe match key,false
+users.user-security,User Security,User Security,Users,shield-lock,/AsiCommon/Controls/Contact/User/FindUser.aspx,password username change login expired,false
+users.import-contacts,Import Contacts,Import Contacts,Users,file-import,/iCore/Contacts/Contact-importer.aspx,bulk records,false
+users.duplicate-merge-logs,Duplicate Merge Logs,Duplicate Merge Logs,Users,git-merge,/iParts/Contact%20Management/DuplicateMerge/DuplicateMergeLogDisplay.aspx,dupe contact,false
