@@ -1,0 +1,12 @@
+/* Optional for red or pale branding: enable a distinct, visible field focus colour.
+:root { --field-focus-colour: #006f94; }
+*/
+
+/* ── Site logo ──── */
+a.logo {
+  width: 200px !important;
+  height: 60px !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url("/images/Hub/UHUB_Logo.png");
+}
