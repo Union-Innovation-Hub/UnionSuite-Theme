@@ -5435,7 +5435,7 @@ SOFTWARE.
   'use strict';
   if (window.UnionSuiteCaseWorkplace) return;
 
-  const JOBS_QUERY = '$/_i4u_/Core/Cases/Layouts v2/API - Manage Case - Primary Contacts Workplaces';
+  const JOBS_QUERY = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Manage Case - Primary Contacts Workplaces';
   const ENDPOINT = '/cases/quick-update/set-primary-workplace';
   const NO_WORKPLACE = '';
   const CARD = '[data-us-case-member]';
@@ -10006,7 +10006,11 @@ SOFTWARE.
      blank Alert-Title leaves the alert out. Alert-Only true shows the alert
      and no fields, for a record with nothing to show yet (an agreement not
      yet resolved; owner, 3 October 2026).
-   Tone and Alert are reserved and are never group names.
+   - Empty-<Group> holds the line a group shows in place of its fields when
+     every one of them is blank: Empty-Workplace "This case isn't about a
+     workplace." on the case's Case details (owner, 16 November 2026). With
+     any value, or a blank Empty- column, the group shows as usual.
+   Tone, Alert and Empty are reserved and are never group names.
    Values: blank shows an em dash; ISO dates read "1 Jan 2026"; true/false
    Yes/No; a web address or email becomes a link. A value longer than 60
    characters takes the full row; a shorter link sits beside the other
@@ -10083,12 +10087,17 @@ SOFTWARE.
   // instead of becoming fields.
   function layoutOf(row) {
     const tones = new Map();
+    const empties = new Map();
     const alert = {};
     const groups = new Map([['', {heading: '', fields: []}]]);
     columns(row).forEach(([column, raw]) => {
       const {group, name} = parse(column);
       if (/^tone$/i.test(group)) {
         tones.set(name.toLowerCase(), text(raw).toLowerCase());
+        return;
+      }
+      if (/^empty$/i.test(group)) {
+        empties.set(name.toLowerCase(), text(raw));
         return;
       }
       if (/^alert$/i.test(group)) {
@@ -10100,6 +10109,9 @@ SOFTWARE.
       groups.get(key).fields.push({key: name.toLowerCase(), label: label(name), value: format(raw)});
     });
     groups.forEach(group => group.fields.forEach(field => { field.tone = TONES[tones.get(field.key)] || ''; }));
+    groups.forEach((group, key) => {
+      if (empties.get(key) && group.fields.every(field => !field.value.text)) group.empty = empties.get(key);
+    });
     return {
       alert: alert.title ? alert : null,
       groups: [...groups.values()].filter(group => group.fields.length)
@@ -10188,6 +10200,13 @@ SOFTWARE.
       list.className = single ? 'us-fields us-fields--single' : 'us-fields';
       list.append(...group.fields.map(fieldNode));
       section.append(list);
+      // Every field blank and an Empty- line given: the line, not a row of
+      // dashes. The blank fields stay in the markup, hidden.
+      if (group.empty) {
+        section.classList.add('us-field-groups__group--empty');
+        list.hidden = true;
+        section.append(note(group.empty));
+      }
       return section;
     });
     if (layout.alert) {
@@ -10311,7 +10330,7 @@ SOFTWARE.
     return root;
   }
 
-  window.UnionSuiteFieldGroups = Object.freeze({refresh: schedule, reload, build, version: '1.1'});
+  window.UnionSuiteFieldGroups = Object.freeze({refresh: schedule, reload, build, version: '1.2'});
 })();
 /* US-FIELD-GROUPS:END */
 
@@ -13034,7 +13053,7 @@ SOFTWARE.
     // prefix, so a case email was never found. Same columns and Subject
     // filter, for "Case …" subjects.
     'us-case-comms': {
-      query: '$/_i4u_/Core/Cases/Layouts v2/API - Case Email Logs',
+      query: '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Case Email Logs',
       subjectFilter: 'Subject',
       entity: 'i4u_UT_Cases_Communications',
       recordField: 'CaseOrdinal',

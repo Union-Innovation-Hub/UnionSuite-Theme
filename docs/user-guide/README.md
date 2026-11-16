@@ -76,15 +76,41 @@ verify:
 | `related` | no | Other topic ids |
 | `verify` | no | Notes for us: not shown to staff, listed by the build |
 
+A `code` span holding an iMIS path (`$/…`, `@/…`, `/_i4u_/…` or
+`/iParts/…`) gets a copy button after it on the help page: the theme's own
+copy control (`US-COPY` in `zUnionSuite.js` and `.css`, inlined by the
+build), quiet (`us-copy--quiet`: icon, tick and flash, no "Copied" label).
+
 The body supports paragraphs, `**bold**`, `*italic*`, `` `Ctrl+Enter` ``
 (shown as a key), `[links](#topic-id)`, numbered and `-` lists (one level of
 `-` under a step), `|` tables and `> ` tips. A line that is only bold is a
 subheading.
 
+## Configuration and technical topics
+
+An area's `_area.json` may name `adminSections` (cases: `Configuration`
+and `Technical`): sections for the people who set the pages up, not the
+staff who use them. Their topics are written the same way, with three
+differences:
+
+- **Build words are allowed:** IQA, iPart, folder paths, column names,
+  shortcuts and endpoints, in `code`. Still short sentences and tables.
+- **Client facing:** never name our own sites (the dev site, the dev
+  tenant, SandBox). Describe what ships as the *base version*.
+- **Configuration** says what a site may change in its *Client* folders,
+  where it lives, and how it shows on the page (labels, groups, order).
+  **Technical** says how the page is built and what it calls.
+- **Where they show:** last on the help page, in a folded "For
+  administrators" part (a link into it opens it). The page's Ask box answers
+  from them only while that part is open, and the side pane's chat only in
+  Easy Edit. The chatbot JSON marks each topic's `audience`: `staff` or
+  `admin`. Hiding them is for tidiness, not security: they hold no secrets.
+
 ## Writing rules
 
 - **Write for someone on their first day.** Short sentences, everyday words,
-  "you". No iMIS, IQA, iPart, CloudToolz or other build words.
+  "you". No iMIS, IQA, iPart, CloudToolz or other build words (except in
+  the configuration and technical sections, above).
 - **Name buttons exactly as the screen does, in bold:** **Add note**, not
   "the add button".
 - **Say where things are** before what to press: "On the **Overview**, find

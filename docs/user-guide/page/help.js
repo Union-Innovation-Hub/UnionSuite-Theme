@@ -7,7 +7,12 @@
   'use strict';
 
   const help = JSON.parse(document.getElementById('help-data').textContent);
-  const matcher = window.UnionSuiteHelpMatch.create(help);
+  // Questions are answered from the staff topics; once the reader opens the
+  // administrators' part, from every topic.
+  const staffMatcher = window.UnionSuiteHelpMatch.create({...help, topics: help.topics.filter(topic => topic.audience !== 'admin')});
+  const allMatcher = window.UnionSuiteHelpMatch.create(help);
+  const admin = document.getElementById('for-administrators');
+  const matcherNow = () => (admin && admin.open ? allMatcher : staffMatcher);
   const input = document.getElementById('ask-input');
   const result = document.getElementById('ask-result');
   const toc = document.querySelector('.toc__details');
@@ -21,6 +26,43 @@
   }
   placeToc();
   wide.addEventListener('change', placeToc);
+
+  // The topic list's filter: every word typed must start a word of the
+  // topic's title, its section or its keywords ("priv" finds Restricted
+  // notes through "private"). Sections with no match hide; Escape clears.
+  const filter = document.getElementById('toc-filter');
+  const empty = document.getElementById('toc-empty');
+  const words = value => value.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const topicWords = new Map(help.topics.map(topic => [topic.id, words([topic.title, topic.section, ...(topic.keywords || [])].join(' '))]));
+  function applyFilter() {
+    const wanted = words(filter.value);
+    let shown = 0;
+    document.querySelectorAll('.toc__section').forEach(section => {
+      let any = false;
+      section.querySelectorAll(':scope > ul > li').forEach(item => {
+        const id = item.querySelector('a')?.getAttribute('href').slice(1);
+        const have = topicWords.get(id) || [];
+        const match = wanted.every(word => have.some(term => term.startsWith(word)));
+        item.toggleAttribute('data-filtered', !match);
+        if (match) any = true;
+      });
+      section.toggleAttribute('data-filtered', !any);
+      if (any) shown++;
+    });
+    const admin = document.querySelector('.toc__admin');
+    if (admin) admin.toggleAttribute('data-filtered', !admin.querySelector('.toc__section:not([data-filtered])'));
+    empty.hidden = shown > 0;
+  }
+  if (filter) {
+    filter.parentElement.hidden = false;
+    filter.addEventListener('input', applyFilter);
+    filter.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && filter.value) {
+        filter.value = '';
+        applyFilter();
+      }
+    });
+  }
 
   function link(topic, text) {
     const anchor = document.createElement('a');
@@ -36,7 +78,7 @@
       result.replaceChildren();
       return;
     }
-    const answer = matcher.reply(text);
+    const answer = matcherNow().reply(text);
     const parts = [];
     result.classList.toggle('ask__result--unsure', !answer.sure);
 
@@ -98,6 +140,8 @@
   // and its heading takes focus so a keyboard or screen reader user lands
   // there too; narrow windows fold the topic list away.
   function goTo(target) {
+    const fold = target.closest('details.help-admin');
+    if (fold) fold.open = true;
     document.querySelectorAll('.topic--current').forEach(topic => topic.classList.remove('topic--current'));
     if (target.classList.contains('topic')) target.classList.add('topic--current');
     target.scrollIntoView({block: 'start'});
@@ -123,5 +167,6 @@
 
   // A link to a topic (Cases-Help.html#add-a-note) marks it on arrival.
   const linked = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (linked && linked.closest('details.help-admin')) linked.closest('details.help-admin').open = true;
   if (linked && linked.classList.contains('topic')) linked.classList.add('topic--current');
 })();

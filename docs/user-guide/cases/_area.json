@@ -14,6 +14,12 @@
     "People on the case",
     "Looking back",
     "Closing a case",
-    "Help"
+    "Help",
+    "Configuration",
+    "Technical"
+  ],
+  "adminSections": [
+    "Configuration",
+    "Technical"
   ]
 }

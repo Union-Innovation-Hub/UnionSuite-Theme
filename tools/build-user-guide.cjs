@@ -30,6 +30,10 @@ const GUIDES = path.join(__dirname, '..', 'Theme', 'UnionSuite-Guides');
 const PAGE = path.join(GUIDE, 'page');
 // The matcher is a theme script: the side pane's Case help chat uses it too.
 const MATCHER = path.join(__dirname, '..', 'Theme', 'UnionSuite', 'Scripts', 'UnionSuiteHelpMatch.js');
+// The theme's copy control (US-COPY), inlined so a path's copy button works
+// as it does in iMIS: icon, tick and flash.
+const THEME_JS = path.join(__dirname, '..', 'Theme', 'UnionSuite', 'zUnionSuite.js');
+const THEME_CSS = path.join(__dirname, '..', 'Theme', 'UnionSuite', 'zUnionSuite.css');
 
 const TOPIC_KEYS = ['id', 'title', 'section', 'answer', 'asks', 'keywords', 'related', 'verify'];
 const LIST_KEYS = new Set(['asks', 'keywords', 'related', 'verify']);
@@ -203,6 +207,10 @@ function blocksText(blocks) {
 function loadArea(folder) {
   const area = JSON.parse(fs.readFileSync(path.join(folder, '_area.json'), 'utf8'));
   const problems = [];
+  area.adminSections = area.adminSections || [];
+  for (const title of area.adminSections) {
+    if (!area.sections.includes(title)) problems.push(area.id + ': admin section "' + title + '" is not in its sections.');
+  }
   const files = fs.readdirSync(folder).filter(name => name.endsWith('.md')).sort();
   const topics = [];
   for (const name of files) {
@@ -268,6 +276,7 @@ function helpJson({area, topics}) {
     page,
     examples: area.examples || [],
     sections: area.sections,
+    admin_sections: area.adminSections,
     synonyms: synonyms(),
     topics: topics.map(({meta, body}) => {
       const blocks = parseBlocks(body);
@@ -275,6 +284,9 @@ function helpJson({area, topics}) {
         id: meta.id,
         title: meta.title,
         section: meta.section,
+        // "admin" topics (configuration, technical) are for the people who
+        // set the pages up; the staff chat leaves them out.
+        audience: area.adminSections.includes(meta.section) ? 'admin' : 'staff',
         url: page + '#' + meta.id,
         answer: meta.answer,
         answer_text: plain(meta.answer),
@@ -290,21 +302,51 @@ function helpJson({area, topics}) {
   };
 }
 
+// One marked section of a theme file, markers included.
+function themeSection(file, name) {
+  const source = fs.readFileSync(file, 'utf8');
+  const start = source.indexOf('/* ' + name + ':START');
+  const endMarker = '/* ' + name + ':END */';
+  const end = source.indexOf(endMarker, start);
+  if (start < 0 || end < 0) throw new Error(path.basename(file) + ' has no ' + name + ' section.');
+  return source.slice(start, end + endMarker.length);
+}
+
+// An iMIS path in `code` ($/… or @/… documents, /_i4u_/… pages) gets the
+// theme's copy button after it, quiet (no "Copied" label). Each path has
+// its own id, which the button names as the text to copy and flash.
+const PATH = /<kbd>((?:[$@]\/|\/_i4u_\/|\/iParts\/)[^<]*)<\/kbd>/g;
+function withCopyButtons(html) {
+  let count = 0;
+  return html.replace(PATH, (match, text) => {
+    const id = 'help-path-' + (++count);
+    return '<span class="help-path"><kbd id="' + id + '">' + text + '</kbd>' +
+      '<button type="button" class="us-copy us-copy--quiet" data-us-copy-target="' + id + '" aria-label="Copy path" title="Copy path"></button></span>';
+  });
+}
+
 function pageHtml(help) {
-  const css = fs.readFileSync(path.join(PAGE, 'help.css'), 'utf8');
+  const css = fs.readFileSync(path.join(PAGE, 'help.css'), 'utf8') + '\n' + themeSection(THEME_CSS, 'US-COPY');
+  const copy = themeSection(THEME_JS, 'US-COPY');
   const matcher = fs.readFileSync(MATCHER, 'utf8');
   const script = fs.readFileSync(path.join(PAGE, 'help.js'), 'utf8');
   const byId = new Map(help.topics.map(topic => [topic.id, topic]));
   const sections = help.sections
     .map(title => ({title, slug: 'section-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-'), topics: help.topics.filter(topic => topic.section === title)}))
     .filter(section => section.topics.length);
+  const isAdmin = section => help.admin_sections.includes(section.title);
+  const staffSections = sections.filter(section => !isAdmin(section));
+  const adminSections = sections.filter(isAdmin);
 
-  const toc = sections.map(section =>
+  const tocItems = list => list.map(section =>
     '<li class="toc__section"><a class="toc__section-link" href="#' + section.slug + '">' + escapeHtml(section.title) + '</a>\n<ul>' +
     section.topics.map(topic => '<li><a href="#' + topic.id + '">' + escapeHtml(topic.title) + '</a></li>').join('') +
     '</ul></li>').join('\n');
+  const toc = tocItems(staffSections) + (adminSections.length
+    ? '\n<li class="toc__admin"><p class="toc__admin-label">For administrators</p>\n<ul>\n' + tocItems(adminSections) + '\n</ul></li>'
+    : '');
 
-  const articles = sections.map(section =>
+  const sectionsHtml = list => list.map(section =>
     '<section class="help-section" id="' + section.slug + '" aria-labelledby="' + section.slug + '-title">\n' +
     '<h2 class="help-section__title" id="' + section.slug + '-title">' + escapeHtml(section.title) + '</h2>\n' +
     section.topics.map(topic => {
@@ -317,6 +359,14 @@ function pageHtml(help) {
         '</article>';
     }).join('\n') +
     '\n</section>').join('\n');
+  // Configuration and technical topics close the page, folded away so staff
+  // reading the help aren't met with folder paths; a link into them opens it.
+  const articles = withCopyButtons(sectionsHtml(staffSections) + (adminSections.length
+    ? '\n<details class="help-admin" id="for-administrators">\n' +
+      '<summary class="help-admin__summary">For administrators: configuration and technical</summary>\n' +
+      '<p class="help-admin__intro">How a site sets up its case pages, and how the page is built. Staff don\'t need this part.</p>\n' +
+      sectionsHtml(adminSections) + '\n</details>'
+    : ''));
 
   const examples = help.examples.map(example =>
     '<button type="button" class="ask__example">' + escapeHtml(example) + '</button>').join(' ');
@@ -327,7 +377,7 @@ function pageHtml(help) {
     title: help.title,
     examples: help.examples,
     synonyms: help.synonyms,
-    topics: help.topics.map(({id, title, url, answer_text, answer_html, asks, keywords}) => ({id, title, url, answer_text, answer_html, asks, keywords}))
+    topics: help.topics.map(({id, title, section, audience, url, answer_text, answer_html, asks, keywords}) => ({id, title, section, audience, url, answer_text, answer_html, asks, keywords}))
   }).replace(/</g, '\\u003c');
 
   return `<!doctype html>
@@ -360,7 +410,12 @@ ${css}
 <nav class="toc" aria-label="Topics">
 <details class="toc__details" open>
 <summary class="toc__summary">All topics</summary>
-<ul class="toc__list">
+<div class="toc__filter" hidden>
+<svg class="toc__filter-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>
+<input class="toc__filter-input" id="toc-filter" type="search" autocomplete="off" spellcheck="false" placeholder="Filter topics" aria-label="Filter topics" aria-controls="toc-list">
+</div>
+<p class="toc__empty" id="toc-empty" role="status" hidden>No topics match.</p>
+<ul class="toc__list" id="toc-list">
 ${toc}
 </ul>
 </details>
@@ -372,6 +427,9 @@ ${articles}
 <script type="application/json" id="help-data">${data}</script>
 <script>
 ${matcher}
+</script>
+<script>
+${copy}
 </script>
 <script>
 ${script}

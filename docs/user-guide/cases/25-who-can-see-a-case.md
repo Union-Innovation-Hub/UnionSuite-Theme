@@ -24,4 +24,6 @@ You choose the Access when you create the case.
 
 Managers and system administrators can see every case.
 
+Each note has its own Access too, so someone who can open the case may still not see every note in it. See [Restricted notes and files](#restricted-notes-and-files).
+
 **If you see a no-access page,** you are not allowed to see that case. Ask the lead staff member or your manager to [add you to the case](#add-staff).

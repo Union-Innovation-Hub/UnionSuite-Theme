@@ -13,6 +13,8 @@
   --help-tip: #fff7e0;
   --help-tip-border: #e5b53c;
   --help-focus: #1f5fae;
+  --help-success: #1e7a46;
+  --help-danger: #b42318;
   --help-radius: 10px;
   --help-ease: cubic-bezier(.2, 0, 0, 1);
 }
@@ -31,6 +33,8 @@
     --help-tip: #2d2716;
     --help-tip-border: #a9832a;
     --help-focus: #7fb0ec;
+    --help-success: #5cc98b;
+    --help-danger: #f2877d;
   }
 }
 
@@ -252,6 +256,63 @@ a {
   display: none;
 }
 
+/* The topic filter: stuck to the top of the list's own scroll box, on the
+   page's background so topics scroll out of sight under it. Shown by
+   help.js, so it never appears without the script that makes it work. */
+.toc__filter {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  background: var(--help-bg);
+}
+
+.toc__filter[hidden] {
+  display: none;
+}
+
+.toc__filter-icon {
+  position: absolute;
+  left: 10px;
+  top: calc(50% - 4px);
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--help-muted);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.toc__filter-input {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px 6px 34px;
+  border: 1px solid var(--help-border);
+  border-radius: 8px;
+  background: var(--help-surface);
+  color: inherit;
+  font: inherit;
+  transition: border-color 150ms var(--help-ease), box-shadow 150ms var(--help-ease);
+}
+
+.toc__filter-input:focus {
+  outline: none;
+  border-color: var(--help-focus);
+  box-shadow: 0 0 0 3px var(--help-accent-soft);
+}
+
+.toc__empty {
+  margin: 0;
+  color: var(--help-muted);
+}
+
+.toc [data-filtered] {
+  display: none;
+}
+
 .toc__list,
 .toc__list ul {
   margin: 0;
@@ -283,6 +344,55 @@ a {
 .toc__list ul a:hover {
   color: var(--help-accent);
   border-left-color: var(--help-accent);
+}
+
+/* The administrators' topics, last in the list, set apart by a rule. Their
+   section links sit in a nested list, so undo the topic-link indent. */
+.toc__admin {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--help-border);
+}
+
+.toc__admin-label {
+  margin: 0 0 12px;
+  color: var(--help-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.toc__list .toc__admin .toc__section-link {
+  padding: 0;
+  border-left: 0;
+  color: var(--help-text);
+}
+
+/* ── Administrators' part ──────────────────────────────────── */
+
+.help-admin {
+  margin-top: 48px;
+  border-top: 1px solid var(--help-border);
+  padding-top: 24px;
+}
+
+.help-admin__summary {
+  cursor: pointer;
+  color: var(--help-text);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.help-admin__summary:focus-visible {
+  outline: 2px solid var(--help-focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.help-admin__intro {
+  margin: 8px 0 24px;
+  color: var(--help-muted);
 }
 
 /* ── Topics ────────────────────────────────────────────────── */
@@ -409,6 +519,53 @@ kbd {
   font-size: .9em;
 }
 
+/* A path with the theme's copy button (US-COPY, inlined by the build). The
+   theme's own tokens, mapped to the help page's. The button is compact so
+   it doesn't open up the line; at the touch width it keeps the theme's 44px
+   hit area, drawn into the line's spacing by negative margins. */
+.help-path {
+  --text-muted: var(--help-muted);
+  --icon-hover-bg: var(--help-sunken);
+  --icon-hover-colour: var(--help-accent);
+  --success: var(--help-success);
+  --danger: var(--help-danger);
+  --accent: var(--help-accent);
+  --radius-sm: 4px;
+  --font-ui: inherit;
+}
+
+.help-path > kbd {
+  overflow-wrap: anywhere;
+}
+
+.help-path > button.us-copy {
+  width: 24px;
+  height: 24px;
+  margin-block: -4px;
+  margin-inline-start: 2px;
+}
+
+.help-path > button.us-copy::before,
+.help-path > button.us-copy::after {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 950px) {
+  .help-path > button.us-copy {
+    width: 44px;
+    height: 44px;
+    margin-block: -14px;
+    margin-inline: -6px -10px;
+  }
+}
+
+@media print {
+  .help-path > button.us-copy {
+    display: none;
+  }
+}
+
 .topic__related {
   margin: 16px 0 0;
   padding-top: 12px;
@@ -461,6 +618,16 @@ kbd {
 
   .toc__list {
     padding-bottom: 12px;
+  }
+
+  /* The list is part of the page here, so the filter sticks to the window,
+     on the list's surface. */
+  .toc__filter {
+    background: var(--help-surface);
+  }
+
+  .toc__filter-input {
+    min-height: 44px;
   }
 
   .toc__list ul a,

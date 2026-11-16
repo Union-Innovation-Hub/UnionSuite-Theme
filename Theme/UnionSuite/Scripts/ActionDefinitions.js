@@ -1,6 +1,24 @@
 /* Standard Union Suite actions. Load once AFTER zUnionSuite.js and business
    dependencies, BEFORE UnionSuite-Client/Actions.js. Do not embed in iParts. */
 
+/* The current website on a domain-root link (owner, 16 November 2026).
+   Shortcuts belong to a website, and a domain-root address such as
+   /Cases_ResolveCase resolves on the domain's default website (UTTemplate
+   on the dev tenant, UTStaff at clients), not the one being viewed.
+   ?WebsiteKey=<gWebsiteKey>, as iMIS's own /Party.aspx links carry, makes
+   iMIS resolve it on the current website. A WebsiteKey already on the
+   address is kept. UnionSuiteWebsite.stamp(url) sets it on a URL object
+   and returns the URL. */
+(function () {
+  'use strict';
+  function stamp(url) {
+    const key = window.gWebsiteKey;
+    if (key && !url.searchParams.has('WebsiteKey')) url.searchParams.set('WebsiteKey', String(key));
+    return url;
+  }
+  window.UnionSuiteWebsite = Object.freeze({stamp});
+})();
+
 /* The task form's pages (Forms/TaskForm.js; owner, 20 October 2026): one
    iMIS page per module, each holding only <div data-us-form="task"
    data-module="…">. Blank until the page exists; a blank page keeps that
@@ -22,7 +40,7 @@
     Object.entries(values).forEach(([name, value]) => {
       if (value !== undefined && value !== null && value !== '') url.searchParams.set(name, String(value));
     });
-    return url.href;
+    return window.UnionSuiteWebsite.stamp(url).href;
   }
   window.UnionSuiteTaskForms = Object.freeze({pages: Object.freeze({...PAGES}), href});
 })();
@@ -44,7 +62,7 @@
     const url = new URL(path,location.origin);
     Object.entries(values).forEach(([name,value]) => url.searchParams.set(name,String(value)));
     url.searchParams.set('AllowEdit','True');
-    return url.href;
+    return window.UnionSuiteWebsite.stamp(url).href;
   }
   // Client context published in the DOM. loggedInPartyId is who is signed in,
   // which is not the same as the contact being viewed.
@@ -147,7 +165,8 @@
   });
   define('home.manage-bulletin',{
     presentation:{label:'Manage bulletin',default:'button',menu:'menu-item'},context:{},
-    action:{type:'navigate',href:'/_i4u_/Core/Staff-Site-Layouts/Home-Dashboard/Staff-Bulletin.aspx',target:'_blank'}
+    action:{type:'navigate',target:'_blank',
+      href:() => window.UnionSuiteWebsite.stamp(new URL('/_i4u_/Core/Staff-Site-Layouts/Home-Dashboard/Staff-Bulletin.aspx',location.origin)).href}
   });
   define('home.add-task',{
     presentation:{label:'Add task',icon:'plus',default:'button',menu:'menu-item'},
@@ -167,7 +186,7 @@
         if (form) return form;
         const url = new URL('/_i4u_/Core/Staff-Site-Layouts/US-Home-Dashboard/Popups/Add-Task.aspx',location.origin);
         url.searchParams.set('ID',context.partyId);
-        return url.href;
+        return window.UnionSuiteWebsite.stamp(url).href;
       },
       popup:{title:'Add task',width:'70%',height:'70%',maxWidth:800},
       // Refresh the iPart the button belongs to, whichever report that is.
@@ -276,7 +295,7 @@
   function page(path, values) {
     const url = new URL(path, location.origin);
     Object.entries(values).forEach(([name, value]) => url.searchParams.set(name, String(value)));
-    return url.href;
+    return window.UnionSuiteWebsite.stamp(url).href;
   }
 
   // The iPart that owns a list carries its add action's class, so the class
@@ -846,7 +865,7 @@
   function page(path, values) {
     const url = new URL(path, location.origin);
     Object.entries(values).forEach(([name, value]) => url.searchParams.set(name, String(value)));
-    return url.href;
+    return window.UnionSuiteWebsite.stamp(url).href;
   }
 
   // The iPart that owns a list carries its add action's class, so the class
@@ -1130,7 +1149,7 @@
   // name, email and phone) in; ID, Full Name, Member Type and Member
   // Category out, at most 20. Its aliases are read by column(), so
   // "Full Name", "FullName" and "FULL_NAME" all match.
-  const WORKPLACE_MEMBERS = '$/_i4u_/Core/Cases/Layouts v2/API - Manage Case - Contact List - Primary Workplace';
+  const WORKPLACE_MEMBERS = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Manage Case - Contact List - Primary Workplace';
   composer('cases.add-party', {
     label: 'Add party',
     form: {href: ({context}) => page('/Cases_ManageContacts', {CaseID: context.caseId}), title: 'Add party'},
@@ -1342,7 +1361,7 @@
   // 28 October 2026), read once for the page. Until it arrives, or if it
   // cannot be read, the status's name decides ("Complete" is what Resolve
   // case saves).
-  const CASE_STATUSES = '$/_i4u_/Core/Cases/Layouts v2/API - Value List - Case Status';
+  const CASE_STATUSES = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Value List - Case Status';
   const CLOSED = /^(closed|resolved|complete|completed)$/i;
   let caseStatuses = null;
   const flag = value => /^(true|1|yes|y)$/i.test(String(value ?? '').trim());
@@ -1362,7 +1381,17 @@
   const isClosed = () => statusEntry(caseStatus())?.closed ?? CLOSED.test(caseStatus());
   const whenOpen = {check: () => !isClosed() || 'This case is already closed.', denied: 'hide'};
   const whenClosed = {check: () => isClosed() || 'This case is open.', denied: 'hide'};
-  const reloadPage = {when: 'close', run: () => location.reload()};
+  // A form that closes with {cancel: true} changed nothing: no reload.
+  const cancelled = env => {
+    try {
+      return env?.result?.closeEvent?.get_argument?.()?.cancel === true || env?.result?.closeEvent?.reason?.cancel === true;
+    } catch (error) {
+      return false;
+    }
+  };
+  const reloadPage = {when: 'close', run: env => {
+    if (!cancelled(env)) location.reload();
+  }};
 
   // Outstanding tasks on the page (the Overview's Tasks list). A tab that
   // is not loaded cannot be counted, so the check is skipped there.
@@ -1372,16 +1401,17 @@
     return [...list.querySelectorAll('.us-task')].filter(task => task.getAttribute('data-us-task-completed') !== 'true').length;
   }
 
+  // The open tasks go to the form as OpenTasks, which warns inside it
+  // instead of a browser confirm before it opens (owner, 16 November 2026:
+  // prototypes/wip/resolve-case-form).
   define('cases.resolve', {
     presentation: {label: 'Resolve case', icon: 'ti-circle-check', default: 'button', menu: 'menu-item'},
     context: {caseId, caseNum},
     action: {type: 'popup', recordKey: ['caseId'], access: whenOpen,
-      confirm: () => {
+      href: ({context}) => {
         const count = openTasks();
-        if (!count) return true;
-        return window.confirm(count + (count === 1 ? ' task is' : ' tasks are') + ' still open. They stay open after the case closes.\n\nResolve the case anyway?');
+        return page('/Cases_ResolveCase', {CaseID: context.caseId, CaseNum: context.caseNum, ...(count ? {OpenTasks: count} : {})});
       },
-      href: ({context}) => page('/Cases_ResolveCase', {CaseID: context.caseId, CaseNum: context.caseNum}),
       popup: {title: 'Resolve case', width: '90%', height: '90%', ...formWidth},
       refresh: reloadPage}
   });
@@ -1531,7 +1561,7 @@
   const emailParties = {
     page: '/_i4u_/Core/Cases/UnionSuite/Manage-Case/Popups/Send-Email-Parties.aspx',
     communicationId: '9ae4a05c-4f8a-4103-bd23-db28a3faf8fc',
-    query: '$/_i4u_/Core/Cases/Layouts v2/API - Communication Recipient List - Parties',
+    query: '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Communication Recipient List - Parties',
     ordinalFilter: 'Ordinal',
     // The IQA's own prompt name. "@url:CaseNum" passed /api/query but the
     // send ignored it and counted every case's parties (224 against 7;

@@ -29,8 +29,8 @@ sources, never the export:
 | File | Goes into |
 |---|---|
 | `form-inject.js` | JavaScript to inject; its `us-bf-*` classes are styled by the theme (`US-BEYOND-FORMS`) |
-| `prefill.js` | The autoexecute (`Cases/Union-Suite/Create-Case-Staff-Prefill`) field's JavaScript |
-| `create-button.js` | Create case's JavaScript (`Cases/Union-Suite/Create-Case-Staff`) |
+| `prefill.js` | The autoexecute (`Cases/US/Create-Case-Staff/Prefill`) field's JavaScript |
+| `create-button.js` | Create case's JavaScript (`Cases/US/Create-Case-Staff`) |
 | `preview.html` / `preview.js` | A stand-in for BeyondFormz's renderer that runs the built export's scripts on sample flow answers (`?prefill=today|new`, `&from=member|note`, `&save=ok|partial|fail`, `&scheme=light|dark`, `&ID=` for no member). Not BeyondFormz: check the real form after importing |
 
 **What the form does:** Type, Subtype (every enabled subtype, read once
@@ -59,8 +59,8 @@ ignored by Git), from the owner's export of the two "UnionSuite Cases"
 copies (29 October 2026). It keeps their `definitionId` and `versionId`, so
 importing overwrites the copies. Edit the script, never the export.
 
-**UnionSuite Cases: Prefill Create Case - Staff Form**,
-`POST /Cases/Union-Suite/Create-Case-Staff-Prefill`. (The copy it replaces
+**US Case Form Prefill: Create Case - Staff Form**,
+`POST /Cases/US/Create-Case-Staff/Prefill`. (The copy it replaces
 was the Edit case prefill, on the live Edit flow's path
 `/cases/preload-edit`.) Answers `{ReqVals, Member, Workplaces, Note}`; each
 part but the rules is left out if it cannot be read, so the form still
@@ -99,8 +99,8 @@ a disabled tag (false) is not offered on a new case. Owner: a disabled
 tag stays visible on the cases that already have it but cannot be added,
 so the case page's tag editing should use the same IQA and rule.
 
-**UnionSuite Cases: Create Case - Staff Form**,
-`POST /Cases/Union-Suite/Create-Case-Staff`. In the quick-add flows'
+**US Case Form: Create Case - Staff Form**,
+`POST /Cases/US/Create-Case-Staff`. In the quick-add flows'
 pattern (`ValidateImisRequest` on the endpoint, iMIS then CloudToolz for
 each record, one log through `LogChangesToIMIS`):
 
@@ -144,7 +144,7 @@ export, in that order; the form calls the new paths.
 **First run on the dev tenant (29 October 2026):**
 
 - The create flow answered 400 until its endpoint path matched the form's
-  `executeFlow` case exactly (`/Cases/Union-Suite/Create-Case-Staff`).
+  `executeFlow` case exactly (`/Cases/US/Create-Case-Staff`).
   Both paths now match the form's casing.
 - Case C222 was created without its types: the tag loop's items were built
   from lists kept in a flow variable, which CloudToolz's JavaScript hands

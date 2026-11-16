@@ -7,10 +7,10 @@
    (29 October 2026). Their definitionId and versionId are kept, so importing
    the output overwrites those copies; everything inside them is replaced:
 
-   - UnionSuite Cases: Prefill Create Case - Staff Form
-     POST /Cases/Union-Suite/Create-Case-Staff-Prefill (the form's autoexecute)
-   - UnionSuite Cases: Create Case - Staff Form
-     POST /Cases/Union-Suite/Create-Case-Staff (the form's Create case)
+   - US Case Form Prefill: Create Case - Staff Form
+     POST /Cases/US/Create-Case-Staff/Prefill (the form's autoexecute)
+   - US Case Form: Create Case - Staff Form
+     POST /Cases/US/Create-Case-Staff (the form's Create case)
 
    Each path matches the form's executeFlow exactly, case and all: the
    create flow answered 400 until its path did (owner, 29 October 2026).
@@ -188,7 +188,7 @@ const MESSAGE = (tone, html) => `'<div class="${tone === 'error' ? 'AsiError Asi
 const MEMBER_WORKPLACES_IQA = '$/_i4u_/Core/Cases/Layouts v2/API - Create Case - Member Workplaces';
 
 const prefill = assemble('create-case-prefill', [
-  ['EndpointData', 'HTTP Endpoint', build.endpoint('/Cases/Union-Suite/Create-Case-Staff-Prefill'), 0, 0],
+  ['EndpointData', 'HTTP Endpoint', build.endpoint('/Cases/US/Create-Case-Staff/Prefill'), 0, 0],
 
   ['SQL_FormFields', 'SQL - Form field rules', build.sql(`
 -- The FormFields rules for this form: which fields show, are required and
@@ -434,7 +434,7 @@ const PARTLY_SAVED_STEPS = [
 ];
 
 const create = assemble('create-case-staff', [
-  ['EndpointData', 'HTTP Endpoint', build.endpoint('/Cases/Union-Suite/Create-Case-Staff'), 0, 0],
+  ['EndpointData', 'HTTP Endpoint', build.endpoint('/Cases/US/Create-Case-Staff'), 0, 0],
 
   ['JS_Prepare', 'JS: Read And Check The Form', build.script(PREPARE), 0, 1],
 
@@ -943,8 +943,8 @@ function flowFrom(displayName, endpointPath, built) {
 }
 
 const flows = [
-  flowFrom('UnionSuite Cases: Prefill Create Case - Staff Form', '/Cases/Union-Suite/Create-Case-Staff-Prefill', prefill),
-  flowFrom('UnionSuite Cases: Create Case - Staff Form', '/Cases/Union-Suite/Create-Case-Staff', create)
+  flowFrom('US Case Form Prefill: Create Case - Staff Form', '/Cases/US/Create-Case-Staff/Prefill', prefill),
+  flowFrom('US Case Form: Create Case - Staff Form', '/Cases/US/Create-Case-Staff', create)
 ];
 
 const output = {

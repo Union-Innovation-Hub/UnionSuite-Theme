@@ -1,0 +1,440 @@
+<!doctype html>
+<!--
+  Resolve case form: a mock-up for the owner (16 November 2026).
+  One form both resolves a case and edits its resolution (C16: recording the
+  outcome and closing are one step). Drawn in a shadow root with the built
+  forms stylesheet (Theme/UnionSuite/Forms/UnionSuiteForms.css), the way the
+  forms runtime draws the task form, so it looks as a built form would.
+  The fields, quick dates and validation respond. Resolve case and Cancel show
+  what the form would send and how it would close; nothing saves.
+  ?mode=resolve|edit&tasks=open|none. Serve the project root (static-node)
+  and open this page.
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resolve Case Form</title>
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Client/Branding.css">
+  <style>
+    /* Mock-up page only, as the task form's mock-up page. */
+    body.rf-page {
+      margin: 0;
+      background: var(--bg-page, #eef0f3);
+      color: var(--text-base, #545962);
+      font: 14px/1.5 var(--font-ui, system-ui, sans-serif);
+    }
+
+    .rf-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border, #e2e5e9);
+      background: var(--bg-surface, #fff);
+    }
+
+    .rf-toolbar h1 {
+      margin: 0 12px 0 0;
+      color: var(--text-strong, #1c2024);
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: none;
+    }
+
+    .rf-segmented {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      border-radius: 8px;
+      background: var(--bg-sunken, #f1f3f5);
+    }
+
+    .rf-segmented button {
+      min-height: 32px;
+      padding: 5px 12px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-base, #545962);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .rf-segmented button[aria-pressed="true"] {
+      background: var(--bg-surface, #fff);
+      color: var(--text-strong, #1c2024);
+      box-shadow: 0 1px 2px rgb(0 0 0 / .08);
+    }
+
+    .rf-stage {
+      display: grid;
+      grid-template-columns: minmax(0, 720px) minmax(260px, 360px);
+      justify-content: center;
+      align-items: start;
+      gap: 24px;
+      padding: 24px 16px 32px;
+    }
+
+    @media (max-width: 1120px) {
+      .rf-stage {
+        grid-template-columns: minmax(0, 720px);
+      }
+    }
+
+    /* The iMIS popup, drawn statically: its title bar holds the title. */
+    .rf-window {
+      border: 1px solid var(--border, #e2e5e9);
+      border-radius: 12px;
+      background: var(--bg-surface, #fff);
+      box-shadow: 0 12px 40px rgb(15 23 42 / .18);
+    }
+
+    .rf-window__title {
+      margin: 0;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border, #e2e5e9);
+      border-radius: 12px 12px 0 0;
+      color: var(--text-strong, #1c2024);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .rf-notes {
+      padding: 16px 20px;
+      border: 1px solid var(--border, #e2e5e9);
+      border-radius: 12px;
+      background: var(--bg-surface, #fff);
+      font-size: 13px;
+    }
+
+    .rf-notes h2 {
+      margin: 0 0 8px;
+      color: var(--text-strong, #1c2024);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: none;
+    }
+
+    .rf-notes h2:not(:first-child) {
+      margin-top: 16px;
+    }
+
+    .rf-notes ol,
+    .rf-notes ul {
+      margin: 0;
+      padding-inline-start: 18px;
+    }
+
+    .rf-notes li + li {
+      margin-top: 6px;
+    }
+
+    .rf-notes strong {
+      color: var(--text-strong, #1c2024);
+    }
+
+    .rf-notes pre {
+      overflow-x: auto;
+      margin: 0;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: var(--bg-sunken, #f1f3f5);
+      color: var(--text-strong, #1c2024);
+      font: 12px/1.45 ui-monospace, Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .rf-confirm {
+      margin: 0;
+      padding: 8px 12px 8px 28px !important;
+      border-radius: 8px;
+      background: var(--warning-bg, #fdf1d8);
+      color: var(--text-strong, #1c2024);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="rf-page">
+  <div class="rf-toolbar">
+    <h1>Resolve case form</h1>
+    <div class="rf-segmented" role="group" aria-label="Mode" data-control="mode">
+      <button type="button" data-value="resolve">Resolve case</button>
+      <button type="button" data-value="edit">Edit resolution</button>
+    </div>
+    <div class="rf-segmented" role="group" aria-label="Open tasks" data-control="tasks" data-resolve-only>
+      <button type="button" data-value="open">2 tasks open</button>
+      <button type="button" data-value="none">No open tasks</button>
+    </div>
+  </div>
+
+  <main class="rf-stage">
+    <section class="rf-window" aria-labelledby="rf-title">
+      <p class="rf-window__title" id="rf-title"></p>
+      <div id="rf-host"></div>
+    </section>
+    <aside class="rf-notes">
+      <h2>One form: resolve, or edit the resolution</h2>
+      <ol>
+        <li><strong>Resolving and closing are one step</strong> (C16). Saving records the outcome and closes the case; the page reloads with the resolution first on the Overview.</li>
+        <li><strong>Open tasks are said in the form,</strong> above the fields, instead of a browser confirm before it opens. They stay open after the case closes, as now. One less dialog, and the warning is still there when you save.</li>
+        <li><strong>Outcome type and Closed date are required.</strong> The date starts as today, with Today and Yesterday to hand, and can't be in the future or before the case was opened.</li>
+        <li><strong>Amount awarded</strong> (dollars) and <strong>Time awarded</strong> (weeks, such as personal leave) are separate and both optional, so a case can win both. They start empty: blank means nothing awarded and saves as empty, never 0. Cents and part weeks (1.5) are fine. They are the live <code>ResolutionAmount</code> and <code>ResolutionWeeks</code>.</li>
+        <li><strong>Outcome</strong> says what happened in words, for the next person to read.</li>
+        <li><strong>Edit resolution</strong> is the same form, filled in, with who resolved it and when. <strong>Save changes</strong> keeps the case closed.</li>
+        <li><kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves from anywhere in the form; <kbd>Esc</kbd> or Cancel closes it without saving.</li>
+      </ol>
+
+      <h2>Last action</h2>
+      <pre data-result>Resolve case or Cancel to see what the form would send and how it would close.</pre>
+
+      <h2>To confirm</h2>
+      <ul class="rf-confirm">
+        <li>The outcome types (these are samples) and where their list lives: a value list IQA, as Case Status.</li>
+        <li>Which fields are required: is Outcome optional?</li>
+        <li>Whether resolving should also complete or cancel open tasks (now: they stay open).</li>
+        <li>The endpoint: <code>/cases/resolve-case</code> exists but has not run. The page: <code>Cases_ResolveCase</code> exists on no website yet.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Sample data ─────────────────────────────────────────── */
+
+    const CASE = {id: 'C49', member: 'Tony Andrews', opened: '2025-08-18'};
+    const OUTCOME_TYPES = ['Won', 'Settled', 'Partially successful', 'Unsuccessful', 'Withdrawn', 'No further action'];
+    // The live case fields' names (ResolutionDate, ResolutionType,
+    // ResolutionAmount, ResolutionWeeks, Resolution).
+    const EXISTING = {
+      ResolutionType: 'Settled',
+      ResolutionDate: '2026-11-12',
+      ResolutionAmount: '4250',
+      ResolutionWeeks: '2',
+      Resolution: 'Employer agreed to back-pay the unpaid overtime from March to September, to restore two weeks of personal leave, and to correct the roster rules from the next pay period.',
+      ResolvedBy: 'Sam Carter',
+      ResolvedOn: '12 Nov 2026'
+    };
+
+    /* ── Switches (reload, as opening a new popup would) ─────── */
+
+    const params = new URLSearchParams(location.search);
+    const state = {
+      mode: params.get('mode') === 'edit' ? 'edit' : 'resolve',
+      tasks: params.get('tasks') === 'none' ? 'none' : 'open'
+    };
+    document.querySelectorAll('[data-control]').forEach(group => {
+      const key = group.getAttribute('data-control');
+      group.querySelectorAll('button').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.value === state[key]));
+        button.addEventListener('click', () => {
+          params.set(key, button.dataset.value);
+          location.search = params.toString();
+        });
+      });
+    });
+    document.querySelectorAll('[data-resolve-only]').forEach(node => { node.hidden = state.mode !== 'resolve'; });
+    const editing = state.mode === 'edit';
+    document.getElementById('rf-title').textContent = editing ? 'Edit resolution' : 'Resolve case';
+
+    /* ── Helpers ─────────────────────────────────────────────── */
+
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const iso = date => date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    const nice = value => { const [y, m, d] = value.split('-').map(Number); return d + ' ' + MONTHS[m - 1] + ' ' + y; };
+    const dayOffset = days => { const date = new Date(); date.setDate(date.getDate() + days); return iso(date); };
+    const ICONS = {
+      briefcase: '<path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M12 12v.01M3 13a20 20 0 0 0 18 0"/>',
+      check: '<path d="M5 12l5 5L20 7"/>',
+      info: '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M12 9h.01M11 12h1v4h1"/>',
+      alert: '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M12 8v4M12 16h.01"/>'
+    };
+    const icon = name => '<svg class="usf-icon" viewBox="0 0 24 24" aria-hidden="true">' + ICONS[name] + '</svg>';
+    const escape = text => String(text).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+
+    /* ── The form ────────────────────────────────────────────── */
+
+    const values = editing ? EXISTING : {ResolutionType: '', ResolutionDate: iso(new Date()), ResolutionAmount: '', ResolutionWeeks: '', Resolution: ''};
+    const host = document.getElementById('rf-host');
+    const root = host.attachShadow({mode: 'open'});
+    root.innerHTML = `
+      <link rel="stylesheet" href="../../../Theme/UnionSuite/Forms/UnionSuiteForms.css">
+      <style>
+        /* Mock-up only: the pieces the forms stylesheet doesn't have yet. */
+        .rf-tasks {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          margin: 0;
+          padding: 10px 12px;
+          border-radius: var(--usf-radius);
+          background: var(--warning-bg, #fdf1d8);
+          color: var(--usf-text-strong);
+        }
+        .rf-tasks .usf-icon { margin-top: 3px; font-size: 16px; color: var(--warning, #b25e09); }
+        .rf-tasks p { margin: 0; }
+        .rf-tasks span { color: var(--usf-text); }
+        .rf-money { position: relative; }
+        .rf-money::before {
+          content: '$';
+          position: absolute;
+          left: 11px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--usf-text-muted);
+          pointer-events: none;
+        }
+        .rf-money .usf__input { padding-left: 24px; }
+        .rf-weeks { position: relative; }
+        .rf-weeks::after {
+          content: 'weeks';
+          position: absolute;
+          right: 11px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--usf-text-muted);
+          pointer-events: none;
+        }
+        .rf-weeks .usf__input { padding-right: 56px; }
+        .usf__field[data-invalid] .usf__input,
+        .usf__field[data-invalid] .usf__textarea { border-color: var(--usf-danger); }
+        select.usf__input { appearance: auto; }
+      </style>
+      <form class="usf" novalidate>
+        <div class="usf__body">
+          <p class="usf__record">${icon('briefcase')}<span class="usf__record-text">Case <strong>${CASE.id}</strong> · ${escape(CASE.member)}</span></p>
+
+          ${!editing && state.tasks === 'open' ? `
+          <div class="rf-tasks" role="note">${icon('info')}
+            <p><strong>2 tasks are still open.</strong> <span>They stay open after the case closes. Finish them first if nothing should be left hanging.</span></p>
+          </div>` : ''}
+
+          <div class="usf__row">
+            <div class="usf__field" data-field="ResolutionType">
+              <div class="usf__head"><label class="usf__label" for="rf-type">Outcome type <span class="usf__required" aria-hidden="true">*</span></label></div>
+              <select class="usf__input" id="rf-type" name="ResolutionType" required>
+                <option value="">Choose the outcome</option>
+                ${OUTCOME_TYPES.map(type => `<option${type === values.ResolutionType ? ' selected' : ''}>${type}</option>`).join('')}
+              </select>
+            </div>
+            <div class="usf__field" data-field="ResolutionDate">
+              <div class="usf__head">
+                <label class="usf__label" for="rf-date">Closed date <span class="usf__required" aria-hidden="true">*</span></label>
+                <div class="usf__quick">
+                  <button type="button" data-days="0">Today</button>
+                  <button type="button" data-days="-1">Yesterday</button>
+                </div>
+              </div>
+              <input class="usf__input" id="rf-date" name="ResolutionDate" type="date" value="${values.ResolutionDate}" min="${CASE.opened}" max="${iso(new Date())}" required>
+            </div>
+          </div>
+
+          <div class="usf__row">
+            <div class="usf__field" data-field="ResolutionAmount">
+              <div class="usf__head"><label class="usf__label" for="rf-amount">Amount awarded <span class="usf__optional">optional</span></label></div>
+              <div class="rf-money"><input class="usf__input" id="rf-amount" name="ResolutionAmount" inputmode="decimal" autocomplete="off" value="${escape(values.ResolutionAmount)}"></div>
+            </div>
+            <div class="usf__field" data-field="ResolutionWeeks">
+              <div class="usf__head"><label class="usf__label" for="rf-weeks">Time awarded <span class="usf__optional">optional</span></label></div>
+              <div class="rf-weeks"><input class="usf__input" id="rf-weeks" name="ResolutionWeeks" inputmode="decimal" autocomplete="off" value="${escape(values.ResolutionWeeks)}"></div>
+            </div>
+          </div>
+
+          <div class="usf__field" data-field="Resolution">
+            <label class="usf__label" for="rf-outcome">Outcome <span class="usf__optional">optional</span></label>
+            <textarea class="usf__textarea" id="rf-outcome" name="Resolution" rows="4" placeholder="What happened, in a few sentences">${escape(values.Resolution)}</textarea>
+          </div>
+
+          ${editing ? `<p class="usf__meta">Resolved ${EXISTING.ResolvedOn} by ${escape(EXISTING.ResolvedBy)}</p>` : ''}
+        </div>
+        <div class="usf__foot">
+          <span class="usf__hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> to save</span>
+          <button class="usf__button" type="button" data-cancel>Cancel</button>
+          <button class="usf__button usf__button--primary" type="submit">${icon('check')}${editing ? 'Save changes' : 'Resolve case'}</button>
+        </div>
+      </form>`;
+
+    const form = root.querySelector('form');
+    const result = document.querySelector('[data-result]');
+    const show = data => { result.textContent = JSON.stringify(data, null, 2); };
+
+    root.querySelectorAll('[data-days]').forEach(button => button.addEventListener('click', () => {
+      root.getElementById('rf-date').value = dayOffset(Number(button.dataset.days));
+      clear('ResolutionDate');
+    }));
+
+    function field(name) { return root.querySelector('[data-field="' + name + '"]'); }
+    function clear(name) {
+      const node = field(name);
+      node.removeAttribute('data-invalid');
+      node.querySelector('.usf__error')?.remove();
+      node.querySelector('input, select, textarea')?.removeAttribute('aria-invalid');
+    }
+    function fail(name, message) {
+      const node = field(name);
+      node.setAttribute('data-invalid', '');
+      const control = node.querySelector('input, select, textarea');
+      control.setAttribute('aria-invalid', 'true');
+      const error = document.createElement('p');
+      error.className = 'usf__error';
+      error.id = 'rf-error-' + name;
+      error.innerHTML = icon('alert') + escape(message);
+      control.setAttribute('aria-describedby', error.id);
+      node.append(error);
+    }
+    form.addEventListener('input', event => clear(event.target.closest('[data-field]')?.dataset.field));
+
+    // Blank means nothing was awarded and saves as empty, never 0.
+    function validate() {
+      ['ResolutionType', 'ResolutionDate', 'ResolutionAmount', 'ResolutionWeeks'].forEach(clear);
+      const data = Object.fromEntries(new FormData(form));
+      const problems = [];
+      if (!data.ResolutionType) problems.push(['ResolutionType', 'Choose the outcome type.']);
+      if (!data.ResolutionDate) problems.push(['ResolutionDate', 'Enter the date the case closed.']);
+      else if (data.ResolutionDate > iso(new Date())) problems.push(['ResolutionDate', 'The closed date can’t be in the future.']);
+      else if (data.ResolutionDate < CASE.opened) problems.push(['ResolutionDate', 'The case was opened ' + nice(CASE.opened) + '; it can’t close before that.']);
+      const amount = data.ResolutionAmount.replace(/[$,\s]/g, '');
+      if (amount && !/^\d+(\.\d{1,2})?$/.test(amount)) problems.push(['ResolutionAmount', 'Enter an amount in dollars, such as 4250 or 4250.50.']);
+      const weeks = data.ResolutionWeeks.replace(/\s|weeks?$/gi, '');
+      if (weeks && !/^\d+(\.\d{1,2})?$/.test(weeks)) problems.push(['ResolutionWeeks', 'Enter a number of weeks, such as 2 or 1.5.']);
+      problems.forEach(([name, message]) => fail(name, message));
+      if (problems.length) {
+        field(problems[0][0]).querySelector('input, select, textarea').focus();
+        return null;
+      }
+      return {...data, ResolutionAmount: amount || null, ResolutionWeeks: weeks || null};
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const data = validate();
+      if (!data) { show({blocked: 'Fix the highlighted fields first.'}); return; }
+      show({
+        sends: {endpoint: '/cases/resolve-case', CaseID: CASE.id, Edit: editing, ...data},
+        closes: {saved: true, Ordinal: CASE.id},
+        then: editing ? 'The Resolution panel reloads; the case stays closed.' : 'The page reloads: the case is closed and the Overview starts with the resolution.'
+      });
+    });
+    form.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+      if (event.key === 'Escape') root.querySelector('[data-cancel]').click();
+    });
+    root.querySelector('[data-cancel]').addEventListener('click', () => show({closes: {cancel: true}, then: 'Nothing changes.'}));
+  })();
+  </script>
+</body>
+</html>

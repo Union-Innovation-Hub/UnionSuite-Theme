@@ -2,22 +2,26 @@
 id: resolve-and-close
 title: Resolve and close a case
 section: Closing a case
-answer: Choose **Resolve case** from the status menu or the banner's **Actions**. Fill in the outcome and save; the case closes.
+answer: Choose **Resolve case** from the status menu or the banner's **Actions**. Choose the outcome type, check the closed date, add anything awarded, and press **Resolve case**; the case closes.
 asks:
   - how do I close a case
   - finish a case
   - record the outcome of a case
   - resolve a case
   - mark a case as complete
-keywords: [close, resolve, resolution, finish, complete, outcome, result, end, won, settled, closed]
+keywords: [close, resolve, resolution, finish, complete, outcome, result, end, won, settled, closed, awarded, amount, weeks, leave]
 related: [reopen-or-edit-resolution, add-and-complete-tasks, change-the-status]
+verify:
+  - The rebuilt Resolve case form (prototypes/wip/resolve-case-form) is not imported yet; check these steps against it once it is.
 ---
 Recording the outcome and closing the case are one step.
 
 1. Choose **Resolve case**. It is in the status menu, the banner's **Actions** menu and the *Resolution* panel on the **Details** tab.
-2. If tasks are still open, you are told how many. They stay open after the case closes. Choose whether to go ahead.
-3. Fill in the form: the outcome type, the outcome, any amount, and the closed date.
-4. Save.
+2. If tasks are still open, the form says how many. They stay open after the case closes.
+3. Choose the **Outcome type**. **Closed date** starts as today; press **Yesterday** or pick another date if it closed earlier.
+4. If anything was won, fill in **Amount awarded** (dollars), **Time awarded** (weeks, such as personal leave), or both. Leave them empty if nothing was.
+5. Say what happened under **Outcome**.
+6. Press **Resolve case**, or `Ctrl+Enter`.
 
 The page reloads. The case is closed, and the Overview now starts with the resolution.
 

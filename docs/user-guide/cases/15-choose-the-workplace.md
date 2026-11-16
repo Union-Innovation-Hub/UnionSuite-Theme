@@ -21,6 +21,8 @@ When a member has jobs, the member card's **Work** heading has a small arrow.
 3. Choose the job the case is about, or **Not about a workplace**.
 4. It saves straight away.
 
+The **Details** tab's *Workplace* follows your choice. For **Not about a workplace**, the member card and the **Details** tab both say *This case isn't about a workplace.*
+
 If no job has been chosen, the card asks *Which job is this case about?* Press **Choose workplace**.
 
 > **Tip:** If the save fails, the previous job comes back with *Not saved. Try again.*

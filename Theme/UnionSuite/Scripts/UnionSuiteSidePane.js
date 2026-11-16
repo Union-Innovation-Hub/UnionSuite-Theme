@@ -349,6 +349,12 @@
           if (typeof window.UnionSuiteHelpMatch?.create !== 'function') {
             throw new Error('UnionSuiteHelpMatch.js is not loaded');
           }
+          // Configuration and technical topics (audience "admin") answer only
+          // in Easy Edit, where the people who set pages up work; staff get
+          // the staff topics alone.
+          const easyEdit = window.gIsEasyEditEnabled === true ||
+            document.body.classList.contains('TemplateAreaEasyEditOn');
+          help.topics = help.topics.filter(topic => easyEdit || topic.audience !== 'admin');
           const topics = new Map(help.topics.map(topic => [topic.id, Object.assign(topic, {
             href: absolute(topic.url, address),
             steps: doc.getElementById(topic.id)?.querySelector('.topic__body') || null

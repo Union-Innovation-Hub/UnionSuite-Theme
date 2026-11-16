@@ -62,8 +62,10 @@ const inject = read('form-inject.js');
    col-md-N sets the width. The form's script adds the us-bf-* classes it
    needs to the field wrappers, which className cannot reach. */
 const FIELDS = [
-  field('autoexecute', 'autoexecute-1743469376028-0', {
-    executeFlow: 'Cases/Union-Suite/Create-Case-Staff-Prefill',
+  // The export's own autoexecute field, whatever it is named now
+  // (autoexecute-Prefill since 16 November 2026).
+  field('autoexecute', (form.fields.find(entry => entry.type === 'autoexecute') || {}).name || 'autoexecute-Prefill', {
+    executeFlow: 'Cases/US/Create-Case-Staff/Prefill',
     javaScript: read('prefill.js')
   }),
 
@@ -145,7 +147,7 @@ const FIELDS = [
   field('button', 'CreateCaseButton', {
     label: 'Create case',
     className: 'btn-primary btn PrimaryButton',
-    executeFlow: 'Cases/Union-Suite/Create-Case-Staff',
+    executeFlow: 'Cases/US/Create-Case-Staff',
     labelHoldingMessage: 'Creating case…',
     javaScript: read('create-button.js')
   }),

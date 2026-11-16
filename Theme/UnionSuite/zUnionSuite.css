@@ -11936,7 +11936,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
    CloudToolz's 0,3,0, and below the date and textarea rules that follow.
    The browser's date picker and Select2's dropdown are left as they are. */
 
-[data-beyondformid] .rendered-form .form-group > :is(
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > :is(
   input:where(:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=hidden], [type=image])),
   select,
   textarea
@@ -11954,7 +11954,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   box-shadow: none;
 }
 
-[data-beyondformid] .rendered-form .form-group > :is(
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > :is(
   input:where(:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=hidden], [type=image])),
   select,
   textarea
@@ -11962,7 +11962,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   border-color: var(--brand-600);
 }
 
-[data-beyondformid] .rendered-form .form-group > :is(
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > :is(
   input:where(:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=hidden], [type=image])),
   select,
   textarea
@@ -11973,7 +11973,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   box-shadow: var(--field-focus-glow);
 }
 
-[data-beyondformid] .rendered-form .form-group > :is(
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > :is(
   input:where(:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=hidden], [type=image])),
   select,
   textarea
@@ -11984,7 +11984,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   opacity: 1;
 }
 
-[data-beyondformid] .rendered-form .form-group > :is(
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > :is(
   input:where(:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=hidden], [type=image])),
   select,
   textarea
@@ -11993,7 +11993,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   color: var(--text-strong);
 }
 
-[data-beyondformid] .rendered-form .form-group > :is(
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > :is(
   input:where(:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=hidden], [type=image])),
   select,
   textarea
@@ -12187,20 +12187,22 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   display: none !important;
 }
 
-/* The form's width: one readable column on a full page. */
-[data-beyondformid] .rendered-form:has(.us-bf-section):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+/* The form's width: one readable column on a full page. A designed form is
+   one with us-bf-section headings or a us-bf-for line (Resolve case, which
+   has no sections; 16 November 2026). */
+[data-beyondformid] .rendered-form:has(.us-bf-section, .us-bf-for):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   max-width: 760px;
 }
 
 /* Bootstrap's row gutters, tightened to the theme's field spacing on a
    designed form (one with us-bf-section headings). The staff group
    (.us-bf-staff) holds the lead's row. */
-[data-beyondformid] :is(.rendered-form:has(.us-bf-section), .rendered-form .us-bf-staff) > .row:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+[data-beyondformid] :is(.rendered-form:has(.us-bf-section, .us-bf-for), .rendered-form .us-bf-staff) > .row:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   margin-right: -8px;
   margin-left: -8px;
 }
 
-[data-beyondformid] :is(.rendered-form:has(.us-bf-section), .rendered-form .us-bf-staff) > .row > .form-group:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+[data-beyondformid] :is(.rendered-form:has(.us-bf-section, .us-bf-for), .rendered-form .us-bf-staff) > .row > .form-group:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   margin-bottom: var(--space-4);
   padding-right: 8px;
   padding-left: 8px;
@@ -12458,6 +12460,46 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
 [data-beyondformid] .rendered-form .us-bf-optional:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   color: var(--text-faint);
   font-weight: 400;
+}
+
+/* A mark inside a field, before or after its value: the $ before an amount,
+   "weeks" after a time (Resolve case; 16 November 2026). The form's script
+   wraps the input in span.us-bf-affix with data-before or data-after. */
+[data-beyondformid] .rendered-form .us-bf-affix:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  position: relative;
+  display: block;
+}
+
+[data-beyondformid] .rendered-form .us-bf-affix:is([data-before], [data-after]):not(:where(.us-report-no-styling, .us-report-no-styling *))::before,
+[data-beyondformid] .rendered-form .us-bf-affix[data-after]:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font: 13px/20px var(--font-ui);
+  pointer-events: none;
+}
+
+[data-beyondformid] .rendered-form .us-bf-affix[data-before]:not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
+  content: attr(data-before);
+  left: 11px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-affix:not([data-before]):not(:where(.us-report-no-styling, .us-report-no-styling *))::before {
+  content: none;
+}
+
+[data-beyondformid] .rendered-form .us-bf-affix[data-after]:not(:where(.us-report-no-styling, .us-report-no-styling *))::after {
+  content: attr(data-after);
+  right: 11px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-affix[data-before] > input:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  padding-left: 24px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-affix[data-after] > input:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  padding-right: 56px;
 }
 
 /* Lead staff and Assign me as one group (an Individual case needs one of
@@ -15975,6 +16017,12 @@ html.us-taskbar-mounted #hd .search-dropdown {
   margin: 0;
   color: var(--text-muted);
   font-size: var(--fs-sm);
+}
+
+/* A group with every field blank and an Empty- line: the line in place of
+   the fields (the dl's display would otherwise beat its hidden). */
+.us-field-groups__group--empty > .us-fields {
+  display: none;
 }
 
 /* US-FIELDS:END */
@@ -32964,6 +33012,13 @@ body:not(.EasyEdit) .ContentItemContainer:has(> .us-activity-detail:not(.is-open
    confirm the copy. */
 
 .us-banner .us-banner__record-copy :is(button.us-copy, button.us-banner__copy) > .us-copy-label {
+  display: none;
+}
+
+/* us-copy--quiet: no "Copied" label, for copy buttons set in running text
+   (the help pages' paths; owner, 16 November 2026). The tick, the flash and
+   the live region still confirm the copy. */
+button.us-copy.us-copy--quiet > .us-copy-label {
   display: none;
 }
 

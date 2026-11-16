@@ -59,7 +59,7 @@
   ];
 
   function answer(flow, body) {
-    if (flow === 'Cases/Union-Suite/Create-Case-Staff-Prefill') {
+    if (flow === 'Cases/US/Create-Case-Staff/Prefill') {
       const today = {ReqVals: RULES};
       if (state.from === 'note') {
         today['id-val-CaseDescription'] = 'Created from Note: ' + NOTE;
@@ -79,7 +79,7 @@
         ]
       };
     }
-    if (flow === 'Cases/Union-Suite/Create-Case-Staff') {
+    if (flow === 'Cases/US/Create-Case-Staff') {
       log('Create-Case-Staff body:\n' + JSON.stringify(body, null, 2));
       // As flows/build-flows.cjs's create flow answers. The success link is
       // a hash, so opening the case stays on this page.

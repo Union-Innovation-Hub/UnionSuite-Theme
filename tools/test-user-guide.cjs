@@ -20,7 +20,11 @@ if (loaded.problems.length) {
   console.error(loaded.problems.join('\n'));
   process.exit(1);
 }
-const matcher = Match.create(helpJson(loaded));
+// Staff get the staff topics alone; the administrators' topics answer only
+// in Easy Edit (the side pane) or with that part of the page open.
+const help = helpJson(loaded);
+const matcher = Match.create({...help, topics: help.topics.filter(topic => topic.audience !== 'admin')});
+const adminMatcher = Match.create(help);
 
 // Question → the topic it must answer. None of these is one of the
 // topics' own asks word for word.
@@ -58,17 +62,37 @@ const EXPECT = [
   ['what are the tabs', 'find-your-way-around']
 ];
 
+// The same, asked by someone setting the page up (every topic).
+const ADMIN_EXPECT = [
+  ['give a client their own case tabs', 'change-the-case-tabs'],
+  ['where do the client case IQAs go', 'where-case-settings-live'],
+  ['add lead staff to the case header', 'change-the-banner-details'],
+  ['add a field to the member card', 'change-the-party-details'],
+  ['what columns does the meeting card show when opened', 'change-the-activity-card-details'],
+  ['what does the prefix before the hyphen in a column do', 'field-group-columns'],
+  ['which endpoints save a case', 'case-queries-and-endpoints'],
+  ['what shortcuts does the case page need', 'case-shortcuts-and-popups']
+];
+
 // Questions with nothing to do with cases must not get a sure answer.
 const UNSURE = ['what is the weather', 'pay my invoice', 'banana'];
 
 let failed = 0;
-for (const [question, id] of EXPECT) {
-  const answer = matcher.reply(question);
+function expect(using, question, id) {
+  const answer = using.reply(question);
   const got = answer.topic ? answer.topic.id : '(none)';
   if (got !== id || !answer.sure) {
     failed++;
-    const ranked = matcher.rank(question, 3).map(r => r.topic.id + ' ' + r.score).join(', ');
+    const ranked = using.rank(question, 3).map(r => r.topic.id + ' ' + r.score).join(', ');
     console.log('FAIL  "' + question + '" → ' + got + (answer.sure ? '' : ' (unsure)') + ', expected ' + id + '\n      ' + ranked);
+  }
+}
+for (const [question, id] of EXPECT) expect(matcher, question, id);
+for (const [question, id] of ADMIN_EXPECT) expect(adminMatcher, question, id);
+for (const {id} of help.topics.filter(topic => topic.audience === 'admin')) {
+  if (matcher.rank('change the case tabs', 50).some(r => r.topic.id === id)) {
+    failed++;
+    console.log('FAIL  the staff matcher can answer with admin topic ' + id);
   }
 }
 for (const question of UNSURE) {
@@ -79,6 +103,6 @@ for (const question of UNSURE) {
   }
 }
 
-const total = EXPECT.length + UNSURE.length;
+const total = EXPECT.length + ADMIN_EXPECT.length + UNSURE.length;
 console.log((total - failed) + ' of ' + total + ' passed.');
 process.exitCode = failed ? 1 : 0;
