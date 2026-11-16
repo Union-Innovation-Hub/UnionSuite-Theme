@@ -173,6 +173,33 @@
         ],
         "createdAt": "2026-10-28T21:29:47.686Z",
         "reason": "Claude triage: the flagged sizes are the mock-up page's own toolbar and notes panel (preview chrome, as in the task-form mock-up), not the form being designed"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "embeds/finance-dashboard/fd-styles.css"
+        ],
+        "createdAt": "2026-11-12T04:56:08.995Z",
+        "reason": "user confirmed 4 Sep 2026 (embeds/finance-dashboard/TODO.md section 4): the 4px border-left on run cards stays; it carries run status. Remaining hits are the run cards and their loading skeleton."
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "prototypes/wip/resolve-case-form/resolve-case-form.html"
+        ],
+        "createdAt": "2026-11-16T04:13:56.941Z",
+        "reason": "Claude: the flagged sizes are the mock-up page's own toolbar and notes chrome (16/14/13/12px), copied from the approved task form mock-up page; the form itself uses the built UnionSuiteForms.css type scale"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "prototypes/wip/case-page/staff-edit-compare.html"
+        ],
+        "createdAt": "2026-11-16T10:46:35.586Z",
+        "reason": "Claude: the flagged sizes are the comparison page's own option headings, blurbs and cost notes (theme tokens fs-base/fs-sm/fs-xs), page chrome as in workplace-compare.html; the cards themselves use the live theme CSS"
       }
     ]
   }
