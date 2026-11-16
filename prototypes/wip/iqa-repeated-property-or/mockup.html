@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IQA filters: repeated property warning (mock-up)</title>
+<style>
+  :root {
+    --text: #545962;
+    --heading: #172b4d;
+    --line: #dddddd;
+    --field-line: #cccccc;
+    --row-alt: #fafafa;
+    --head: #f5f5f5;
+    --navy: #0b0b3b;
+    --orange: #f7933d;
+    --warn-bg: #fff6e3;
+    --warn-line: #e5a030;
+    --warn-text: #7a4a00;
+    --note-bg: #f1f4f9;
+    --note-line: #b9c4d6;
+    --note-text: #3d4b63;
+    --keyword: #7141ac;
+    --identifier: #005a9c;
+    --string: #9c3425;
+    --ease: cubic-bezier(.2, 0, 0, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 20px 16px 48px;
+    background: #eef0f3;
+    color: var(--text);
+    font-family: "Open Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  /* ---- Mock-up controls (not part of the proposal) ---- */
+
+  .mock-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: center;
+    max-width: 1180px;
+    margin: 0 auto 14px;
+    padding: 12px 14px;
+    border: 1px dashed #9aa3b2;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 13px;
+  }
+
+  .mock-bar strong {
+    color: var(--heading);
+  }
+
+  .mock-seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .mock-seg button {
+    min-height: 30px;
+    padding: 4px 10px;
+    border: 1px solid var(--field-line);
+    border-radius: 5px;
+    background: #ffffff;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease);
+  }
+
+  .mock-seg button[aria-pressed="true"] {
+    border-color: var(--navy);
+    background: var(--navy);
+    color: #ffffff;
+  }
+
+  /* ---- The editor, as it looks today ---- */
+
+  .editor {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 16px;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .tabs li {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 9px 18px;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+    background: #f7f7f7;
+    color: var(--heading);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .tabs li.is-active {
+    border-top: 3px solid var(--orange);
+    background: #ffffff;
+  }
+
+  .tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--warn-line);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    transition: opacity 200ms var(--ease), transform 200ms var(--ease);
+  }
+
+  .tab-count[hidden] {
+    display: none;
+  }
+
+  .tab-body {
+    padding: 16px 4px 4px;
+  }
+
+  .intro {
+    margin: 0 0 14px;
+    font-size: 13px;
+  }
+
+  .where-tabs {
+    display: inline-flex;
+    margin: 0 0 -1px 8px;
+  }
+
+  .where-tabs span {
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px 4px 0 0;
+    background: #ffffff;
+  }
+
+  .where-tabs span.is-active {
+    border-color: var(--orange);
+    background: var(--orange);
+    color: #ffffff;
+  }
+
+  .group-box {
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    overflow-x: auto;
+  }
+
+  .group-title {
+    margin: 4px 6px 10px;
+    font-size: 13px;
+  }
+
+  .group-title b {
+    margin-right: 6px;
+    color: var(--heading);
+    font-size: 15px;
+  }
+
+  table.filters {
+    width: 100%;
+    min-width: 660px;
+    border-collapse: collapse;
+  }
+
+  table.filters th {
+    padding: 8px;
+    background: var(--head);
+    color: var(--heading);
+    font-weight: 600;
+    text-align: left;
+  }
+
+  table.filters td {
+    padding: 8px;
+    vertical-align: middle;
+    transition: background-color 200ms var(--ease);
+  }
+
+  table.filters tbody tr:nth-child(even) td {
+    background: var(--row-alt);
+  }
+
+  td.property {
+    white-space: nowrap;
+  }
+
+  select,
+  input[type="text"] {
+    width: 100%;
+    height: 33px;
+    padding: 5px 10px;
+    border: 1px solid var(--field-line);
+    border-radius: 5px;
+    background: #ffffff;
+    color: var(--text);
+    font: inherit;
+  }
+
+  .value {
+    display: grid;
+    gap: 4px;
+  }
+
+  .row-actions {
+    color: #8a909a;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .row-actions i {
+    margin-right: 8px;
+    color: #1d6fa5;
+    font-family: Georgia, serif;
+    font-weight: 700;
+  }
+
+  .add-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .add-row input {
+    max-width: 220px;
+  }
+
+  .navy-button {
+    min-height: 33px;
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 5px;
+    background: var(--navy);
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ---- The proposal ---- */
+
+  /* Lane: a narrow first column. A line runs from the first to the last row
+     that share a property, with a dot on each of those rows. */
+  th.lane-head,
+  td.lane {
+    width: 0;
+    padding: 0;
+  }
+
+  .proposed th.lane-head,
+  .proposed td.lane {
+    width: 18px;
+  }
+
+  td.lane {
+    position: relative;
+  }
+
+  .lane-line {
+    position: absolute;
+    left: 8px;
+    width: 2px;
+    background: var(--lane-colour);
+    opacity: 0;
+    transition: opacity 200ms var(--ease), width 200ms var(--ease), left 200ms var(--ease);
+  }
+
+  .proposed .lane-line {
+    opacity: 1;
+  }
+
+  .lane-line.is-through {
+    top: 0;
+    bottom: 0;
+  }
+
+  .lane-line.is-first {
+    top: 50%;
+    bottom: 0;
+  }
+
+  .lane-line.is-last {
+    top: 0;
+    bottom: 50%;
+  }
+
+  .lane-dot {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--lane-colour);
+    border-radius: 50%;
+    background: #ffffff;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 200ms var(--ease), background-color 200ms var(--ease);
+  }
+
+  .proposed .lane-dot {
+    opacity: 1;
+  }
+
+  tr.tier-warn {
+    --lane-colour: var(--warn-line);
+  }
+
+  tr.tier-note {
+    --lane-colour: var(--note-line);
+  }
+
+  /* Rows in between carry the line in the colour of the set passing through. */
+  tr[data-through="warn"] {
+    --lane-colour: var(--warn-line);
+  }
+
+  tr[data-through="note"] {
+    --lane-colour: var(--note-line);
+  }
+
+  .proposed table.filters tbody tr.tier-warn td {
+    background: var(--warn-bg);
+  }
+
+  .proposed table.filters tbody tr.tier-note td {
+    background: var(--note-bg);
+  }
+
+  .or-chip {
+    display: none;
+    margin-left: 8px;
+    padding: 1px 7px;
+    border: 1px solid var(--lane-colour);
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--keyword);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    vertical-align: 1px;
+  }
+
+  .proposed tr.is-linked .or-chip {
+    display: inline-block;
+  }
+
+  /* Pointing at, or tabbing into, one linked row marks the rows it pairs with. */
+  .proposed tr.is-partner .lane-dot {
+    background: var(--lane-colour);
+  }
+
+  .proposed tr.is-partner .lane-line {
+    left: 7px;
+    width: 4px;
+  }
+
+  .proposed tr.is-partner td.property span:first-child {
+    color: var(--heading);
+    font-weight: 700;
+  }
+
+  .advice {
+    display: none;
+    margin-top: 12px;
+  }
+
+  .proposed .advice {
+    display: grid;
+    gap: 10px;
+  }
+
+  .advice-card {
+    padding: 12px 14px;
+    border: 1px solid var(--note-line);
+    border-left-width: 4px;
+    border-radius: 5px;
+    background: var(--note-bg);
+    color: var(--note-text);
+    animation: advice-in 220ms var(--ease);
+  }
+
+  .advice-card.is-warn {
+    border-color: var(--warn-line);
+    background: var(--warn-bg);
+    color: var(--warn-text);
+  }
+
+  @keyframes advice-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .advice-card h3 {
+    margin: 0 0 6px;
+    color: inherit;
+    font-size: 15px;
+  }
+
+  .advice-card p {
+    margin: 6px 0 0;
+    font-size: 13px;
+  }
+
+  .advice-card ul {
+    margin: 6px 0 0;
+    padding-left: 20px;
+    font-size: 13px;
+  }
+
+  .logic {
+    margin: 8px 0 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 4px;
+    background: #ffffff;
+    color: var(--heading);
+    font-family: Consolas, "Cascadia Mono", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  .logic .kw {
+    color: var(--keyword);
+    font-weight: 700;
+  }
+
+  .logic .id {
+    color: var(--identifier);
+  }
+
+  .logic .str {
+    color: var(--string);
+  }
+
+  .logic .bracket {
+    color: #8a909a;
+    font-weight: 700;
+  }
+
+  .logic .loose {
+    padding: 1px 3px;
+    border-radius: 3px;
+    background: #ffe2a8;
+  }
+
+  .logic-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+
+  .clean {
+    display: none;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .notes {
+    max-width: 1180px;
+    margin: 18px auto 0;
+    font-size: 13px;
+  }
+
+  .notes h2 {
+    margin: 0 0 6px;
+    color: var(--heading);
+    font-size: 15px;
+  }
+
+  .notes li {
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 950px) {
+    .mock-seg button {
+      min-height: 44px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="mock-bar" aria-label="Mock-up controls">
+  <span><strong>Mock-up controls</strong> (not part of the proposal)</span>
+  <span class="mock-seg" id="viewSwitch">
+    <button type="button" data-view="stock" aria-pressed="false">Stock</button>
+    <button type="button" data-view="proposed" aria-pressed="true">Proposed</button>
+  </span>
+  <span class="mock-seg" id="scenarioSwitch"></span>
+</div>
+
+<div class="editor proposed" id="editor">
+  <ul class="tabs">
+    <li>Summary</li>
+    <li>Sources</li>
+    <li class="is-active">Filters <span class="tab-count" id="tabCount" title="Groups where a repeated property changes the result"></span></li>
+    <li>Display</li>
+    <li>Sorting</li>
+    <li>Template</li>
+  </ul>
+
+  <div class="tab-body">
+    <p class="intro">Filters allow you to narrow the number of search results down by adding conditions and constraints on the type of data to include in your query.</p>
+
+    <div class="where-tabs"><span class="is-active">Where</span><span>Where Not</span></div>
+
+    <div class="group-box">
+      <p class="group-title"><b>Group 1</b> Start with records that match this group.</p>
+
+      <table class="filters">
+        <thead>
+          <tr>
+            <th class="lane-head"></th>
+            <th>Property</th>
+            <th>Comparison</th>
+            <th>Value</th>
+            <th>In Search?</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <div class="add-row">
+        <input type="text" placeholder="Add a filter" aria-label="Add a filter">
+        <button type="button" class="navy-button">Reorder filters</button>
+      </div>
+
+      <div class="advice" id="advice" role="status"></div>
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+  <h2>What to try</h2>
+  <ul>
+    <li>Change a <b>Comparison</b>: the tier, the wording and the logic line follow.</li>
+    <li>Point at or tab into a marked row: the rows it is joined to stand out, even when other rows sit between them.</li>
+    <li>Switch between the scenarios, and between Stock and Proposed.</li>
+  </ul>
+  <h2>Assumed from the SQL iMIS showed for Case Display (to confirm on more queries)</h2>
+  <ul>
+    <li>Rows on the same property in one group are joined with OR, wherever they sit in the list.</li>
+    <li>iMIS writes no brackets round the OR, so the last OR row takes the group's other filters with it and the earlier OR rows skip them.</li>
+    <li>The SQL lists the filters by property name, not in screen order.</li>
+  </ul>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const COMPARISONS = [
+    ['Equal', 'Equal', '='],
+    ['NotEqual', 'Not Equal', '≠'],
+    ['Less', 'Less', '<'],
+    ['LessEqual', 'Less Equal', '≤'],
+    ['Greater', 'Greater', '>'],
+    ['GreaterEqual', 'Greater Equal', '≥'],
+    ['StartsWith', 'Starts With', 'starts with'],
+    ['EndsWith', 'Ends With', 'ends with'],
+    ['Contain', 'Contains', 'contains'],
+    ['NotContain', 'Not Contain', 'does not contain']
+  ];
+
+  const SYMBOL = Object.fromEntries(COMPARISONS.map(([value, , symbol]) => [value, symbol]));
+  const NEGATIVE = new Set(['NotEqual', 'NotContain']);
+  const LOWER_BOUND = new Set(['Greater', 'GreaterEqual']);
+  const UPPER_BOUND = new Set(['Less', 'LessEqual']);
+
+  const SCENARIOS = [
+    {
+      label: 'Your example',
+      rows: [
+        { property: 'Status', comparison: 'Equal', kind: 'Constant', value: 'Complete' },
+        { property: 'CaseID', comparison: 'Equal', kind: 'Constant', value: '123' },
+        { property: 'Date', comparison: 'GreaterEqual', kind: 'Dynamic', value: 'Current Date' },
+        { property: 'CaseID', comparison: 'NotContain', kind: 'Constant', value: 'SEC' }
+      ]
+    },
+    {
+      label: 'Either status, plus a date',
+      rows: [
+        { property: 'Status', comparison: 'Equal', kind: 'Constant', value: 'Open' },
+        { property: 'Status', comparison: 'Equal', kind: 'Constant', value: 'Pending' },
+        { property: 'Date', comparison: 'GreaterEqual', kind: 'Dynamic', value: 'Current Date' }
+      ]
+    },
+    {
+      label: 'Date range',
+      rows: [
+        { property: 'Date', comparison: 'GreaterEqual', kind: 'Constant', value: '1/07/2026' },
+        { property: 'Date', comparison: 'LessEqual', kind: 'Constant', value: '30/06/2027' }
+      ]
+    },
+    {
+      label: 'Either status, alone',
+      rows: [
+        { property: 'Status', comparison: 'Equal', kind: 'Constant', value: 'Open' },
+        { property: 'Status', comparison: 'Equal', kind: 'Constant', value: 'Pending' }
+      ]
+    },
+    {
+      label: 'No repeats',
+      rows: [
+        { property: 'Status', comparison: 'Equal', kind: 'Constant', value: 'Complete' },
+        { property: 'Date', comparison: 'GreaterEqual', kind: 'Dynamic', value: 'Current Date' }
+      ]
+    }
+  ];
+
+  const editor = document.getElementById('editor');
+  const body = document.getElementById('rows');
+  const advice = document.getElementById('advice');
+  const tabCount = document.getElementById('tabCount');
+  let rows = [];
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  /* ---- Analysis: the part the enhancer would run on the real rows ---- */
+
+  // Sets of rows that share a property. Each gets a tier:
+  //   warn  the OR changes which records come back in a way nobody would guess
+  //   note  the OR is the whole group and every comparison is a positive one
+  function analyse(list) {
+    const byProperty = new Map();
+    list.forEach((row, index) => {
+      if (!byProperty.has(row.property)) byProperty.set(row.property, []);
+      byProperty.get(row.property).push(index);
+    });
+
+    const sets = [];
+    byProperty.forEach((indexes, property) => {
+      if (indexes.length < 2) return;
+      const used = indexes.map((index) => list[index].comparison);
+      const negatives = used.filter((value) => NEGATIVE.has(value)).length;
+      const hasOthers = indexes.length < list.length;
+      const reasons = [];
+
+      if (negatives >= 2) reasons.push('negatives');
+      else if (negatives === 1) reasons.push('mixed');
+      if (used.some((value) => LOWER_BOUND.has(value)) && used.some((value) => UPPER_BOUND.has(value))) reasons.push('range');
+      if (hasOthers) reasons.push('skips');
+
+      sets.push({ property, indexes, reasons, tier: reasons.length ? 'warn' : 'note' });
+    });
+    return sets;
+  }
+
+  // The group as iMIS writes it: filters listed by property name, OR between
+  // rows on the same property, AND everywhere else, no brackets. AND binds
+  // first, so the list splits at each OR into runs of AND.
+  function evaluationOrder(list) {
+    const ordered = list
+      .map((row, index) => ({ row, index }))
+      .sort((a, b) => a.row.property.localeCompare(b.row.property) || a.index - b.index);
+
+    const runs = [[]];
+    ordered.forEach((item, position) => {
+      const previous = ordered[position - 1];
+      if (previous && previous.row.property === item.row.property) runs.push([]);
+      runs[runs.length - 1].push(item);
+    });
+    return runs;
+  }
+
+  function termNodes(row) {
+    const quoted = row.kind === 'Constant' ? '"' + row.value + '"' : row.value;
+    return [
+      element('span', 'id', row.property),
+      document.createTextNode(' ' + SYMBOL[row.comparison] + ' '),
+      element('span', row.kind === 'Constant' ? 'str' : '', quoted)
+    ];
+  }
+
+  function termText(row) {
+    return row.property + ' ' + SYMBOL[row.comparison] + ' ' + row.value;
+  }
+
+  function logicLine(runs) {
+    const line = element('div', 'logic');
+    const several = runs.length > 1;
+
+    runs.forEach((run, runIndex) => {
+      if (runIndex) line.append(' ', element('span', 'kw', 'or'), ' ');
+      const alone = several && run.length === 1;
+      const holder = alone ? element('span', 'loose') : line;
+      if (alone) holder.title = 'Matches on its own: the group\'s other filters do not apply to it';
+
+      if (several && run.length > 1) holder.append(element('span', 'bracket', '( '));
+      run.forEach((item, itemIndex) => {
+        if (itemIndex) holder.append(' ', element('span', 'kw', 'and'), ' ');
+        holder.append(...termNodes(item.row));
+      });
+      if (several && run.length > 1) holder.append(element('span', 'bracket', ' )'));
+      if (alone) line.append(holder);
+    });
+    return line;
+  }
+
+  function quoteList(items) {
+    if (items.length < 2) return items.join('');
+    return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+  }
+
+  function adviceCard(set, list, runs) {
+    const card = element('div', 'advice-card' + (set.tier === 'warn' ? ' is-warn' : ''));
+    const count = set.indexes.length === 2 ? 'twice' : set.indexes.length + ' times';
+    const title = set.tier === 'warn'
+      ? set.property + ' is filtered ' + count + ' in this group, so iMIS joins those rows with OR, not AND'
+      : set.property + ' is filtered ' + count + ' in this group: a record matching any one of those rows is included';
+    card.append(element('h3', '', title));
+
+    const points = element('ul');
+    const others = list.filter((row) => row.property !== set.property).map((row) => row.property);
+
+    if (set.reasons.includes('negatives')) {
+      points.append(element('li', '', 'Two "not" comparisons joined with OR are true for almost every record, so these rows filter out nothing.'));
+    }
+    if (set.reasons.includes('mixed')) {
+      points.append(element('li', '', 'A record only has to pass one of the ' + set.property + ' rows. It does not have to pass both.'));
+    }
+    if (set.reasons.includes('range')) {
+      points.append(element('li', '', 'A "from" and a "to" joined with OR match every record that has a ' + set.property + ', so this is not a range.'));
+    }
+    if (set.reasons.includes('skips')) {
+      const loose = runs
+        .filter((run) => run.length === 1 && run[0].row.property === set.property)
+        .map((run) => '"' + termText(run[0].row) + '"');
+      if (loose.length) {
+        points.append(element('li', '', 'Records matching ' + quoteList(loose) + ' are returned whatever the ' + quoteList(others) + ' ' + (others.length > 1 ? 'filters say' : 'filter says') + '. There are no brackets round the OR.'));
+      }
+    }
+    if (points.children.length) card.append(points);
+
+    card.append(element('span', 'logic-label', 'How this group runs'), logicLine(runs));
+
+    if (set.tier === 'warn') {
+      const fix = set.reasons.includes('range')
+        ? 'To filter a range, use one row with the Between comparison, or put the "to" row in a group of its own with Add Condition.'
+        : set.reasons.length === 1 && set.reasons[0] === 'skips'
+          ? 'To keep the either/or and still apply the other filters to every record, move the ' + set.property + ' rows into a group of their own with Add Condition.'
+          : 'To require every row, move all but one of the ' + set.property + ' rows into a group of their own with Add Condition.';
+      card.append(element('p', '', fix));
+    }
+    return card;
+  }
+
+  /* ---- Drawing ---- */
+
+  function comparisonSelect(row) {
+    const select = element('select');
+    select.setAttribute('aria-label', 'Comparison field');
+    COMPARISONS.forEach(([value, label]) => {
+      const option = element('option', '', label);
+      option.value = value;
+      option.selected = value === row.comparison;
+      select.append(option);
+    });
+    select.addEventListener('change', () => {
+      row.comparison = select.value;
+      mark();
+    });
+    return select;
+  }
+
+  function draw() {
+    body.replaceChildren();
+    rows.forEach((row) => {
+      const line = element('tr');
+
+      const lane = element('td', 'lane');
+      lane.append(element('span', 'lane-line'), element('span', 'lane-dot'));
+
+      const property = element('td', 'property');
+      property.append(element('span', '', row.property), element('span', 'or-chip', 'or'));
+
+      const comparison = element('td');
+      comparison.append(comparisonSelect(row));
+
+      const value = element('td');
+      const holder = element('div', 'value');
+      const kind = element('select');
+      kind.append(element('option', '', row.kind));
+      const input = element('input');
+      input.type = 'text';
+      input.value = row.value;
+      input.addEventListener('input', () => {
+        row.value = input.value;
+        mark();
+      });
+      holder.append(kind, input);
+      value.append(holder);
+
+      const search = element('td');
+      const searchSelect = element('select');
+      searchSelect.append(element('option', '', 'No'));
+      search.append(searchSelect);
+
+      const actions = element('td', 'row-actions');
+      actions.append(element('i', '', 'fx'), '✖  ▲ ▼');
+
+      line.append(lane, property, comparison, value, search, actions);
+      line.addEventListener('pointerenter', () => partners(line, true));
+      line.addEventListener('pointerleave', () => partners(line, false));
+      line.addEventListener('focusin', () => partners(line, true));
+      line.addEventListener('focusout', () => partners(line, false));
+      body.append(line);
+    });
+    mark();
+  }
+
+  // Classes only: the rows stay in place, so focus and typed values survive.
+  function mark() {
+    const sets = analyse(rows);
+    const runs = evaluationOrder(rows);
+    const lines = [...body.rows];
+
+    lines.forEach((line) => {
+      line.className = '';
+      line.removeAttribute('data-set');
+      line.removeAttribute('data-through');
+      line.querySelector('.lane-line').className = 'lane-line';
+      line.querySelector('.lane-dot').hidden = true;
+      line.querySelector('.lane-line').hidden = true;
+      line.querySelector('.or-chip').title = '';
+    });
+
+    sets.forEach((set, setIndex) => {
+      const first = set.indexes[0];
+      const last = set.indexes[set.indexes.length - 1];
+      for (let index = first; index <= last; index += 1) {
+        const line = lines[index];
+        const laneLine = line.querySelector('.lane-line');
+        const linked = set.indexes.includes(index);
+        laneLine.hidden = false;
+        laneLine.classList.add(index === first ? 'is-first' : index === last ? 'is-last' : 'is-through');
+
+        if (linked) {
+          line.classList.add('is-linked', 'tier-' + set.tier);
+          line.dataset.set = String(setIndex);
+          line.querySelector('.lane-dot').hidden = false;
+          line.querySelector('.or-chip').title = 'Joined with OR to the other ' + set.property + ' row' + (set.indexes.length > 2 ? 's' : '') + ' in this group';
+        } else if (!line.classList.contains('is-linked')) {
+          line.dataset.through = set.tier;
+        }
+      }
+    });
+
+    advice.replaceChildren(...sets.map((set) => adviceCard(set, rows, runs)));
+
+    const warnings = sets.filter((set) => set.tier === 'warn').length;
+    tabCount.textContent = String(warnings);
+    tabCount.hidden = !warnings || !editor.classList.contains('proposed');
+  }
+
+  function partners(line, on) {
+    const set = line.dataset.set;
+    [...body.rows].forEach((other) => {
+      other.classList.toggle('is-partner', on && set !== undefined && other.dataset.set === set);
+    });
+  }
+
+  /* ---- Mock-up controls ---- */
+
+  const scenarioSwitch = document.getElementById('scenarioSwitch');
+  SCENARIOS.forEach((scenario, index) => {
+    const button = element('button', '', scenario.label);
+    button.type = 'button';
+    button.setAttribute('aria-pressed', String(index === 0));
+    button.addEventListener('click', () => {
+      [...scenarioSwitch.children].forEach((other) => other.setAttribute('aria-pressed', String(other === button)));
+      rows = scenario.rows.map((row) => ({ ...row }));
+      draw();
+    });
+    scenarioSwitch.append(button);
+  });
+
+  document.getElementById('viewSwitch').addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    [...button.parentNode.children].forEach((other) => other.setAttribute('aria-pressed', String(other === button)));
+    editor.classList.toggle('proposed', button.dataset.view === 'proposed');
+    mark();
+  });
+
+  rows = SCENARIOS[0].rows.map((row) => ({ ...row }));
+  draw();
+})();
+</script>
+</body>
+</html>

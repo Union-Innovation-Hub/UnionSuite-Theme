@@ -120,7 +120,7 @@ Recents), `list-search-and-paging/`, `cco-inline-loading/`, `task-rows/`.
 | `activity-cards/`, `dues-adjustments/`, `membership-stats-filters/`, `bulletin-markdown/`, `login-screen/`, `workplace-reassign/` | WIP mockups, not in the theme |
 | `cco-inline-loading/` | Live trial, tests and research behind the approved design |
 | `banner-tabs/` | Deferred |
-| `email-composer/`, `iqa-where-used/`, `theme-consistency/` | Research or proposals |
+| `email-composer/`, `iqa-where-used/`, `iqa-repeated-property-or/`, `theme-consistency/` | Research or proposals |
 | `section-presets/` | Active; two presets in the theme |
 | `popup-loader/`, `task-form/`, `tasks-empty-state/`, `user-credentials/`, `bo-expression-builder/` | Implemented in the theme; folder kept as the design record |
 
