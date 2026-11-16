@@ -67,6 +67,13 @@
   //                                      case opened today with nothing recorded
   //   ?age=older                         opened in July, no member contact for 21 days
   //   ?lead=none                         no lead staff member
+  //   ?you=mary                          the signed-in user is Mary O'Conner, the lead
+  //                                      (default: someone not on the case), so Remove
+  //                                      on her card shows the lose-access alert (C43)
+  //   ?access=individual                 Individual access (default Team): Remove
+  //                                      warns before the last staff member (C43)
+  // The Other tab button (C43) changes the case as another tab would,
+  // without redrawing this one, so Remove's fresh check can be seen.
   //   ?case=closed                       closed, with a resolution
   //   ?jobs=former | future | none | single
   //                                      Priya's four jobs (two current, one
@@ -76,7 +83,9 @@
   //                                      job (default: the night shift, a
   //                                      current job)
   // A toolbar press rebuilds the sample data and re-renders in place.
-  let standing, size, larger, fresh, older, noLead, closed, jobs;
+  let standing, size, larger, fresh, older, noLead, access, closed, jobs;
+  // The page's signed-in user before ?you changes it.
+  const signedIn = JSON.parse(document.getElementById('__ClientContext')?.value || '{}');
   // The primary party's iMIS ID; Make primary party changes it.
   let primaryId = '20544';
   // The case's PrimaryWorkplaceID (C42): a job's workplace ID, or blank for
@@ -90,6 +99,12 @@
   // with a follow-up is also a task (owner, 9 October 2026), so it adds a
   // task row too, marked FromNote so the activity lists it once, as the note.
   const added = {notes: [], tasks: [], meetings: [], staff: [], attachments: [], parties: []};
+  // Staff removed from the case (C43), kept across rebuilds.
+  const removedStaff = new Set();
+  // What another tab has done to the case (C43): none, individual (its
+  // access set to Individual) or removed (Dani taken off). This page's
+  // lists are not redrawn; only Remove's check and saves see it.
+  let elsewhere = 'none';
   // The members at the case's workplace, for Add party's list IQA
   // (C40); Josh is already on the larger case.
   const contacts = [
@@ -184,6 +199,10 @@
     fresh = size === 'new';
     older = params.get('age') === 'older';
     noLead = params.get('lead') === 'none';
+    access = params.get('access') === 'individual' ? 'Individual' : 'Team';
+    // Who is signed in (C43): Mary (10183), or the page's own user.
+    const context = document.getElementById('__ClientContext');
+    if (context) context.value = JSON.stringify({...signedIn, ...(params.get('you') === 'mary' ? {loggedInPartyId: '10183'} : {})});
     closed = params.get('case') === 'closed';
     jobs = ['former', 'future', 'none', 'single'].includes(params.get('jobs')) ? params.get('jobs') : 'chosen';
     // The case's PrimaryWorkplaceID: a job, or blank (not about a
@@ -360,7 +379,8 @@
     // task joins the end of the outstanding ones (C40);
     // completed tasks stay after them.
     // Staff added inline (C38) join the case team or the delegates.
-    rows.staff = [...rows.staff, ...added.staff];
+    // Removed staff (C43) leave.
+    rows.staff = [...rows.staff, ...added.staff].filter(row => !removedStaff.has(row.Ordinal));
     // Attachments uploaded inline (C39), newest first.
     rows.attachments = [...added.attachments, ...rows.attachments];
     // Meetings saved inline (C37) join the list in date order.
@@ -539,7 +559,8 @@
         empty: '<p>No changes recorded yet.</p>'},
       // The parties template is the guide's (US-CASE-PARTIES is in the theme).
       {set: 'cp-parties', template: 'Case-Parties-Query-Template.html', src: '../../../Theme/UnionSuite-Guides/usage/templates/List-Templates/Case-Parties-Query-Template.html', rows: rows.parties},
-      {set: 'cp-staff', template: 'Case-Staff-Query-Template.html', rows: rows.staff},
+      // No results, as the iPart's native setting (after the last Remove, C43).
+      {set: 'cp-staff', template: 'Case-Staff-Query-Template.html', rows: rows.staff, empty: '<p>No staff assigned.</p>'},
       {set: 'cp-tasks', template: 'Case-Tasks-Query-Template.html', rows: rows.tasks.map(taskColumns), empty: emptyState('ti-checklist', 'No tasks yet', 'Add the first step for this case.', 'us-action-cases-add-task')},
       {set: 'cp-meetings-detail', template: 'Case-Meetings-Detail-Query-Template.html', rows: rows.meetings, empty: emptyState('ti-calendar-plus', 'No meetings', 'Schedule one to meet the member or the employer.', 'us-action-cases-add-meeting')},
       {set: 'cp-meetings', template: 'Case-Meetings-Query-Template.html', rows: rows.meetings, empty: emptyState('ti-calendar-plus', 'No meetings', 'Schedule one to meet the member or the employer.', 'us-action-cases-add-meeting')},
@@ -646,6 +667,12 @@
       const name = target.searchParams.get('QueryName') || '';
       if (name.endsWith('/CloudToolzUrl')) return reply(items([{Description: cloudToolz + '/'}]));
       if (name.endsWith('/API - Zen Attachment Tags')) return reply(items(tags));
+      // Remove staff's check (C43): the case's staff and access as they are
+      // now, including what another tab has changed.
+      if (name.endsWith('/API - Manage Case - Staff Removal Check')) {
+        const caseAccess = elsewhere === 'individual' ? 'Individual' : access;
+        return reply(items(rows.staff.map(row => ({Ordinal: row.Ordinal, IsLead: row.ContactIsLead, CaseAccess: caseAccess}))), 200, 450);
+      }
       // The Overview attachments footer's count (US-QUERY-VALUE).
       if (name.endsWith('/API - Manage Case - Attachment Count')) return reply(items([{AttachmentCount: String(rows.attachments.length)}]));
       // The banner's second row: replaces the current page's Details block.
@@ -737,7 +764,7 @@
         'Case-Priority': 'High',
         'Tone-Priority': 'danger',
         'Case-Source': 'Member phone call',
-        'Case-Access level': 'Case team only',
+        'Case-Access level': access === 'Individual' ? 'Staff on the case only' : 'Case team only',
         'Workplace-Employer': caseJob()?.['Work-Employer'] || '',
         'Workplace-Site': caseJob()?.['Work-Workplace'] || '',
         'Workplace-Workbench': workbenches[caseWorkplaceId] || '',
@@ -859,6 +886,15 @@
         return reply({Ordinal: ordinal}, 200, 500);
       }
       if (target.pathname === '/cases/quick-update/set-lead-staff') setLeadStaff(JSON.parse(init.body || '{}').StaffOrdinal);
+      // Remove from case (C43): the row goes, and the lead with it.
+      if (target.pathname === '/cases/quick-update/remove-staff') {
+        const ordinal = String(JSON.parse(init.body || '{}').StaffOrdinal || '');
+        if (!rows.staff.some(row => row.Ordinal === ordinal)) return reply('That person is not on the case.', 400, 300);
+        removedStaff.add(ordinal);
+        // In place: the staff list holds this array.
+        rows.staff.splice(rows.staff.findIndex(row => row.Ordinal === ordinal), 1);
+        return reply({}, 200, 600);
+      }
       // The quick status change (C23): a known open status, as the flow
       // checks it; a closed one is Resolve case's.
       if (target.pathname === '/cases/quick-update/set-status') {
@@ -952,6 +988,8 @@
   const toggles = [
     ['cp-variant-age', 'age', 'older', 'Age: older', 'Age: recent'],
     ['cp-variant-lead', 'lead', 'none', 'Lead staff: none', 'Lead staff: assigned'],
+    ['cp-variant-access', 'access', 'individual', 'Access: individual', 'Access: team'],
+    ['cp-variant-you', 'you', 'mary', "You: Mary O'Conner", 'You: not on the case'],
     ['cp-variant-closed', 'case', 'closed', 'Status: closed', 'Status: open']
   ];
   const standingOrder = ['unfinancial', 'financial', 'new', 'former'];
@@ -1033,6 +1071,23 @@
     if (event.target.closest('#cp-color-scheme')) {
       window.UnionSuiteAppearance?.toggle();
       showColorScheme();
+      return;
+    }
+    // Another tab changes the case (C43): none → access set to Individual
+    // → Dani removed → none (which redraws the page as it really is).
+    const other = event.target.closest('#cp-elsewhere');
+    if (other) {
+      elsewhere = {none: 'individual', individual: 'removed', removed: 'none'}[elsewhere];
+      if (elsewhere === 'removed') {
+        const index = rows.staff.findIndex(row => row.Ordinal === '702');
+        if (index >= 0) { removedStaff.add('702'); rows.staff.splice(index, 1); }
+      }
+      other.textContent = {none: 'Other tab: no change', individual: 'Other tab: access Individual', removed: 'Other tab: Dani removed'}[elsewhere];
+      other.setAttribute('aria-pressed', String(elsewhere !== 'none'));
+      if (elsewhere === 'none') {
+        removedStaff.delete('702');
+        rerender().catch(error => console.error(error));
+      }
       return;
     }
     const failing = event.target.closest('#cp-save-failing');

@@ -39,7 +39,13 @@
      ContactGroup            Case team | Delegates; the group heading only (the type already says it on the card)
      ContactGroupOrder       1 for Case team, 2 for Delegates (sort only)
      ContactGroupTone        info for Case team, success for Delegates
-     ContactEmail, ContactPhone  as text; the icon copies; blank shows a dash -->
+     ContactEmail, ContactPhone  as text; the icon copies; blank shows a dash
+
+     Remove from case (C43, owner, 16 November 2026): the theme's trash icon
+     (cases.remove-staff) checks the case as it is now (its own IQA, API -
+     Manage Case - Staff Removal Check, not this list), then asks on the
+     card, warning when it is the lead or the last staff member on an
+     Individual case; both are allowed. -->
 <article class="us-contact-tile us-contact-tile--card" data-us-contact-id="{#query.ContactId}" data-us-contact-ordinal="{#query.Ordinal}" data-us-contact-name="{#query.ContactName}"
   data-us-contact-lead="{#query.ContactIsLead}" data-us-contact-group="{#query.ContactGroup}" data-us-contact-group-tone="{#query.ContactGroupTone}"
   data-us-contact-role="{#query.ContactRole}" data-us-contact-type="{#query.ContactType}"
@@ -60,5 +66,6 @@
     <span class="us-case-staff__crown" role="img" aria-label="Lead staff member" title="Lead staff member"><i class="ti ti-crown" aria-hidden="true"></i></span>
     <button type="button" class="us-case-staff__make-lead us-action-cases-set-lead-staff" data-ordinal="{#query.Ordinal}">Make lead staff</button>
     <button type="button" class="us-contact-tile__edit us-action-cases-edit-staff" data-ordinal="{#query.Ordinal}">Edit staff</button>
+    <button type="button" class="us-action-cases-remove-staff" data-ordinal="{#query.Ordinal}">Remove from case</button>
   </div>
 </article>

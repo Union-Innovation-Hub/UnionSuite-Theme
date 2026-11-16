@@ -230,3 +230,218 @@
 
 /* C42 Case workplace quick edit: in the theme (US-CASE-WORKPLACE,
    24 October 2026). */
+
+/* C43 Remove staff (owner, 16 November 2026): the theme's trash icon on a
+   staff card (cases.remove-staff, remove-staff.candidate.js) asks on the
+   card itself. Target: US-CONTACT-TILES, beside the us-case-staff rules. */
+.us-case-staff .us-action-cases-remove-staff {
+  color: var(--text-faint);
+  transition: color 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+.us-case-staff .us-action-cases-remove-staff:is(:hover, :focus-visible) {
+  color: var(--danger);
+}
+
+/* While the check runs, the icon shows the theme's busy spinner. Once the
+   card asks, its icon stays an icon, in the danger colour: the action
+   waits on the answer (busy), but nothing is saving yet. */
+.us-case-staff [data-us-staff-removing] .us-command.us-icon-button[data-us-command-state="busy"] > :is(.ti, svg) {
+  display: inline-block;
+  color: var(--danger);
+}
+
+.us-case-staff [data-us-staff-removing] .us-command.us-icon-button[data-us-command-state="busy"]::before {
+  content: none;
+}
+
+/* The card being asked about: its outline takes a hint of danger (the
+   tile's own border, as on hover). Not a coloured side bar: in this theme
+   a side bar means selected or a status (impeccable critique, 16 November
+   2026). */
+.us-case-staff .us-contact-tile[data-us-staff-removing] {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+/* The card's other controls wait while it asks: Make lead or Edit on the
+   person being removed would race the removal. The script sets inert. */
+.us-case-staff [data-us-staff-removing] .us-contact-tile__actions > [inert] {
+  opacity: .4;
+}
+
+/* The question takes the card's full width under the contact details. */
+.us-staff-remove {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--danger) 20%, var(--border));
+  color: var(--text-base);
+  font-size: var(--fs-sm);
+  animation: us-staff-remove-in 160ms cubic-bezier(.2, 0, 0, 1) both;
+}
+
+.us-staff-remove__question {
+  margin: 0;
+  color: var(--text-strong);
+  font-weight: var(--fw-medium);
+}
+
+.us-staff-remove__warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--warning-bg);
+  color: var(--text-strong);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+}
+
+.us-staff-remove__warning .ti {
+  flex: none;
+  margin-top: 1px;
+  color: var(--warning);
+  font-size: 16px;
+}
+
+/* The consequences, as one list in one block. */
+.us-staff-remove__warning ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Removing yourself from an Individual case: the loud one, in danger red,
+   first, with its own heading. */
+.us-staff-remove__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--danger-bg);
+  color: var(--text-strong);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+}
+
+.us-staff-remove__alert .ti {
+  flex: none;
+  margin-top: 1px;
+  color: var(--danger);
+  font-size: 16px;
+}
+
+.us-staff-remove__alert strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--fs-sm);
+}
+
+.us-staff-remove__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* The Undo notice (removal with nothing to warn about): the theme's
+   command notice look, bottom left, one per removal, stacked. The save
+   waits until it runs out; Undo cancels it. */
+.us-undo-notices {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: var(--z-tooltip);
+  display: grid;
+  gap: var(--space-2);
+  max-width: min(480px, calc(100vw - 40px));
+}
+
+.us-undo-notices:empty {
+  display: none;
+}
+
+.us-undo-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 12px 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  color: var(--text-strong);
+  box-shadow: var(--shadow-lg);
+  font: 13px/1.5 var(--font-ui);
+  animation: us-staff-remove-in 180ms cubic-bezier(.2, 0, 0, 1) both;
+}
+
+.us-undo-notice__text {
+  flex: 1 1 auto;
+}
+
+.us-undo-notice__button {
+  flex: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  color: var(--text-link);
+  font: inherit;
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+
+.us-undo-notice__button:is(:hover, :focus-visible) {
+  border-color: currentColor;
+}
+
+/* A save that failed after the wait: the card is back, and this says why. */
+.us-undo-notice--error {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+@keyframes us-staff-remove-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .us-staff-remove,
+  .us-undo-notice {
+    animation: none;
+  }
+}
+
+/* Touch and narrow screens: full-width answers, easy to hit. */
+@media (max-width: 950px) {
+  .us-staff-remove__buttons > * {
+    flex: 1 1 0;
+    min-height: 44px;
+  }
+
+  .us-undo-notices {
+    right: 16px;
+    left: 16px;
+    max-width: none;
+  }
+
+  .us-undo-notice__button {
+    min-height: 44px;
+    padding-inline: 16px;
+  }
+}
