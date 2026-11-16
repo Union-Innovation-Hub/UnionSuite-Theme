@@ -654,13 +654,17 @@
       })
     });
     if (!response.ok) throw new Error('The ZenToken could not be stored (HTTP ' + response.status + ').');
+    tokenStoredAt = Date.now();
   }
 
-  async function cloudToolz(path, init = {}) {
-    const context = clientContext();
-    const url = await baseUrl();
-    await storeZenToken(context);
-    const response = await fetch(url + path, {
+  // A stored ZenToken lasts 60 seconds (owner, 17 November 2026). A
+  // prepared call older than this, less a margin, gets a new one first.
+  const ZEN_TOKEN_MS = 60000;
+  const ZEN_TOKEN_MARGIN_MS = 10000;
+  let tokenStoredAt = 0;
+
+  function send(url, path, init, context) {
+    return fetch(url + path, {
       ...init,
       headers: {
         ...(init.body ? {'Content-Type': 'application/json'} : {}),
@@ -670,8 +674,34 @@
         WebsiteKey: window.gWebsiteKey || ''
       }
     });
+  }
+
+  async function cloudToolz(path, init = {}) {
+    const context = clientContext();
+    const url = await baseUrl();
+    await storeZenToken(context);
+    const response = await send(url, path, init, context);
     if (!response.ok) throw new Error('CloudToolz ' + path.split('?')[0] + ' failed (HTTP ' + response.status + ').');
     return response;
+  }
+
+  // For a call that may have to go as the page closes. cloudToolz() first
+  // waits for the base URL and a new ZenToken, and a page that is unloading
+  // cancels those requests, so the call itself is never sent.
+  // prepareCloudToolz() does both early (when the user confirms);
+  // sendPreparedCloudToolz() then starts the call at once on that token.
+  async function prepareCloudToolz() {
+    await baseUrl();
+    await storeZenToken(clientContext());
+  }
+
+  // Null when nothing is prepared, or when the token is too old for a call
+  // that can still wait for a new one. A keepalive call (the page is
+  // closing) goes on whatever token there is: nothing can follow it.
+  function sendPreparedCloudToolz(path, init = {}) {
+    if (!cloudToolzUrl || !tokenStoredAt) return null;
+    if (!init.keepalive && Date.now() - tokenStoredAt > ZEN_TOKEN_MS - ZEN_TOKEN_MARGIN_MS) return null;
+    return send(cloudToolzUrl, path, init, clientContext());
   }
 
   // Status for a task or milestone note. action: Complete | In Progress | Not Complete.
@@ -713,7 +743,7 @@
     });
   }
 
-  window.UnionSuiteAgreements = Object.freeze({cloudToolz, saveItemStatus, saveTermStatus, deleteTerm, saveMilestoneOrder, noteAccess, version: '1.0'});
+  window.UnionSuiteAgreements = Object.freeze({cloudToolz, prepareCloudToolz, sendPreparedCloudToolz, saveItemStatus, saveTermStatus, deleteTerm, saveMilestoneOrder, noteAccess, version: '1.0'});
 
   // The bin in an open term row: asks first, deletes, then refreshes the
   // terms list it sits in. A failed delete leaves the row and says so.
@@ -1847,8 +1877,11 @@
       on the notice or the user moves focus into it; the theme focusing
       Undo when the notice opens doesn't count), so Undo only cancels the
       wait: nothing was saved and nothing is logged (owner: change-log
-      entries cannot be deleted). Leaving or hiding the page saves anything still waiting at
-      once (keepalive). A failed save brings the card back with an error.
+      entries cannot be deleted). The ZenToken is stored as the card closes,
+      so the save itself goes at once when it is due. Leaving or hiding the
+      page saves anything still waiting at once (keepalive), on that token:
+      waiting for a new one then, the save was never sent. A failed save
+      brings the card back with an error.
 
    2b. Something to warn about, or the check failed: the card asks on
       itself (no dialog), "Remove <name> from this case?" ("Remove
@@ -2084,11 +2117,16 @@
     if (!reducedMotion() && item.animate) item.animate([{opacity: 0}, {opacity: 1}], {duration: 180, easing: EASE});
   }
 
+  // Sent on the ZenToken stored when the removal was confirmed
+  // (removeWithUndo), so it starts at once: as the page closes, a call that
+  // first waited for a new token was never sent. Without a usable prepared
+  // token it goes the usual way, storing a new one first.
   function save(context, {keepalive = false} = {}) {
-    const cloudToolz = window.UnionSuiteAgreements?.cloudToolz;
-    if (!cloudToolz) return Promise.reject(new Error('The CloudToolz call (UnionSuiteAgreements) is unavailable.'));
-    return cloudToolz(REMOVE, {method: 'POST', keepalive,
-      body: JSON.stringify({CaseID: context.caseId, CaseNum: context.caseNum, StaffID: context.staffId, StaffOrdinal: context.ordinal})});
+    const api = window.UnionSuiteAgreements;
+    if (!api?.cloudToolz) return Promise.reject(new Error('The CloudToolz call (UnionSuiteAgreements) is unavailable.'));
+    const init = {method: 'POST', keepalive,
+      body: JSON.stringify({CaseID: context.caseId, CaseNum: context.caseNum, StaffID: context.staffId, StaffOrdinal: context.ordinal})};
+    return api.sendPreparedCloudToolz?.(REMOVE, init) || api.cloudToolz(REMOVE, init);
   }
 
   // After a save: the list as it is now, and the banner's Lead staff fact.
@@ -2102,6 +2140,10 @@
     const item = card.closest('.QueryTemplateSet > section') || card;
     const entry = {env, item, name, notice: null, timer: 0, state: 'waiting'};
     waiting.set(ordinal, entry);
+    // Confirmed: store the ZenToken now, so the save can go at once later,
+    // even as the page closes (save). If this fails, save stores a new one.
+    window.UnionSuiteAgreements?.prepareCloudToolz?.()
+      .catch(error => console.warn('[cases.remove-staff] The ZenToken could not be stored in advance:', error.message));
     await hideItem(item);
 
     const undo = () => {
