@@ -1,0 +1,887 @@
+{
+  "hierarchies": [
+    {
+      "id": 1932,
+      "coreOrgId": null,
+      "parentId": 1857,
+      "isFolder": false,
+      "excludeFromWorkflowInstancesDisplay": false,
+      "definitionId": "b117fce4f5294b2b8650fe74d9c04b15",
+      "displayName": "Cases: Quick Update - Remove Staff",
+      "version": 3,
+      "isPublished": true,
+      "createdAt": "2026-11-16T23:11:15.1044674+00:00",
+      "lastExecutedAt": "2026-11-16T23:15:32.0185698+00:00",
+      "avgRuntime": null,
+      "latestInstanceStatus": "Faulted",
+      "protected": false,
+      "cronSetting": null,
+      "endpointPath": "/cases/quick-update/remove-staff",
+      "inMaintenanceWindow": false,
+      "securedEndpoint": "green",
+      "createdBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "updatedBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "hasChildRecords": false
+    }
+  ],
+  "flowz": [
+    {
+      "definitionId": "b117fce4f5294b2b8650fe74d9c04b15",
+      "versionId": "771b881dfe01409eb69c159bfcc9d14a",
+      "name": "Cases: Quick Update - Remove Staff",
+      "displayName": "Cases: Quick Update - Remove Staff",
+      "description": "",
+      "version": 3,
+      "variables": {
+        "data": {}
+      },
+      "customAttributes": {
+        "data": {}
+      },
+      "isSingleton": false,
+      "persistenceBehavior": "WorkflowBurst",
+      "deleteCompletedInstances": false,
+      "isPublished": true,
+      "isLatest": true,
+      "createdAt": "2026-11-16T23:11:15.1044674Z",
+      "activities": [
+        {
+          "activityId": "568df3ab-c244-4da3-8b15-034b7ae9e26d",
+          "type": "HttpEndpoint",
+          "name": "EndpointData",
+          "displayName": "HTTP Endpoint",
+          "x": 275,
+          "y": 40,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Path",
+              "expressions": {
+                "Literal": "/cases/quick-update/remove-staff"
+              }
+            },
+            {
+              "name": "Methods",
+              "expressions": {
+                "Json": "[\"POST\"]"
+              }
+            },
+            {
+              "name": "ReadContent",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "TargetType",
+              "expressions": {}
+            },
+            {
+              "name": "Schema",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": ""
+              }
+            },
+            {
+              "name": "ValidateCallerUrl",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateImisRequest",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "ImisRequestVerificationRole",
+              "expressions": {}
+            },
+            {
+              "name": "Authorize",
+              "expressions": {}
+            },
+            {
+              "name": "Policy",
+              "expressions": {}
+            },
+            {
+              "name": "AuthorizeWithCustomHeader",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderName",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderValue",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateOutlookPluginToken",
+              "expressions": {}
+            },
+            {
+              "name": "RequiredOutlookPluginUsername",
+              "expressions": {}
+            },
+            {
+              "name": "OutlookPluginMailboxEmail",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Validation",
+          "displayName": "SQL - Validation and Timestamp",
+          "x": 275,
+          "y": 314,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "DECLARE @CaseOrd int = TRY_CAST(@CaseOrdinal AS int);\r\nDECLARE @StaffOrd int = TRY_CAST(@StaffOrdinal AS int);\r\n\r\nDECLARE @EntityCode AS varchar(20) = COALESCE(\r\n  (SELECT TOP 1 OrgCode FROM [Cases].[i4u_UT_Cases] WHERE Ordinal = @CaseOrd),\r\n  (SELECT TOP 1 EntityCode FROM [ZenCrm].[Individuals] WHERE ImisId = @LoggedInUser),\r\n  (SELECT TOP 1 OrgCode FROM UnionTemplate.Entities WHERE IsDefault = 1) -- Final fallback, default org code\r\n);\r\nDECLARE @localTimestamp datetime = COALESCE([UnionTemplate].fn_GetDateTimeWithTimeZone(@EntityCode), GETUTCDATE());\r\n\r\nDECLARE @message varchar(4000) = '';\r\n\r\n-- check if case exists\r\nIF NOT EXISTS (\r\n\tSELECT *\r\n\tFROM Cases.i4u_UT_Cases\r\n\tWHERE CaseID = @CaseID\r\n\t\tAND Ordinal = @CaseOrd\r\n)\r\n\tSET @message += 'Case is not valid. | ';\r\n\r\n-- check if users entity matches case\r\nIF NOT EXISTS (\r\n\tSELECT *\r\n\tFROM Cases.i4u_UT_Cases C\r\n\tINNER JOIN UnionTemplate.EntityAccess A\r\n\t\tON C.OrgCode = A.EntityCode\r\n\tWHERE C.CaseID = @CaseID\r\n\t\tAND C.Ordinal = @CaseOrd\r\n\t\tAND A.StaffimisID = @LoggedInUser\r\n)\r\n\tSET @message += 'Unauthorised entity | ';\r\n\r\n-- The staff row, on this case only, as it is before the change.\r\nDECLARE @Found int = 0;\r\nDECLARE @RowStaffId varchar(20) = NULL;\r\nDECLARE @RowStaffType varchar(150) = NULL;\r\nSELECT TOP 1\r\n\t@Found = 1,\r\n\t@RowStaffId = LTRIM(RTRIM(CAST(StaffId AS varchar(20)))),\r\n\t@RowStaffType = CAST(StaffType AS varchar(150))\r\nFROM Cases.i4u_UT_Cases_Staff\r\nWHERE Ordinal = @StaffOrd\r\n\tAND CaseOrdinal = @CaseOrd;\r\n\r\n-- The case's lead before the change: cleared below when it is this person.\r\nDECLARE @OldLeadId varchar(20) = (\r\n\tSELECT TOP 1 LTRIM(RTRIM(CAST(StaffLeadID AS varchar(20))))\r\n\tFROM Cases.i4u_UT_Cases\r\n\tWHERE Ordinal = @CaseOrd\r\n\t\tAND CaseID = @CaseID\r\n);\r\n\r\n-- The row is there but for someone else: the page is out of date.\r\nIF @Found = 1 AND ISNULL(@RowStaffId, '') <> LTRIM(RTRIM(ISNULL(@StaffID, '')))\r\n\tSET @message += 'Staff member not on this case. | ';\r\n\r\n-- No row: already removed (another tab, or a resend as the page closed).\r\n-- Valid, and the flow answers 200 without writing or logging.\r\nSELECT\r\n\tCASE WHEN @message = '' THEN 1 ELSE 0 END AS [Valid],\r\n\t@message AS [Message],\r\n\tCONVERT(varchar(23), @localTimestamp, 126) AS [Timestamp],\r\n\tCASE WHEN @Found = 0 THEN 1 ELSE 0 END AS [AlreadyRemoved],\r\n\tCASE WHEN @Found = 1 AND NULLIF(@OldLeadId, '') = @RowStaffId THEN 1 ELSE 0 END AS [WasLead],\r\n\t@RowStaffId AS [StaffId],\r\n\t@RowStaffType AS [StaffType],\r\n\t@OldLeadId AS [OldStaffLeadID];\r\n"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseNum\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseID\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseID\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@StaffOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.StaffOrdinal\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@StaffID\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.StaffID\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@LoggedInUser\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Headers.loggedinpartyid\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"@CaseOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.CaseNum) ?? \"\")},{\"Name\":\"@CaseID\",\"Value\":String((activities.EndpointData.Output().Body.CaseID) ?? \"\")},{\"Name\":\"@StaffOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.StaffOrdinal) ?? \"\")},{\"Name\":\"@StaffID\",\"Value\":String((activities.EndpointData.Output().Body.StaffID) ?? \"\")},{\"Name\":\"@LoggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "type": "If",
+          "displayName": "IF: Case Valid",
+          "x": 40,
+          "y": 565,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].Valid == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "a6cc0a55-a6e6-4eae-9443-7ff33d33f249",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - General Error",
+          "x": 510,
+          "y": 565,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "Literal": "An unexpected error occurred. Please contact a system adminstrator."
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "5109db33-b467-4eae-84de-b30a5eee9485",
+          "type": "If",
+          "displayName": "IF: Already Removed",
+          "x": 40,
+          "y": 816,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].AlreadyRemoved == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "55727115-9880-478e-8fc9-b971c2bd205d",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - Case Not Valid",
+          "x": 510,
+          "y": 816,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "JavaScript": "// The validation's messages, without the trailing separator.\r\nString(activities.SQL_Validation.ResultSet()[0].Message || 'Case not valid').replace(/\\s*\\|\\s*$/, '')"
+              },
+              "syntax": "JavaScript"
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "BadRequest"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "35e21b71-488d-436a-85e9-6cc7093b6aab",
+          "type": "DeleteFromSingleInstanceDataSource",
+          "name": "iMIS_Delete",
+          "displayName": "iMIS Delete - i4u_UT_Cases_Staff",
+          "x": 40,
+          "y": 1067,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "NameOfDataSource",
+              "expressions": {
+                "Liquid": "i4u_UT_Cases_Staff"
+              }
+            },
+            {
+              "name": "PartyId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Liquid": "activities.EndpointData.Output().Body.StaffOrdinal",
+                "JavaScript": "activities.EndpointData.Output().Body.StaffOrdinal"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8ef85e5c-3e48-4387-b7f9-97ece8a37beb",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - iMIS delete failure",
+          "x": 510,
+          "y": 1067,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "['The staff member could not be removed in iMIS.',\r\n activities.iMIS_Delete.Exception(),\r\n activities.iMIS_Delete.InnerException()].filter(Boolean).join(' ')"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "33245a89-2729-40eb-8297-979fc0f2aefb",
+          "type": "If",
+          "displayName": "IF: Was Lead",
+          "x": 40,
+          "y": 1318,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].WasLead == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "ec38d4fd-17fb-4074-b509-e2abd7bbb078",
+          "type": "UpdateSingleInstanceDataSource",
+          "name": "iMIS_ClearLead",
+          "displayName": "iMIS Update - i4u_UT_Cases (clear lead)",
+          "x": 275,
+          "y": 1569,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "NameOfDataSource",
+              "expressions": {
+                "Literal": "i4u_UT_Cases"
+              }
+            },
+            {
+              "name": "DataMapping",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"StaffLeadID\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"\\\"\\\"\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"StaffLeadID\",\"Value\":String((\"\") ?? \"\")}])"
+              }
+            },
+            {
+              "name": "PartyId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.EndpointData.Output().Body.CaseNum"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "406bb761-c7ed-457c-aef1-946618a9c6c0",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - iMIS lead failure",
+          "x": 510,
+          "y": 1569,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "['The staff member was removed, but the case\\'s lead could not be cleared in iMIS.',\r\n activities.iMIS_ClearLead.Exception(),\r\n activities.iMIS_ClearLead.InnerException()].filter(Boolean).join(' ')"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Delete",
+          "displayName": "SQL: CT Delete - i4u_UT_Cases_Staff",
+          "x": 40,
+          "y": 1820,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "No records"
+              }
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "SET XACT_ABORT ON;\r\nBEGIN TRANSACTION;\r\n\r\nDELETE\r\nFROM [Cases].[i4u_UT_Cases_Staff]\r\nWHERE Ordinal = @StaffOrdinal\r\n\tAND CaseOrdinal = @CaseOrdinal;\r\n\r\n-- They were the lead: the case has no lead until someone is made lead.\r\nIF @WasLead = '1'\r\n\tUPDATE [Cases].[i4u_UT_Cases]\r\n\tSET StaffLeadID = NULL,\r\n\t\tLastUpdatedBy = @LoggedInUser,\r\n\t\tLastUpdateOn = @LocalTimestamp\r\n\tWHERE Ordinal = @CaseOrdinal;\r\n\r\nCOMMIT TRANSACTION;"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@StaffOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.StaffOrdinal\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseNum\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@WasLead\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.SQL_Validation.ResultSet()[0].WasLead\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@LoggedInUser\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Headers.loggedinpartyid\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@LocalTimestamp\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.SQL_Validation.ResultSet()[0].Timestamp\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"@StaffOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.StaffOrdinal) ?? \"\")},{\"Name\":\"@CaseOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.CaseNum) ?? \"\")},{\"Name\":\"@WasLead\",\"Value\":String((activities.SQL_Validation.ResultSet()[0].WasLead) ?? \"\")},{\"Name\":\"@LoggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")},{\"Name\":\"@LocalTimestamp\",\"Value\":String((activities.SQL_Validation.ResultSet()[0].Timestamp) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e9accf6e-d920-4a6f-9e1e-b1b058331eda",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - CT delete failure",
+          "x": 510,
+          "y": 1820,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "[activities.SQL_Delete.Exception(),\r\n activities.SQL_Delete.InnerException()].filter(Boolean).join(' ')"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e75a04b4-1200-4708-b93b-8ff251272bf4",
+          "type": "RunJavaScript",
+          "name": "CreateLogContext",
+          "displayName": "JS: Create Log Context",
+          "x": 40,
+          "y": 2071,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "// UPDATE LOG CONTEXT HERE\r\nvar endpoint = activities.EndpointData.Output();\r\nvar body = endpoint.Body;\r\nvar staff = activities.SQL_Validation.ResultSet()[0]; // the staff row and the case's lead, read before the delete\r\n\r\nvar logContext = {\r\n    \"Note\": \"Case \" + body.CaseID + \": Remove Staff (\" + staff.StaffId + \")\", // UPDATE HERE\r\n    \"Table\": \"i4u_UT_Cases_Staff\", // UPDATE HERE\r\n    \"UpdateReason\": \"Delete\", // UPDATE HERE\r\n    \"workflowDefinitionId\": workflowDefinitionId, // DON'T UPDATE, VARIABLE IS PROVIDED BY CLOUDTOOLZ\r\n    \"sourceOrdinal\": String(body.StaffOrdinal) // the removed case staff row's ordinal\r\n}\r\n// EMPTY: DELETE - the logging flow writes one row for the removal. A Delete's\r\n// change-history card shows its Note as the summary.\r\nvar fieldsToCompare = [];\r\n\r\n// The removed row's values, under the i4u_UT_Cases_Staff column names.\r\nvar logBody = {\r\n    \"StaffId\": String(staff.StaffId ?? \"\"),\r\n    \"StaffType\": String(staff.StaffType ?? \"\")\r\n}\r\n\r\n// compile all variables into one object\r\nvar logChanges = {\r\n    \"logContext\": logContext, // DON'T CHANGE\r\n    \"fieldsToCompare\": fieldsToCompare, // DON'T CHANGE\r\n    \"body\": logBody,\r\n    \"profileID\": String(body.CaseID), // the case the change belongs to\r\n    \"updatedByID\": endpoint.Headers.loggedinpartyid\r\n}\r\nsetVariable('logChanges', logChanges);\r\n\r\n// When they were the lead, a second entry on the case: StaffLeadID old -> blank.\r\n// Sent by LogLeadChangeToIMIS only when WasLead.\r\nsetVariable('logLeadChange', {\r\n    \"logContext\": {\r\n        \"Note\": \"Case \" + body.CaseID + \": Clear Lead Staff\",\r\n        \"Table\": \"i4u_UT_Cases\",\r\n        \"UpdateReason\": \"Edit\",\r\n        \"workflowDefinitionId\": workflowDefinitionId,\r\n        \"sourceOrdinal\": String(body.CaseNum) // the case's ordinal\r\n    },\r\n    \"fieldsToCompare\": [\"StaffLeadID\"],\r\n    \"body\": {\r\n        \"StaffLeadID\": \"\",\r\n        \"OldValue\": JSON.stringify({ \"StaffLeadID\": String(staff.OldStaffLeadID ?? \"\") })\r\n    },\r\n    \"profileID\": String(body.CaseID),\r\n    \"updatedByID\": endpoint.Headers.loggedinpartyid\r\n});"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "type": "RunWorkflow",
+          "name": "LogChangesToIMIS",
+          "displayName": "Log Changes To IMIS",
+          "x": 40,
+          "y": 2322,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "WorkflowDefinitionId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getWorkflowDefinitionIdByName('LogChangesToIMIS')"
+              }
+            },
+            {
+              "name": "Input",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getVariable('logChanges')"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            },
+            {
+              "name": "Mode",
+              "expressions": {
+                "Literal": "FireAndForget"
+              }
+            },
+            {
+              "name": "TenantId",
+              "expressions": {}
+            },
+            {
+              "name": "CorrelationId",
+              "expressions": {}
+            },
+            {
+              "name": "ContextId",
+              "expressions": {}
+            },
+            {
+              "name": "CustomAttributes",
+              "expressions": {}
+            },
+            {
+              "name": "RetryFailedActivities",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "f997df2c-3b81-4eda-923e-71ac11561ee8",
+          "type": "If",
+          "displayName": "IF: Log Lead Change",
+          "x": 40,
+          "y": 2322,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].WasLead == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "058b4593-f6d5-4bef-a580-d2ca803305c4",
+          "type": "RunWorkflow",
+          "name": "LogLeadChangeToIMIS",
+          "displayName": "Log Lead Change To IMIS",
+          "x": 275,
+          "y": 2824,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "WorkflowDefinitionId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getWorkflowDefinitionIdByName('LogChangesToIMIS')"
+              }
+            },
+            {
+              "name": "Input",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getVariable('logLeadChange')"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            },
+            {
+              "name": "Mode",
+              "expressions": {
+                "Literal": "FireAndForget"
+              }
+            },
+            {
+              "name": "TenantId",
+              "expressions": {}
+            },
+            {
+              "name": "CorrelationId",
+              "expressions": {}
+            },
+            {
+              "name": "ContextId",
+              "expressions": {}
+            },
+            {
+              "name": "CustomAttributes",
+              "expressions": {}
+            },
+            {
+              "name": "RetryFailedActivities",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response",
+          "x": 40,
+          "y": 3075,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify({\r\n  StaffOrdinal: Number(activities.EndpointData.Output().Body.StaffOrdinal),\r\n  WasLead: activities.SQL_Validation.ResultSet()[0].WasLead == 1,\r\n  AlreadyRemoved: activities.SQL_Validation.ResultSet()[0].AlreadyRemoved == 1\r\n})"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "OK"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        }
+      ],
+      "connections": [
+        {
+          "sourceActivityId": "568df3ab-c244-4da3-8b15-034b7ae9e26d",
+          "targetActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "targetActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "targetActivityId": "a6cc0a55-a6e6-4eae-9443-7ff33d33f249",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "targetActivityId": "5109db33-b467-4eae-84de-b30a5eee9485",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "targetActivityId": "55727115-9880-478e-8fc9-b971c2bd205d",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "5109db33-b467-4eae-84de-b30a5eee9485",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "5109db33-b467-4eae-84de-b30a5eee9485",
+          "targetActivityId": "35e21b71-488d-436a-85e9-6cc7093b6aab",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "35e21b71-488d-436a-85e9-6cc7093b6aab",
+          "targetActivityId": "33245a89-2729-40eb-8297-979fc0f2aefb",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "35e21b71-488d-436a-85e9-6cc7093b6aab",
+          "targetActivityId": "8ef85e5c-3e48-4387-b7f9-97ece8a37beb",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "33245a89-2729-40eb-8297-979fc0f2aefb",
+          "targetActivityId": "ec38d4fd-17fb-4074-b509-e2abd7bbb078",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "33245a89-2729-40eb-8297-979fc0f2aefb",
+          "targetActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "ec38d4fd-17fb-4074-b509-e2abd7bbb078",
+          "targetActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "ec38d4fd-17fb-4074-b509-e2abd7bbb078",
+          "targetActivityId": "406bb761-c7ed-457c-aef1-946618a9c6c0",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "targetActivityId": "e75a04b4-1200-4708-b93b-8ff251272bf4",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "targetActivityId": "e9accf6e-d920-4a6f-9e1e-b1b058331eda",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "e75a04b4-1200-4708-b93b-8ff251272bf4",
+          "targetActivityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "targetActivityId": "f997df2c-3b81-4eda-923e-71ac11561ee8",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "targetActivityId": "f997df2c-3b81-4eda-923e-71ac11561ee8",
+          "outcome": "Not Found"
+        },
+        {
+          "sourceActivityId": "f997df2c-3b81-4eda-923e-71ac11561ee8",
+          "targetActivityId": "058b4593-f6d5-4bef-a580-d2ca803305c4",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "f997df2c-3b81-4eda-923e-71ac11561ee8",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "058b4593-f6d5-4bef-a580-d2ca803305c4",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "058b4593-f6d5-4bef-a580-d2ca803305c4",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "Not Found"
+        }
+      ],
+      "id": "771b881dfe01409eb69c159bfcc9d14a"
+    }
+  ],
+  "schedules": []
+}

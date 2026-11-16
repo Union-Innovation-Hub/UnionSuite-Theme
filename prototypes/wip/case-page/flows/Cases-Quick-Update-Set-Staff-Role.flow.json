@@ -1,0 +1,650 @@
+{
+  "hierarchies": [
+    {
+      "id": 1931,
+      "coreOrgId": null,
+      "parentId": 1857,
+      "isFolder": false,
+      "excludeFromWorkflowInstancesDisplay": false,
+      "definitionId": "5bbfba8afe4247ce9763bac1dc8eb872",
+      "displayName": "Cases: Quick Update - Set Staff Role",
+      "version": 7,
+      "isPublished": true,
+      "createdAt": "2026-11-16T22:01:21.0368254+00:00",
+      "lastExecutedAt": "2026-11-16T22:01:27.5709447+00:00",
+      "avgRuntime": 0,
+      "latestInstanceStatus": "Faulted",
+      "protected": false,
+      "cronSetting": null,
+      "endpointPath": "/cases/quick-update/set-staff-role",
+      "inMaintenanceWindow": false,
+      "securedEndpoint": "green",
+      "createdBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "updatedBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "hasChildRecords": false
+    }
+  ],
+  "flowz": [
+    {
+      "definitionId": "5bbfba8afe4247ce9763bac1dc8eb872",
+      "versionId": "45e98e95321b4cc882ff6a8e1e19cc10",
+      "name": "Cases: Quick Update - Set Staff Role",
+      "displayName": "Cases: Quick Update - Set Staff Role",
+      "description": "",
+      "version": 7,
+      "variables": {
+        "data": {}
+      },
+      "customAttributes": {
+        "data": {}
+      },
+      "isSingleton": false,
+      "persistenceBehavior": "WorkflowBurst",
+      "deleteCompletedInstances": false,
+      "isPublished": true,
+      "isLatest": true,
+      "createdAt": "2026-11-16T22:01:21.0368254Z",
+      "activities": [
+        {
+          "activityId": "568df3ab-c244-4da3-8b15-034b7ae9e26d",
+          "type": "HttpEndpoint",
+          "name": "EndpointData",
+          "displayName": "HTTP Endpoint",
+          "x": 275,
+          "y": 40,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Path",
+              "expressions": {
+                "Literal": "/cases/quick-update/set-staff-role"
+              }
+            },
+            {
+              "name": "Methods",
+              "expressions": {
+                "Json": "[\"POST\"]"
+              }
+            },
+            {
+              "name": "ReadContent",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "TargetType",
+              "expressions": {}
+            },
+            {
+              "name": "Schema",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": ""
+              }
+            },
+            {
+              "name": "ValidateCallerUrl",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateImisRequest",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "ImisRequestVerificationRole",
+              "expressions": {}
+            },
+            {
+              "name": "Authorize",
+              "expressions": {}
+            },
+            {
+              "name": "Policy",
+              "expressions": {}
+            },
+            {
+              "name": "AuthorizeWithCustomHeader",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderName",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderValue",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateOutlookPluginToken",
+              "expressions": {}
+            },
+            {
+              "name": "RequiredOutlookPluginUsername",
+              "expressions": {}
+            },
+            {
+              "name": "OutlookPluginMailboxEmail",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Validation",
+          "displayName": "SQL - Validation and Timestamp",
+          "x": 275,
+          "y": 314,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "DECLARE @CaseOrd int = TRY_CAST(@CaseOrdinal AS int);\r\nDECLARE @StaffOrd int = TRY_CAST(@StaffOrdinal AS int);\r\n\r\nDECLARE @EntityCode AS varchar(20) = COALESCE(\r\n  (SELECT TOP 1 OrgCode FROM [Cases].[i4u_UT_Cases] WHERE Ordinal = @CaseOrd),\r\n  (SELECT TOP 1 EntityCode FROM [ZenCrm].[Individuals] WHERE ImisId = @LoggedInUser),\r\n  (SELECT TOP 1 OrgCode FROM UnionTemplate.Entities WHERE IsDefault = 1) -- Final fallback, default org code\r\n);\r\nDECLARE @localTimestamp datetime = COALESCE([UnionTemplate].fn_GetDateTimeWithTimeZone(@EntityCode), GETUTCDATE());\r\n\r\nDECLARE @message varchar(4000) = '';\r\n\r\n-- check if case exists\r\nIF NOT EXISTS (\r\n\tSELECT *\r\n\tFROM Cases.i4u_UT_Cases\r\n\tWHERE CaseID = @CaseID\r\n\t\tAND Ordinal = @CaseOrd\r\n)\r\n\tSET @message += 'Case is not valid. | ';\r\n\r\n-- check if users entity matches case\r\nIF NOT EXISTS (\r\n\tSELECT *\r\n\tFROM Cases.i4u_UT_Cases C\r\n\tINNER JOIN UnionTemplate.EntityAccess A\r\n\t\tON C.OrgCode = A.EntityCode\r\n\tWHERE C.CaseID = @CaseID\r\n\t\tAND C.Ordinal = @CaseOrd\r\n\t\tAND A.StaffimisID = @LoggedInUser\r\n)\r\n\tSET @message += 'Unauthorised entity | ';\r\n\r\n-- The staff row, on this case only, as it is before the change.\r\nDECLARE @Found int = 0;\r\nDECLARE @RowStaffId varchar(20) = NULL;\r\nDECLARE @RowStaffType varchar(150) = NULL;\r\nSELECT TOP 1\r\n\t@Found = 1,\r\n\t@RowStaffId = LTRIM(RTRIM(CAST(StaffId AS varchar(20)))),\r\n\t@RowStaffType = CAST(StaffType AS varchar(150))\r\nFROM Cases.i4u_UT_Cases_Staff\r\nWHERE Ordinal = @StaffOrd\r\n\tAND CaseOrdinal = @CaseOrd;\r\n\r\nIF @Found = 0\r\n\tSET @message += 'Staff member not on this case. | ';\r\nELSE IF @RowStaffType = 'Representative'\r\n\tSET @message += 'A delegate''s role can''t be changed. | ';\r\n\r\n-- A role from the list: never blank, and never Representative (the role is\r\n-- also the group, so this keeps Staff and Delegates apart).\r\nIF NULLIF(LTRIM(RTRIM(@Role)), '') IS NULL OR LTRIM(RTRIM(@Role)) = 'Representative'\r\n\tSET @message += 'Choose a role from the list. | ';\r\n\r\nSELECT\r\n\tCASE WHEN @message = '' THEN 1 ELSE 0 END AS [Valid],\r\n\t@message AS [Message],\r\n\tCONVERT(varchar(23), @localTimestamp, 126) AS [Timestamp],\r\n\t@RowStaffId AS [StaffId],\r\n\t@RowStaffType AS [OldStaffType];\r\n"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseNum\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseID\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseID\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@StaffOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.StaffOrdinal\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@Role\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.Role\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@LoggedInUser\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Headers.loggedinpartyid\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"@CaseOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.CaseNum) ?? \"\")},{\"Name\":\"@CaseID\",\"Value\":String((activities.EndpointData.Output().Body.CaseID) ?? \"\")},{\"Name\":\"@StaffOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.StaffOrdinal) ?? \"\")},{\"Name\":\"@Role\",\"Value\":String((activities.EndpointData.Output().Body.Role) ?? \"\")},{\"Name\":\"@LoggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "type": "If",
+          "displayName": "IF: Case Valid",
+          "x": 40,
+          "y": 565,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].Valid == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "a6cc0a55-a6e6-4eae-9443-7ff33d33f249",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - General Error",
+          "x": 510,
+          "y": 565,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "Literal": "An unexpected error occurred. Please contact a system adminstrator."
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "c2a995a6-1db9-45da-bc9d-5712e4f10d54",
+          "type": "UpdateSingleInstanceDataSource",
+          "name": "iMIS_Update",
+          "displayName": "iMIS Update - i4u_UT_Cases_Staff",
+          "x": 40,
+          "y": 816,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "NameOfDataSource",
+              "expressions": {
+                "Literal": "i4u_UT_Cases_Staff"
+              }
+            },
+            {
+              "name": "DataMapping",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"StaffType\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.Role\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"StaffType\",\"Value\":String((activities.EndpointData.Output().Body.Role) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "PartyId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Literal": "activities.EndpointData.Output().Body.StaffOrdinal",
+                "JavaScript": "activities.EndpointData.Output().Body.StaffOrdinal"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "55727115-9880-478e-8fc9-b971c2bd205d",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - Case Not Valid",
+          "x": 510,
+          "y": 816,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "JavaScript": "// The validation's messages, without the trailing separator.\r\nString(activities.SQL_Validation.ResultSet()[0].Message || 'Case not valid').replace(/\\s*\\|\\s*$/, '')"
+              },
+              "syntax": "JavaScript"
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "BadRequest"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Update",
+          "displayName": "SQL: CT Update - i4u_UT_Cases_Staff",
+          "x": 40,
+          "y": 1067,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "No records"
+              }
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "UPDATE S\r\nSET StaffType = @StaffType,\r\n\tLastUpdatedBy = @LoggedInUser,\r\n\tLastUpdatedOn = @LocalTimestamp\r\nFROM [Cases].[i4u_UT_Cases_Staff] S\r\nWHERE Ordinal = @StaffOrdinal\r\n\tAND CaseOrdinal = @CaseOrdinal"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@StaffOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.StaffOrdinal\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseNum\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@StaffType\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.Role\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@LoggedInUser\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Headers.loggedinpartyid\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@LocalTimestamp\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"activities.SQL_Validation.ResultSet()[0].Timestamp\",\"JavaScript\":\"activities.SQL_Validation.ResultSet()[0].Timestamp\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"@StaffOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.StaffOrdinal) ?? \"\")},{\"Name\":\"@CaseOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.CaseNum) ?? \"\")},{\"Name\":\"@StaffType\",\"Value\":String((activities.EndpointData.Output().Body.Role) ?? \"\")},{\"Name\":\"@LoggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")},{\"Name\":\"@LocalTimestamp\",\"Value\":String((activities.SQL_Validation.ResultSet()[0].Timestamp) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8ef85e5c-3e48-4387-b7f9-97ece8a37beb",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - iMIS update failure",
+          "x": 510,
+          "y": 1067,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "['The role could not be updated in iMIS.',\r\n activities.iMIS_Update.Exception(),\r\n activities.iMIS_Update.InnerException()].filter(Boolean).join(' ')"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e75a04b4-1200-4708-b93b-8ff251272bf4",
+          "type": "RunJavaScript",
+          "name": "CreateLogContext",
+          "displayName": "JS: Create Log Context",
+          "x": 40,
+          "y": 1318,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "// UPDATE LOG CONTEXT HERE\r\nvar endpoint = activities.EndpointData.Output();\r\nvar body = endpoint.Body;\r\nvar staff = activities.SQL_Validation.ResultSet()[0]; // the staff row, read before the update\r\n\r\nvar logContext = {\r\n    \"Note\": \"Case \" + body.CaseID + \": Set Staff Role\", // UPDATE HERE\r\n    \"Table\": \"i4u_UT_Cases_Staff\", // UPDATE HERE\r\n    \"UpdateReason\": \"Edit\", // UPDATE HERE\r\n    \"workflowDefinitionId\": workflowDefinitionId, // DON'T UPDATE, VARIABLE IS PROVIDED BY CLOUDTOOLZ\r\n    \"sourceOrdinal\": String(body.StaffOrdinal) // the case staff row's ordinal\r\n}\r\n// UPDATE FIELDS YOU WANT TO COMPARE HERE - names must match the keys in logBody below\r\nvar fieldsToCompare = [\"StaffType\"];\r\n\r\n// The role, new and as it was (SQL_Validation reads it before the update),\r\n// under the i4u_UT_Cases_Staff column name.\r\nvar logBody = {\r\n    \"StaffType\": String(body.Role ?? \"\"),\r\n    \"OldValue\": JSON.stringify({ \"StaffType\": String(staff.OldStaffType ?? \"\") })\r\n}\r\n\r\n// compile all variables into one object\r\nvar logChanges = {\r\n    \"logContext\": logContext, // DON'T CHANGE\r\n    \"fieldsToCompare\": fieldsToCompare, // DON'T CHANGE\r\n    \"body\": logBody,\r\n    \"profileID\": String(body.CaseID), // the case the change belongs to\r\n    \"updatedByID\": endpoint.Headers.loggedinpartyid\r\n}\r\nsetVariable('logChanges', logChanges);"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e9accf6e-d920-4a6f-9e1e-b1b058331eda",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - CT update failure",
+          "x": 510,
+          "y": 1318,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "[activities.SQL_Update.Exception(),\r\n activities.SQL_Update.InnerException()].filter(Boolean).join(' ')"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "type": "RunWorkflow",
+          "name": "LogChangesToIMIS",
+          "displayName": "Log Changes To IMIS",
+          "x": 40,
+          "y": 1569,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "WorkflowDefinitionId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getWorkflowDefinitionIdByName('LogChangesToIMIS')"
+              }
+            },
+            {
+              "name": "Input",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getVariable('logChanges')"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            },
+            {
+              "name": "Mode",
+              "expressions": {
+                "Literal": "FireAndForget"
+              }
+            },
+            {
+              "name": "TenantId",
+              "expressions": {}
+            },
+            {
+              "name": "CorrelationId",
+              "expressions": {}
+            },
+            {
+              "name": "ContextId",
+              "expressions": {}
+            },
+            {
+              "name": "CustomAttributes",
+              "expressions": {}
+            },
+            {
+              "name": "RetryFailedActivities",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response",
+          "x": 40,
+          "y": 1820,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify({\r\n  StaffOrdinal: Number(activities.EndpointData.Output().Body.StaffOrdinal),\r\n  Role: activities.EndpointData.Output().Body.Role\r\n})"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "OK"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        }
+      ],
+      "connections": [
+        {
+          "sourceActivityId": "568df3ab-c244-4da3-8b15-034b7ae9e26d",
+          "targetActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "targetActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "targetActivityId": "a6cc0a55-a6e6-4eae-9443-7ff33d33f249",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "targetActivityId": "c2a995a6-1db9-45da-bc9d-5712e4f10d54",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "targetActivityId": "55727115-9880-478e-8fc9-b971c2bd205d",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "c2a995a6-1db9-45da-bc9d-5712e4f10d54",
+          "targetActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "c2a995a6-1db9-45da-bc9d-5712e4f10d54",
+          "targetActivityId": "8ef85e5c-3e48-4387-b7f9-97ece8a37beb",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "targetActivityId": "e75a04b4-1200-4708-b93b-8ff251272bf4",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "targetActivityId": "e9accf6e-d920-4a6f-9e1e-b1b058331eda",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "e75a04b4-1200-4708-b93b-8ff251272bf4",
+          "targetActivityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "1079d172-d418-456a-bbb8-a3aee5541328",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "Not Found"
+        }
+      ],
+      "id": "45e98e95321b4cc882ff6a8e1e19cc10"
+    }
+  ],
+  "schedules": []
+}
