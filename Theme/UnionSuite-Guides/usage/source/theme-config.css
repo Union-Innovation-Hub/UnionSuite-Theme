@@ -14,3 +14,7 @@
 .branding-steps>li::before{content:counter(branding-step);position:absolute;top:23px;left:0;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#e1eaf0;color:#355a70;font-size:12px;font-weight:650}
 .branding-shot{margin:0;min-width:0;align-self:start}.branding-shot img{display:block;width:100%;height:auto;border:1px solid #d5dfe6;border-radius:6px;background:#fff}.branding-shot-menu img{width:180px;max-width:100%}.branding-shot figcaption{font-size:11px;color:#7a8892;margin-top:8px}
 @media(max-width:750px){.branding-files{grid-template-columns:1fr;gap:18px;padding:16px}.branding-steps>li:has(figure){grid-template-columns:1fr}.branding-steps>li{padding-left:38px;gap:14px}.branding-shot{max-width:480px}.branding-files p,.branding-steps p{font-size:12px}}
+
+/* A caption above each example in a tab that holds more than one. */
+.preview-subhead{margin:16px 0 8px;color:#4b5867;font-size:13px;font-weight:600}
+.preview-subhead:first-child{margin-top:0}

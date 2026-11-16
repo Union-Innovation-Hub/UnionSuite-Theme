@@ -18,8 +18,30 @@ const scopes = {
   iqa: '',
   actions: ':root .us-actions:not(:where(.us-report-no-styling, .us-report-no-styling *, [data-us-actions-ignore], [data-us-actions-ignore] *))'
 };
+// The Member overview's banner: the guide's member banner template
+// (Banner-Contact-Template.html), filled with sample values, so the page
+// follows the template (16 November 2026: it showed the original generic
+// banner). Its IQA-fed blocks (positions, tab counts, alerts) need live data
+// and are left out.
+const MEMBER_SAMPLE = {
+  '[Contact type]': 'Member', '[Contact ID]': '104019', '[Full name]': 'Alex Morgan',
+  '[Member type]': 'Regular member', '[Join date]': '1 June 2026',
+  '{#query.StatusColour}': '#23845B', '{#query.StatusDescription}': 'Financial member',
+  '[Email address]': 'alex@example.org', '[Mobile number]': '0412 555 019',
+  '[Employer name]': 'Harbour Services', '[Branch name]': 'Sydney Metro', '[Organiser name]': 'Sam Taylor'
+};
+function memberBanner() {
+  let html = read('Theme/UnionSuite-Guides/usage/templates/Banner-Contact-Template.html')
+    .replace(/<!--[\s\S]*?-->\s*/g, '')
+    .replace(/<div class="(?:us-banner__positions|us-cco-counts|us-banner__alerts)"[^>]*><\/div>/g, '');
+  for (const [key, value] of Object.entries(MEMBER_SAMPLE)) html = html.split(key).join(value);
+  const left = html.match(/\[[A-Z][^\]]*\]|\{#query\.\w+\}/);
+  if (left) throw Error('Member banner sample has no value for ' + left[0] + '; add it to MEMBER_SAMPLE.');
+  if (/data-us-(positions|counts|alerts)-query/.test(html)) throw Error('Member banner sample: an IQA block was not removed; update memberBanner().');
+  return html.trim();
+}
 function build(shared, check = false) {
-  const {inserts, rootTokens, declarations, tokenCategory, theme, themeJs, nativePreviewCss, clientRoots, bannerDefaults, iqaDefaults, iqaSelector, demoBanner} = shared;
+  const {inserts, rootTokens, declarations, tokenCategory, theme, themeJs, nativePreviewCss, clientRoots, bannerDefaults, iqaDefaults, iqaSelector} = shared;
   // Overrides must reach the same elements as the theme's own alias rule and
   // outrank it, so reuse its selector rather than an abbreviated copy.
   scopes.iqa = ':root ' + iqaSelector.replace(/\s+/g, ' ');
@@ -43,11 +65,28 @@ function build(shared, check = false) {
   }
   // Use the actual root overrides for this source snapshot; no logo/site rules.
   for (const [name,value] of declarations(clientRoots)) { const token=tokens.find(t=>t.name===name); if(token) token.value=value; }
-  const preview = markup => portable(markup).replace('</head>','<meta name="us-config-preview" content="component"><script>'+read('Theme/UnionSuite-Guides/usage/source/config-preview.js')+'</script></head>');
+  // Insert before the document's own </head>. The theme JS sits in the head
+  // and builds a page of its own as a string ('...</style></head><body>'),
+  // so the first "</head>" can be inside a <script>: skip those. Spliced,
+  // not replace(), as the theme JS also holds "$'" (16 November 2026: the
+  // Member overview showed the theme's code as text).
+  const beforeHeadEnd = (html, insert) => {
+    let from = 0;
+    for (;;) {
+      const head = html.indexOf('</head>', from);
+      const script = html.indexOf('<script', from);
+      if (head < 0) throw Error('No </head> outside a script.');
+      if (script < 0 || head < script) return html.slice(0, head) + insert + html.slice(head);
+      const end = html.indexOf('</script>', script);
+      if (end < 0) throw Error('Unclosed <script>.');
+      from = end + '</script>'.length;
+    }
+  };
+  const preview = markup => beforeHeadEnd(portable(markup),'<meta name="us-config-preview" content="component"><script>'+read('Theme/UnionSuite-Guides/usage/source/config-preview.js')+'</script>');
   const frame = (id,title,markup) => `<iframe id="${id}" data-theme-preview title="${esc(title)}" loading="lazy" srcdoc="${esc(preview(markup))}"></iframe>`;
-  const reuse = html => html.replace(/srcdoc="([^"]*)"/,(_,source)=>'srcdoc="'+esc(preview(decode(source).replace('</head>','<style>'+clientRoots+'</style></head>')))+'"');
+  const reuse = html => html.replace(/srcdoc="([^"]*)"/,(_,source)=>'srcdoc="'+esc(preview(beforeHeadEnd(decode(source),'<style>'+clientRoots+'</style>')))+'"');
   const documentHtml = (title,markup) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${nativePreviewCss}\n${theme}\n${clientRoots}</style><style>${read('Theme/UnionSuite-Guides/usage/source/config-preview.css')}</style><script>${themeJs}</script></head><body>${markup}</body></html>`;
-  const overview = read('Theme/UnionSuite-Guides/usage/source/Config-Preview.source.html').replace('{{BANNER}}',demoBanner).replace('{{DATA_PANEL}}',read('Theme/UnionSuite-Guides/usage/examples/Data-Panel-Native-read.html'));
+  const overview = read('Theme/UnionSuite-Guides/usage/source/Config-Preview.source.html').split('{{BANNER}}').join(memberBanner()).split('{{DATA_PANEL}}').join(read('Theme/UnionSuite-Guides/usage/examples/Data-Panel-Native-read.html'));
   const howtoImages = {
     BRANDING_MENU_IMAGE:'branding-themes-menu.png',
     BRANDING_DOWNLOAD_IMAGE:'branding-download-client.png',
@@ -68,6 +107,7 @@ function build(shared, check = false) {
     OVERVIEW: frame('config-overview','Member overview: banner, buttons and data panel',documentHtml('Member overview',overview)),
     REPORT: reuse(inserts.REPORT_DEMO),
     TABS: reuse(inserts.TABS_DEMO),
+    CCO_RAIL: reuse(inserts.CCO_RAIL_DEMO),
     ACTIONS: reuse(inserts.ACTION_MENU_DEMO).replace('Approved option 5','Record actions').replace('Shared theme CSS and behaviour. Open Actions, then Manage Case Contacts. Below 950px the child rows expand inline with the drawing line. Example actions only update the message below.','Open Actions, then Manage Case Contacts to explore a nested menu. Try different colours and preview sizes. Sample commands only update the message below.').replace('Author template','Actions menu').replace('Existing case markup','Quick Actions').replace('Banner Quick Actions','Banner actions'),
     FORMS: frame('config-forms','Form controls and feedback',documentHtml('Forms and feedback',read('Theme/UnionSuite-Guides/usage/source/Config-Form.source.html')))
   };
