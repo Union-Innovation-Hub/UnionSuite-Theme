@@ -71,8 +71,10 @@ owner's endpoints, 16 November 2026; the paths must match exactly).
 node prototypes/wip/resolve-case-form/flows/build-flows.cjs <Flowz export.json>
 ```
 
-It reads a Flowz export holding the two flows, keeps their definitionId and
-versionId (importing overwrites them) and changes only what the form needs.
+It reads a Flowz export holding the two flows (any export of them, before
+or after a rebuild) and keeps their definitionId and versionId (importing
+overwrites them). The prefill keeps its steps; the resolve flow is built
+whole.
 It writes `dist/Imports/Resolve-Case-Flows.json` (ignored by Git), checked
 with the Flowz builder's validator.
 
@@ -87,24 +89,53 @@ with the Flowz builder's validator.
   blank date through `formatDate`) and `0.000000000000` into the new form.
   `ResolvedBy` and `ResolvedOn` are not sent: the case keeps no "resolved
   by", so the form leaves that line out.
-- **`US Case Form: Resolve Case`** (`/Cases/US/Resolve`).
-  `IF_Valid` (new, after the authorisation): a case, an outcome type, a
-  closed date and plain-number amounts, or `Response_Invalid` and nothing
-  is saved. It stands in for the `Form/Validation` step. The update sets
-  Status `Complete` only when resolving; with `Edit=true` it changes the
-  five fields only. `IF_Resolving` (new, after the history row) sends the
-  notification emails only when resolving. The success answer says "Case
-  resolved." or "Resolution updated." with `Success: true`. Blank amounts
-  save blank, as the old form sent them. The email settings and sends are
-  unchanged.
+- **`US Case Form: Resolve Case`** (`/Cases/US/Resolve`). Rebuilt
+  whole (owner, 17 November 2026): **no email is sent from CloudToolz**.
+  The emails go from iMIS, through an automation reading
+  `i4u_UT_AutomationTrigger`, so they use a communication template and are
+  logged to the member and the case. In order:
+  1. `IF_Valid`: a case (`CaseID` and the numeric `CaseNum`), an outcome
+     type, a closed date and plain-number amounts, or `Response_Invalid`
+     and nothing is saved. It stands in for the `Form/Validation` step.
+  2. `SQL_Case` (CloudToolz): the case as it is (old values for the log,
+     `PrimaryContctID`, `StaffLeadID`), the two Cases / Resolution switches
+     (`EmailPrimaryContact`, `EmailPrimaryStaff`, Entity `DEMO`) and the
+     entity's local time. No case: "This case couldn't be found."
+  3. `iMIS_Update`: `i4u_UT_Cases` by `CaseNum`, the five fields and
+     `LastUpdatedOn`/`By`, plus Status `Complete` when resolving.
+  4. `SQL_Update`: the same in `Cases.i4u_UT_Cases` (blank date, amount and
+     weeks as NULL). If it fails, iMIS is already saved: the answer says so
+     with `Error`, the form stays open, and saving again finishes it.
+  5. `LogChangesToIMIS` (fire and forget): Note `Case C49: Resolved` or
+     `…: Resolution Edited`, Table `i4u_UT_Cases`, the five fields and
+     Status (resolving only), old and new written alike so only real
+     changes show.
+  6. When resolving (not `Edit=true`), one `i4u_UT_AutomationTrigger` row
+     per switch that is `1`, if the case has that person: the primary
+     contact (Type `Case Resolved - Primary Contact`) and the staff lead
+     (`Case Resolved - Staff Lead`). Each row: `ID` the person, `Reference`
+     the CaseID, `Date` the local time, `EntryGUID` a new GUID,
+     `CommunicationLogKey` blank for the automation.
+  7. The answer: "Case resolved." or "Resolution updated." with `Success:
+     true`. A trigger row that failed is named ("…the email to the member
+     couldn't be queued"); the case is still resolved.
 
-Seen in the export, not changed: `If EmailPrimaryStaff` and `If
-EmailPrimaryContact` each continue on both False and Done, the email
-configuration reads `Entity = 'DEMO'`, and two `Set Variable` steps (`Test`,
-`Test1`) look like debugging. If Get Case Details finds no case, the prefill
-ends in a Fault with no answer; the form shows itself after 8 seconds.
+  Gone: the CloudToolz Send Email steps and their lookups, the
+  `SenderEmailAddress`, `EmailBody` and `EmailBodyStaff` settings (no longer
+  read), the Get Case Details reads, and the `i4u_UT_Cases_History`
+  snapshot (the change log replaces it). The endpoint and Request
+  Authorization are kept as exported.
+
+If Get Case Details finds no case, the prefill ends in a Fault with no
+answer; the form shows itself after 8 seconds.
 
 ## To confirm
+
+- The resolution columns in CloudToolz `Cases.i4u_UT_Cases` are named as in
+  iMIS (`ResolutionType`, `ResolutionDate`, `ResolutionAmount`,
+  `ResolutionWeeks`, `Resolution`); `SQL_Case` and `SQL_Update` assume so.
+- The iMIS automation picks up `i4u_UT_AutomationTrigger` rows by the two
+  Type values above (change `TRIGGER_TYPE_*` in `build-flows.cjs` to match).
 
 - The outcome types in `Case Value List - Outcome Type`.
 - Whether resolving completes or cancels open tasks (now: they stay open).

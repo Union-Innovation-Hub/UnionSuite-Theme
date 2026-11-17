@@ -9,7 +9,7 @@ asks:
   - which folders are client folders
   - where are the case IQAs
 keywords: [configure, configuration, client, core, folder, customise, customize, settings, setup, admin]
-related: [change-the-case-tabs, change-the-banner-details, change-the-case-detail-panels, change-the-party-details, change-the-activity-card-details]
+related: [change-the-case-tabs, change-the-banner-details, change-the-case-detail-panels, change-the-party-details, change-the-activity-card-details, set-up-the-case-resolved-emails]
 ---
 The case page is built from two sets of folders. **Core** is the same on every site and is replaced when UnionSuite is upgraded. **Client** belongs to the site: change what you need there, and an upgrade leaves it alone.
 
@@ -35,6 +35,12 @@ The case page is built from two sets of folders. **Core** is the same on every s
 | --- | --- |
 | `i4u_UT_CASE_STATUS` | The case statuses, and whether each is open or closed. See [Add or change the case statuses](#change-the-case-statuses) |
 | `i4u_UT_CASE_STATUSCOLOUR` | Each status's colour in the case banner |
+
+**Settings**
+
+| Table | What it is |
+| --- | --- |
+| `UnionTemplate.Configuration` (Cases, Resolution) | Who is emailed when a case is resolved. See [Set up the case resolved emails](#set-up-the-case-resolved-emails) |
 
 **Rules for every client IQA**
 

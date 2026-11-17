@@ -14,9 +14,8 @@ asks:
 keywords: [status, statuses, case status, lookup, lookup table, general table, general lookup, i4u_UT_CASE_STATUS, i4u_UT_CASE_STATUSCOLOUR, code, description, expansion, open, closed, value list, colour, color, banner colour, pill, rail]
 related: [change-the-status, resolve-and-close, reopen-or-edit-resolution, where-case-settings-live, case-queries-and-endpoints]
 verify:
-  - Confirm API - Value List - Case Status turns Expansion into Closed Status as true or false. The theme reads true, 1, yes or y as closed, so the word Closed passed straight through would read as open.
   - Confirm which status Reopen case (/cases/reopen) saves, and that it is a row with Expansion Open.
-  - Status colours are in the theme from 1.0.32. Confirm API - Value List - Case Status returns the Colour column from i4u_UT_CASE_STATUSCOLOUR before staff rely on it.
+  - Status colours need theme 1.0.32 on the site. API - Value List - Case Status returns Colour and Closed Status as true or false (17 November 2026); check the banner once the theme is uploaded.
 ---
 The statuses are a general lookup table, **`i4u_UT_CASE_STATUS`**. Change them in iMIS under **General lookup tables**: choose the table and use **Add new row** or the pencil on a row.
 
@@ -57,6 +56,9 @@ Each status's colour is a second lookup table, **`i4u_UT_CASE_STATUSCOLOUR`**, m
 
 **How the page reads it**
 
-`$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Value List - Case Status` reads both tables and returns `Code`, `Description`, `Closed Status`, which is true when **Expansion** is `Closed`, and `Colour`, the colour table's **Description**. The status menu and the status save use it. The Overview's Resolution gate, `Query Template - Manage Case - Case Resolved` in the same folder, joins the case's status to the table and returns a row only when its **Expansion** is `Closed`. So a new row works everywhere once it is in the table.
+`$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Value List - Case Status` reads both tables and returns `Code`, `Description`, `Closed Status` and `Colour`. Keep those names: the page finds the columns by them.
+
+- `Closed Status` must be `true` or `false` (`true` when **Expansion** is `Closed`). The page reads `true`, `1`, `yes` or `y` as closed, so the word `Closed` would count as open.
+- `Colour` is the colour table's **Description**, blank for a status without a row. The status menu and the status save use it. The Overview's Resolution gate, `Query Template - Manage Case - Case Resolved` in the same folder, joins the case's status to the table and returns a row only when its **Expansion** is `Closed`. So a new row works everywhere once it is in the table.
 
 > **Tip:** Keep a `Complete` row with Expansion `Closed`. Resolve case saves that code.
