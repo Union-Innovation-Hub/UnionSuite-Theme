@@ -20,6 +20,8 @@ related: [resolve-and-close, see-what-changed]
 **Reopen the case**
 
 1. Choose **Reopen case** from the banner's **Actions** menu or the status menu.
-2. Confirm. The case goes back to Open.
+2. Confirm. The case goes back to the status it had before it was resolved, such as *In Progress*.
 
-The old resolution is kept in the case's history. See [See what changed](#see-what-changed).
+The resolution stays on the case, and the reopening shows in the case's history as a status change. See [See what changed](#see-what-changed).
+
+> **Tip:** If someone else already reopened the case, nothing changes; the page just shows it open.

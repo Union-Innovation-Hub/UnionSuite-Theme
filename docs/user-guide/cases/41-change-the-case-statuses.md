@@ -14,7 +14,7 @@ asks:
 keywords: [status, statuses, case status, lookup, lookup table, general table, general lookup, i4u_UT_CASE_STATUS, i4u_UT_CASE_STATUSCOLOUR, code, description, expansion, open, closed, value list, colour, color, banner colour, pill, rail]
 related: [change-the-status, resolve-and-close, reopen-or-edit-resolution, where-case-settings-live, case-queries-and-endpoints]
 verify:
-  - Confirm which status Reopen case (/cases/reopen) saves, and that it is a row with Expansion Open.
+  - Reopen case (/cases/quick-update/reopen, 17 November 2026) saves the status before the case was resolved, or InProgress. Confirm on the site once the flow is imported.
   - Status colours need theme 1.0.32 on the site. API - Value List - Case Status returns Colour and Closed Status as true or false (17 November 2026); check the banner once the theme is uploaded.
 ---
 The statuses are a general lookup table, **`i4u_UT_CASE_STATUS`**. Change them in iMIS under **General lookup tables**: choose the table and use **Add new row** or the pencil on a row.

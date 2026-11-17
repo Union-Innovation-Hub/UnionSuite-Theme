@@ -923,10 +923,11 @@
         openStatus = code;
         return reply({Status: code}, 200, 700);
       }
-      if (target.pathname === '/cases/reopen') {
+      if (target.pathname === '/cases/quick-update/reopen') {
         const next = new URL(location.href);
         next.searchParams.delete('case');
         history.replaceState(null, '', next);
+        return reply({Status: 'InProgress', FromLog: false}, 200, 700);
       }
       if (target.pathname === '/cases/quick-update/set-primary-party') {
         const ordinal = JSON.parse(init.body || '{}').PartyOrdinal;

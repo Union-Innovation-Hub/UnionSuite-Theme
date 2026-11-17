@@ -1,0 +1,984 @@
+{
+  "hierarchies": [
+    {
+      "id": 1937,
+      "coreOrgId": null,
+      "parentId": 1857,
+      "isFolder": false,
+      "excludeFromWorkflowInstancesDisplay": false,
+      "definitionId": "81fdfaf4a9214d2cadc477453e319e5e",
+      "displayName": "Cases: Quick Update - Reopen",
+      "version": 1,
+      "isPublished": true,
+      "createdAt": "2026-11-17T02:07:00.9606158+00:00",
+      "lastExecutedAt": null,
+      "avgRuntime": null,
+      "latestInstanceStatus": null,
+      "protected": false,
+      "cronSetting": null,
+      "endpointPath": "/cases/quick-update/reopen",
+      "inMaintenanceWindow": false,
+      "securedEndpoint": "green",
+      "createdBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "updatedBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "hasChildRecords": false
+    }
+  ],
+  "flowz": [
+    {
+      "definitionId": "81fdfaf4a9214d2cadc477453e319e5e",
+      "versionId": "047100c2d16f4849a4ddec1b9dcb4c08",
+      "name": "Cases: Quick Update - Reopen",
+      "displayName": "Cases: Quick Update - Reopen",
+      "version": 1,
+      "variables": {
+        "data": {}
+      },
+      "customAttributes": {
+        "data": {}
+      },
+      "isSingleton": false,
+      "persistenceBehavior": "WorkflowBurst",
+      "deleteCompletedInstances": false,
+      "isPublished": true,
+      "isLatest": true,
+      "createdAt": "2026-11-17T02:07:00.9606158Z",
+      "activities": [
+        {
+          "activityId": "568df3ab-c244-4da3-8b15-034b7ae9e26d",
+          "type": "HttpEndpoint",
+          "name": "EndpointData",
+          "displayName": "HTTP Endpoint",
+          "x": 40,
+          "y": 40,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Path",
+              "expressions": {
+                "Literal": "/cases/quick-update/reopen"
+              }
+            },
+            {
+              "name": "Methods",
+              "expressions": {
+                "Json": "[\"POST\"]"
+              }
+            },
+            {
+              "name": "ReadContent",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "TargetType",
+              "expressions": {}
+            },
+            {
+              "name": "Schema",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": ""
+              }
+            },
+            {
+              "name": "ValidateCallerUrl",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateImisRequest",
+              "expressions": {
+                "Literal": "true"
+              }
+            },
+            {
+              "name": "ImisRequestVerificationRole",
+              "expressions": {}
+            },
+            {
+              "name": "Authorize",
+              "expressions": {}
+            },
+            {
+              "name": "Policy",
+              "expressions": {}
+            },
+            {
+              "name": "AuthorizeWithCustomHeader",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderName",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderValue",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateOutlookPluginToken",
+              "expressions": {}
+            },
+            {
+              "name": "RequiredOutlookPluginUsername",
+              "expressions": {}
+            },
+            {
+              "name": "OutlookPluginMailboxEmail",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Validation",
+          "displayName": "SQL - Validation and Timestamp",
+          "x": 40,
+          "y": 290,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "DECLARE @EntityCode AS varchar(20) = COALESCE(\r\n  (SELECT OrgCode FROM [Cases].[i4u_UT_Cases] WHERE Ordinal = @CaseOrdinal), -- this would be @ImisID\r\n  (SELECT EntityCode FROM [ZenCrm].[Individuals] WHERE ImisId = @LoggedInUser),  -- this would be @LoggedInUserID\r\n  (SELECT OrgCode FROM UnionTemplate.Entities WHERE IsDefault = 1) -- Final fallback, default org code\r\n);\r\nDECLARE @localTimestamp datetime = COALESCE([UnionTemplate].fn_GetDateTimeWithTimeZone(@EntityCode), GETUTCDATE());\r\n\r\n\r\nDECLARE @valid int = 1\r\nDECLARE @message varchar(4000) = ''\r\nSET @message = ''\r\n\r\n-- check if case exists\r\nIF NOT EXISTS (\r\n\tSELECT * \r\n\tFROM Cases.i4u_UT_Cases\r\n\tWHERE CaseID = @CaseID\r\n\t\tAND Ordinal = @CaseOrdinal\r\n)\r\n    SET @message += 'Case is not valid. | '\r\n\r\n-- check if users entity matches case\r\nIF NOT EXISTS (\r\n\tSELECT * \r\n\tFROM Cases.i4u_UT_Cases C\r\n\tINNER JOIN UnionTemplate.EntityAccess A\r\n\t\tON C.OrgCode = A.EntityCode\r\n\tWHERE CaseID = @CaseID\r\n\t\tAND C.Ordinal = @CaseOrdinal\r\n\t\tAND A.StaffimisID = @loggedInUser\r\n)\r\n    SET @message += 'Unauthorised entity | '\r\n\r\nIF @message <> ''\r\n\tSET @valid = 0\r\n\r\nSELECT \r\n\t@valid AS [Valid],\r\n\t@message AS [Message],\r\n\tCONVERT(varchar(23), @localTimestamp, 126) AS [Timestamp],\r\n\t(SELECT TOP 1 CAST([Status] AS varchar(150)) FROM Cases.i4u_UT_Cases\r\n\t\tWHERE Ordinal = @CaseOrdinal AND CaseID = @CaseID) AS [OldStatus];\r\n"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Grid": "[{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseOrdinal\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"activity\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseNum\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@CaseID\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Body.CaseID\"}}},{\"Name\":{\"syntax\":\"Literal\",\"expressions\":{\"Literal\":\"@loggedInUser\",\"JavaScript\":\"\"}},\"Value\":{\"syntax\":\"JavaScript\",\"expressions\":{\"Literal\":\"\",\"JavaScript\":\"activities.EndpointData.Output().Headers.loggedinpartyid\"}}}]",
+                "JavaScript": "JSON.stringify([{\"Name\":\"@CaseOrdinal\",\"Value\":String((activities.EndpointData.Output().Body.CaseNum) ?? \"\")},{\"Name\":\"@CaseID\",\"Value\":String((activities.EndpointData.Output().Body.CaseID) ?? \"\")},{\"Name\":\"@loggedInUser\",\"Value\":String((activities.EndpointData.Output().Headers.loggedinpartyid) ?? \"\")}])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "a6cc0a55-a6e6-4eae-9443-7ff33d33f249",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - General Error",
+          "x": 510,
+          "y": 290,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "Literal": "An unexpected error occurred. Please contact a system adminstrator."
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "type": "If",
+          "displayName": "IF: Case Valid",
+          "x": 40,
+          "y": 540,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Validation.ResultSet()[0].Valid == 1"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "55727115-9880-478e-8fc9-b971c2bd205d",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - Case Not Valid",
+          "x": 510,
+          "y": 540,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "JavaScript": "String(activities.SQL_Validation.ResultSet()[0].Message || 'Case not valid').replace(/\\s*\\|\\s*$/, '')"
+              },
+              "syntax": "JavaScript"
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "BadRequest"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "016ae19d-7e1c-4bb4-8dfb-dd424c8ff42a",
+          "type": "IntelligentQueryArchitectData",
+          "name": "IQA_StatusList",
+          "displayName": "IQA: Case Status Value List",
+          "description": null,
+          "x": 40,
+          "y": 790,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "IqaPath",
+              "syntax": null,
+              "expressions": {
+                "Literal": "$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Value List - Case Status"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "Offset",
+              "syntax": null,
+              "expressions": {}
+            },
+            {
+              "name": "Limit",
+              "syntax": null,
+              "expressions": {
+                "Literal": "100"
+              }
+            },
+            {
+              "name": "CollectionName",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e67a522e-5e35-4c92-855e-9400fb20a10c",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - Status List Failure",
+          "x": 510,
+          "y": 790,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {
+                "Literal": "The case statuses could not be read. Please try again."
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "595f2537-6949-485e-b4a6-33272e307b75",
+          "type": "IntelligentQueryArchitectData",
+          "name": "IQA_GetPreviousStatus",
+          "displayName": "IQA: Get Previous Status",
+          "x": 40,
+          "y": 1040,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "IqaPath",
+              "expressions": {
+                "Literal": "$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Manage Case - Reopen - Get Previous Status"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "Literal": "",
+                "JavaScript": "'&parameter='+activities.EndpointData.Output().Body.CaseID"
+              }
+            },
+            {
+              "name": "Offset",
+              "expressions": {}
+            },
+            {
+              "name": "Limit",
+              "expressions": {
+                "Literal": "1"
+              }
+            },
+            {
+              "name": "CollectionName",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "3cba75ac-ab0d-4568-8847-92a7b776693b",
+          "type": "RunJavaScript",
+          "name": "JS_ChooseStatus",
+          "displayName": "JS: Choose Reopen Status",
+          "description": null,
+          "x": 40,
+          "y": 1290,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "// Which status the case goes back to (owner, 17 November 2026): the one\n// it had before it was resolved, from the change log (IQA_GetPreviousStatus:\n// the Old of the newest i4u_UT_Logging Status row), if that is still an\n// open status in the Case Status value list. Otherwise In Progress, or the\n// list's first open status. Columns are matched whatever their case,\n// spaces or underscores, as Set Status matches them.\nvar key = function (name) { return String(name).replace(/[\\s_]/g, '').toLowerCase(); };\nvar get = function (row, name) {\n  var column = Object.keys(row || {}).find(function (each) { return key(each) === key(name); });\n  return column === undefined ? undefined : row[column];\n};\nvar text = function (value) { return String(value ?? '').trim(); };\nvar read = function (fn) { try { return Array.from(fn() || []); } catch (error) { return []; } };\n\nvar statuses = read(function () { return activities.IQA_StatusList.ResultSet(); });\nvar entry = function (code) {\n  return statuses.find(function (row) { return text(get(row, 'Code')).toLowerCase() === text(code).toLowerCase(); });\n};\nvar isOpen = function (code) {\n  var row = entry(code);\n  return text(code) !== '' && !!row && !/^(true|1|yes|y)$/i.test(text(get(row, 'Closed Status')));\n};\n\nvar current = text(activities.SQL_Validation.ResultSet()[0].OldStatus);\nvar logged = read(function () { return activities.IQA_GetPreviousStatus.ResultSet(); });\nvar previous = logged.length ? text(get(logged[0], 'Old')) : '';\n\nvar firstOpen = statuses.map(function (row) { return text(get(row, 'Code')); }).find(isOpen) || '';\nvar fallback = isOpen('InProgress') ? 'InProgress' : firstOpen;\n\nsetVariable('Reopen', {\n  current: current,\n  // Already open (another tab, or a second click): nothing to do.\n  alreadyOpen: isOpen(current),\n  status: isOpen(previous) ? previous : fallback,\n  fromLog: isOpen(previous)\n});"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "c71e2918-f7f8-4cee-887c-c815f75ac18b",
+          "type": "If",
+          "name": "IF_AlreadyOpen",
+          "displayName": "IF: Already Open",
+          "description": null,
+          "x": 40,
+          "y": 1540,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getVariable('Reopen').alreadyOpen === true"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "2ac13644-a0a9-4599-8a8e-b36a707bad03",
+          "type": "WriteHttpResponse",
+          "name": "Response_AlreadyOpen",
+          "displayName": "HTTP Response - Already Open",
+          "description": null,
+          "x": 510,
+          "y": 1540,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify({Status: String(getVariable('Reopen').current), AlreadyOpen: true})"
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "application/json"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "OK"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "49a5f945-1a4a-4331-895f-18a7a02429b1",
+          "type": "If",
+          "name": "IF_HasStatus",
+          "displayName": "IF: Open Status Found",
+          "description": null,
+          "x": 40,
+          "y": 1790,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Condition",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "String(getVariable('Reopen').status) !== ''"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "3caf9762-e824-428e-8629-1e4bb1586ed1",
+          "type": "WriteHttpResponse",
+          "name": "Response_NoOpenStatus",
+          "displayName": "HTTP Response - No Open Status",
+          "description": null,
+          "x": 510,
+          "y": 1790,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "'The case statuses list no open status to reopen the case to. Nothing was changed.'"
+              }
+            },
+            {
+              "name": "ContentType",
+              "syntax": null,
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "syntax": null,
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "syntax": null,
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "syntax": null,
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "39fea485-b68f-4497-b29d-5f6b0566d005",
+          "type": "UpdateSingleInstanceDataSource",
+          "name": "iMIS_Update",
+          "displayName": "Update iMIS - i4u_UT_Cases",
+          "x": 40,
+          "y": 2040,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "NameOfDataSource",
+              "expressions": {
+                "Literal": "i4u_UT_Cases"
+              }
+            },
+            {
+              "name": "DataMapping",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify([\n  {\"Name\": \"Status\", \"Value\": String(getVariable('Reopen').status)},\n  {\"Name\": \"LastUpdatedBy\", \"Value\": String(activities.EndpointData.Output().Headers.loggedinpartyid ?? \"\")},\n  {\"Name\": \"LastUpdatedOn\", \"Value\": String(activities.SQL_Validation.ResultSet()[0].Timestamp ?? \"\")}\n])"
+              }
+            },
+            {
+              "name": "PartyId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.EndpointData.Output().Body.CaseNum"
+              }
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "8ef85e5c-3e48-4387-b7f9-97ece8a37beb",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - iMIS update failure",
+          "x": 510,
+          "y": 2040,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.iMIS_Update.Exception() + ' ' + \r\nactivities.iMIS_Update.InnerException()"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "SQL_Insert",
+          "displayName": "SQL: CT Update - i4u_UT_Cases",
+          "x": 40,
+          "y": 2290,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "ConnectionId",
+              "expressions": {
+                "Literal": "default"
+              }
+            },
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "UPDATE [Cases].[i4u_UT_Cases]\r\nSET Status = @Status,\r\n\tLastUpdatedBy = @LoggedInUser,\r\n\tLastUpdateOn = @LocalTimestamp\r\nWHERE Ordinal = @CaseOrdinal\r\n\tAND CaseID = @CaseID\r\n"
+              }
+            },
+            {
+              "name": "Parameters",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify([\n  {\"Name\": \"@CaseOrdinal\", \"Value\": String(activities.EndpointData.Output().Body.CaseNum ?? \"\")},\n  {\"Name\": \"@CaseID\", \"Value\": String(activities.EndpointData.Output().Body.CaseID ?? \"\")},\n  {\"Name\": \"@Status\", \"Value\": String(getVariable('Reopen').status)},\n  {\"Name\": \"@LoggedInUser\", \"Value\": String(activities.EndpointData.Output().Headers.loggedinpartyid ?? \"\")},\n  {\"Name\": \"@LocalTimestamp\", \"Value\": String(activities.SQL_Validation.ResultSet()[0].Timestamp ?? \"\")}\n])"
+              }
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            },
+            {
+              "name": "StrictlySelectOnly",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e9accf6e-d920-4a6f-9e1e-b1b058331eda",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - CT insert failure",
+          "x": 510,
+          "y": 2290,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.SQL_Insert.Exception()"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "a0a49466-6af9-4811-8db2-3c5f7570480b",
+          "type": "RunJavaScript",
+          "name": "CreateLogContext",
+          "displayName": "JS: Create Log Context",
+          "x": 40,
+          "y": 2540,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Script",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": "// One change-log entry: the case's status, from closed back to the one it\n// reopens to (JS_ChooseStatus), under the i4u_UT_Cases column name.\nvar endpoint = activities.EndpointData.Output();\nvar body = endpoint.Body;\nvar reopen = getVariable('Reopen');\n\nvar logContext = {\n    \"Note\": \"Case \" + body.CaseID + \": Reopened\",\n    \"Table\": \"i4u_UT_Cases\",\n    \"UpdateReason\": \"Edit\",\n    \"workflowDefinitionId\": workflowDefinitionId, // DON'T UPDATE, VARIABLE IS PROVIDED BY CLOUDTOOLZ\n    \"sourceOrdinal\": String(body.CaseNum) // the case's ordinal\n};\n\n// Names must match the keys in logBody.\nvar fieldsToCompare = [\"Status\"];\n\nvar logBody = {\n    \"Status\": String(reopen.status),\n    \"OldValue\": JSON.stringify({\"Status\": String(reopen.current)})\n};\n\nsetVariable('logChanges', {\n    \"logContext\": logContext, // DON'T CHANGE\n    \"fieldsToCompare\": fieldsToCompare, // DON'T CHANGE\n    \"body\": logBody,\n    \"profileID\": String(body.CaseID), // the case the change belongs to\n    \"updatedByID\": endpoint.Headers.loggedinpartyid\n});"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "b07bb83a-0471-4466-8d58-8a90405eab7f",
+          "type": "RunWorkflow",
+          "name": "LogChangesToIMIS",
+          "displayName": "Log Changes To IMIS",
+          "x": 40,
+          "y": 2790,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "WorkflowDefinitionId",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getWorkflowDefinitionIdByName('LogChangesToIMIS')"
+              }
+            },
+            {
+              "name": "Input",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "getVariable('logChanges')"
+              }
+            },
+            {
+              "name": "PossibleOutcomes",
+              "expressions": {}
+            },
+            {
+              "name": "Mode",
+              "expressions": {
+                "Literal": "FireAndForget"
+              }
+            },
+            {
+              "name": "TenantId",
+              "expressions": {}
+            },
+            {
+              "name": "CorrelationId",
+              "expressions": {}
+            },
+            {
+              "name": "ContextId",
+              "expressions": {}
+            },
+            {
+              "name": "CustomAttributes",
+              "expressions": {}
+            },
+            {
+              "name": "RetryFailedActivities",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        },
+        {
+          "activityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "type": "WriteHttpResponse",
+          "displayName": "HTTP Response - Reopened",
+          "x": 40,
+          "y": 3040,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "JSON.stringify({Status: String(getVariable('Reopen').status), FromLog: getVariable('Reopen').fromLog === true})"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "application/json"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "OK"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {}
+        }
+      ],
+      "connections": [
+        {
+          "sourceActivityId": "568df3ab-c244-4da3-8b15-034b7ae9e26d",
+          "targetActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "targetActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "8501032d-06f9-4453-93af-ff97fc3cf263",
+          "targetActivityId": "a6cc0a55-a6e6-4eae-9443-7ff33d33f249",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "targetActivityId": "016ae19d-7e1c-4bb4-8dfb-dd424c8ff42a",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "1e2d6057-5770-4ccb-a22e-5eae5cc63742",
+          "targetActivityId": "55727115-9880-478e-8fc9-b971c2bd205d",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "016ae19d-7e1c-4bb4-8dfb-dd424c8ff42a",
+          "targetActivityId": "595f2537-6949-485e-b4a6-33272e307b75",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "016ae19d-7e1c-4bb4-8dfb-dd424c8ff42a",
+          "targetActivityId": "e67a522e-5e35-4c92-855e-9400fb20a10c",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "595f2537-6949-485e-b4a6-33272e307b75",
+          "targetActivityId": "3cba75ac-ab0d-4568-8847-92a7b776693b",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "595f2537-6949-485e-b4a6-33272e307b75",
+          "targetActivityId": "3cba75ac-ab0d-4568-8847-92a7b776693b",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "3cba75ac-ab0d-4568-8847-92a7b776693b",
+          "targetActivityId": "c71e2918-f7f8-4cee-887c-c815f75ac18b",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "c71e2918-f7f8-4cee-887c-c815f75ac18b",
+          "targetActivityId": "2ac13644-a0a9-4599-8a8e-b36a707bad03",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "c71e2918-f7f8-4cee-887c-c815f75ac18b",
+          "targetActivityId": "49a5f945-1a4a-4331-895f-18a7a02429b1",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "49a5f945-1a4a-4331-895f-18a7a02429b1",
+          "targetActivityId": "39fea485-b68f-4497-b29d-5f6b0566d005",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "49a5f945-1a4a-4331-895f-18a7a02429b1",
+          "targetActivityId": "3caf9762-e824-428e-8629-1e4bb1586ed1",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "39fea485-b68f-4497-b29d-5f6b0566d005",
+          "targetActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "39fea485-b68f-4497-b29d-5f6b0566d005",
+          "targetActivityId": "8ef85e5c-3e48-4387-b7f9-97ece8a37beb",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "targetActivityId": "a0a49466-6af9-4811-8db2-3c5f7570480b",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "93482b9f-6aa6-458b-b481-050d04b31377",
+          "targetActivityId": "e9accf6e-d920-4a6f-9e1e-b1b058331eda",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "a0a49466-6af9-4811-8db2-3c5f7570480b",
+          "targetActivityId": "b07bb83a-0471-4466-8d58-8a90405eab7f",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "b07bb83a-0471-4466-8d58-8a90405eab7f",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "b07bb83a-0471-4466-8d58-8a90405eab7f",
+          "targetActivityId": "e3d6e95e-58b6-4d95-b88a-1d89a51bb00d",
+          "outcome": "Not Found"
+        }
+      ],
+      "id": "047100c2d16f4849a4ddec1b9dcb4c08"
+    }
+  ]
+}

@@ -1456,12 +1456,17 @@
       refresh: reload}
   });
 
+  // Reopen case (owner, 17 November 2026: "Cases: Quick Update - Reopen").
+  // The flow checks the case as the other quick updates do, from CaseID and
+  // CaseNum, and sets the status the case had before it was resolved (from
+  // the change log), or In Progress. The resolution stays on the case. An
+  // already open case (another tab) answers 200 without a change.
   define('cases.reopen', {
     presentation: {label: 'Reopen case', icon: 'ti-lock-open', default: 'button', menu: 'menu-item'},
     context: {caseId, caseNum},
     action: {type: 'function', recordKey: ['caseId'], access: whenClosed,
-      confirm: {message: 'Reopen this case? It goes back to Open; its resolution stays in the case history.'},
-      run: ({context}) => post('/cases/reopen', {CaseID: context.caseId}),
+      confirm: {message: 'Reopen this case? It goes back to the status it had before it was resolved. Its resolution is kept.'},
+      run: ({context}) => post('/cases/quick-update/reopen', {CaseID: context.caseId, CaseNum: context.caseNum}),
       refresh: {when: 'success', run: () => location.reload()}}
   });
 

@@ -206,8 +206,10 @@ Known IQAs, from the live tenant's IQA list:
    `/cases/quick-add/contact` (a stub today; its replacement is drafted in
    `flows/`); the workplace save's corrected flow (C42, also in `flows/`),
    and `set-primary-party` setting the new primary's primary workplace or
-   clearing it (C42); `/cases/attachment-access` and
-   `/cases/reopen` (CloudToolz). `/cases/resolve-case` exists but has not
+   clearing it (C42); `/cases/attachment-access` (CloudToolz). Reopen case
+   is `/cases/quick-update/reopen` (owner's flow, fixed in
+   `flows/Cases-Quick-Update-Reopen.flow.json`, 17 November 2026; theme
+   `1.0.33`). `/cases/resolve-case` exists but has not
    run; the Resolve case form (`/Cases_ResolveCase`) is to confirm. Can an
    employer be the primary party? The prototype says no.
 4. **Member card fields.** The suggested details (mobile, email, paid to,
