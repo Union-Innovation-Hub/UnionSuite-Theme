@@ -8,7 +8,7 @@ asks:
   - change the groups on the details tab
   - change what the resolution panel shows
   - rename a field on the case details
-keywords: [details, case details, resolution, panel, field, fields, group, heading, label, Group-Label, alert, outcome]
+keywords: [details, case details, resolution, panel, field, fields, group, heading, label, Group-Label, alert, outcome, awarded, amount won, weeks won, comments, nothing was awarded]
 related: [where-case-settings-live, field-group-columns, update-case-details, resolve-and-close]
 ---
 | Panel | IQA (in `$/_i4u_/Client/Cases/UnionSuite/Layouts`) | Where it shows |
@@ -25,7 +25,22 @@ The panels lay themselves out from the IQA's column names, so a change is just a
 - **Case details** groups its fields under *Case* (`Case-Type`, `Case-Status`, `Case-Access`…), *Dates* (`Dates-Opened`, `Dates-Incident Date`, `Dates-Duration`) and *Workplace* (`Workplace-Workplace`, `Workplace-Address`…).
 - For a case that isn't about a workplace, every `Workplace-` field is blank, so the group shows *This case isn't about a workplace.* instead, as the member card does. The line comes from the `Empty-Workplace` column, an expression returning `N'This case isn’t about a workplace.'` every time; the panel only uses it when the group is blank. Change the text there, or remove the column to show dashes.
 - The older `Additional-` columns (Lead staff, Workbench, Source) show under a heading *Additional* here. Rename them `Case-` to put them with the other case fields.
-- **Resolution** shows `Alert-Title`, `Alert-Message` and `Alert-Tone`: *Not yet resolved* (info) while the case is open and *Resolved* (success) once it closes, then the outcome fields (`1-Amount won`). `Alert-Only` set to true shows just the alert.
+- **Resolution** shows `Alert-Title`, `Alert-Message` and `Alert-Tone`: *Not yet resolved* (info) while the case is open and *Resolved* (success) once it closes. `Alert-Only` set to true shows just the alert. Under the alert, the fields sit under three headings:
+
+| Column | Shows |
+| --- | --- |
+| `Outcome-Resolution Date` | *Resolution Date* under *Outcome* |
+| `Outcome-Outcome` | The outcome type's name, such as *Won* |
+| `Awarded-Amount won` | The amount, such as *$4,250.00*, under *Awarded*. Blank when nothing was won |
+| `Awarded-Weeks won` | The weeks, such as *2 weeks*. Blank when none |
+| `Empty-Awarded` | *Nothing was awarded.*, shown instead of the two awards when both are blank |
+| `Comments-Resolution comments` | The comments from **Resolve case**, under *Comments* |
+
+**Amounts and weeks** show exactly as the IQA returns them, and a decimal column comes back as `4250.000000000000`. So the two awards are SQL expressions that format the value and return blank for nothing (use the IQA's own source name in place of `Cases`):
+
+- `Awarded-Amount won`: `CASE WHEN ISNULL(Cases.ResolutionAmount, 0) > 0 THEN '$' + FORMAT(Cases.ResolutionAmount, 'N2') ELSE '' END`
+- `Awarded-Weeks won`: `CASE WHEN ISNULL(Cases.ResolutionWeeks, 0) > 0 THEN FORMAT(Cases.ResolutionWeeks, '0.##') + CASE WHEN Cases.ResolutionWeeks = 1 THEN ' week' ELSE ' weeks' END ELSE '' END`
+- `Empty-Awarded`: `N'Nothing was awarded.'`
 
 **The same label in two groups**
 

@@ -782,9 +782,14 @@
         'Alert-Title': 'Resolved',
         'Alert-Message': "Closed 20 Nov 2026 by Mary O'Conner.",
         'Alert-Tone': 'success',
-        'Outcome type': 'Resolved with employer',
-        '1-Amount won': '',
-        '2-Outcome': 'Supervisor moved off the night shift; the employer agreed to bullying training for all shift leads.'
+        // Three headed rows (owner, 17 November 2026): the outcome, what was
+        // won (a line in place of dashes when nothing was), the comments.
+        'Outcome-Resolution Date': '2026-11-20T00:00:00',
+        'Outcome-Outcome': 'Resolved with employer',
+        'Awarded-Amount won': '$4,250.00',
+        'Awarded-Weeks won': '2 weeks',
+        'Empty-Awarded': 'Nothing was awarded.',
+        'Comments-Resolution comments': 'Supervisor moved off the night shift; the employer agreed to bullying training for all shift leads.'
       } : {
         'Alert-Title': 'Not yet resolved',
         'Alert-Message': 'Resolve the case when it is finished: its outcome is recorded and it closes.',
