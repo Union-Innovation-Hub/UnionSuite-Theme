@@ -15,7 +15,7 @@ related: [resolve-and-close, see-what-changed]
 **Fix the outcome**
 
 1. Choose **Edit resolution** from the banner's **Actions** menu or the status menu.
-2. Change the outcome and save. The case stays closed.
+2. Change the outcome and save. The case stays closed. Where the form shows **Status**, you can change which closing status the case has.
 
 **Reopen the case**
 

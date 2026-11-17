@@ -76,15 +76,26 @@ const FIELDS = [
     javaScript: read('prefill.js')
   }),
 
+  // The status the case closes with (owner, 17 November 2026). The prefill
+  // sends the closed statuses and the script fills this list: with several
+  // it shows, required; with one or none it stays hidden and sends that one,
+  // or Complete. Complete is here so a form whose prefill never answers
+  // still sends what the flow did before.
+  field('select', 'Status', {
+    label: 'Status',
+    className: 'form-control row-1 col-md-6',
+    values: [{label: 'Complete', value: 'Complete', selected: true}]
+  }),
+
   field('select', 'ResolutionType', {
     label: 'Outcome type',
-    className: 'form-control row-1 col-md-6',
+    className: 'form-control row-2 col-md-6',
     required: true,
     iqaPathWithParameters: '$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Case Value List - Outcome Type'
   }),
   field('date', 'ResolutionDate', {
     label: 'Closed date',
-    className: 'form-control row-1 col-md-6',
+    className: 'form-control row-2 col-md-6',
     subtype: 'date',
     required: true
   }),
@@ -94,18 +105,18 @@ const FIELDS = [
   // sending; blank means nothing awarded.
   field('text', 'ResolutionAmount', {
     label: 'Amount awarded',
-    className: 'form-control row-2 col-md-6',
+    className: 'form-control row-3 col-md-6',
     subtype: 'text'
   }),
   field('text', 'ResolutionWeeks', {
     label: 'Time awarded',
-    className: 'form-control row-2 col-md-6',
+    className: 'form-control row-3 col-md-6',
     subtype: 'text'
   }),
 
   field('textarea', 'Resolution', {
     label: 'Outcome',
-    className: 'form-control row-3 col-md-12',
+    className: 'form-control row-4 col-md-12',
     subtype: 'textarea',
     rows: 4,
     placeholder: 'What happened, in a few sentences'

@@ -11,6 +11,10 @@
    - applies the FormFields rules the prefill returns (ReqVals: Visible 0
      hides a field, IsRequired marks it, Editable 0 disables it). Fields
      without a rule stay as built: Outcome type and Closed date required;
+   - fills Status with the closed statuses the prefill sends (owner,
+     17 November 2026): with several it shows, required (the current one
+     chosen when editing); with one or none it stays hidden and sends that
+     one, or Complete;
    - draws the case line, and the open-tasks warning when resolving;
    - starts Closed date as today (not in the future, not before the case
      opened), with Today and Yesterday;
@@ -42,6 +46,7 @@
   /* ---------- Settings ---------- */
 
   const MISSING = {
+    Status: 'Choose the status the case closes with.',
     ResolutionType: 'Choose the outcome type.',
     ResolutionDate: 'Enter the date the case closed.'
   };
@@ -287,6 +292,44 @@
     });
   }
 
+  /* ---------- Status ---------- */
+
+  // Hidden until the prefill says which statuses close a case, still
+  // sending its built-in Complete if the prefill never answers.
+  const statusField = wrapper('Status');
+  if (statusField) {
+    statusField.hidden = true;
+  }
+
+  // The closed statuses ({Code, Description}). Several: a required list,
+  // starting on "Choose the status" (or the case's own when editing). One
+  // or none: hidden, sending that one or Complete; the flow decides the same
+  // way, so the list only matters when there is a choice.
+  function showStatuses(list, current) {
+    const select = control('Status');
+    if (!select || !statusField) {
+      return;
+    }
+    const statuses = (Array.isArray(list) ? list : [])
+      .map(entry => ({code: String((entry && entry.Code) || '').trim(), label: String((entry && (entry.Description || entry.Code)) || '').trim()}))
+      .filter(entry => entry.code !== '');
+    select.innerHTML = '';
+    if (statuses.length <= 1) {
+      const only = statuses[0] || {code: 'Complete', label: 'Complete'};
+      select.add(new Option(only.label, only.code, true, true));
+      setRequired('Status', false);
+      statusField.hidden = true;
+      $(select).trigger('change');
+      return;
+    }
+    select.add(new Option('Choose the status', ''));
+    statuses.forEach(entry => select.add(new Option(entry.label, entry.code)));
+    const own = statuses.find(entry => entry.code.toLowerCase() === String(current || '').trim().toLowerCase());
+    $(select).val(editing && own ? own.code : '').trigger('change');
+    statusField.hidden = false;
+    setRequired('Status', true);
+  }
+
   /* ---------- Mode, the case line and open tasks ---------- */
 
   const editing = /^(true|1|yes)$/i.test(param('Edit'));
@@ -461,7 +504,7 @@
   // Every shown, editable field that fails, with what it says.
   function problems() {
     const found = [];
-    ['ResolutionType', 'ResolutionDate', 'ResolutionAmount', 'ResolutionWeeks', 'Resolution'].forEach(name => {
+    ['Status', 'ResolutionType', 'ResolutionDate', 'ResolutionAmount', 'ResolutionWeeks', 'Resolution'].forEach(name => {
       const el = control(name);
       const field = wrapper(name);
       if (!el || el.disabled || !field || field.hidden) {
@@ -586,12 +629,14 @@
   /* ---------- The prefill ---------- */
 
   /* The prefill's answer: ReqVals (the FormFields rules), and optionally
-     MemberName, DateOpened, and in edit mode the values as id-val-<Field>
-     (BeyondFormz has already written those in) with ResolvedBy and
-     ResolvedOn. */
+     MemberName, DateOpened, ClosedStatuses, and in edit mode the values as
+     id-val-<Field> (BeyondFormz has already written those in) with
+     CurrentStatus, ResolvedBy and ResolvedOn. */
   function prefill(answer) {
     const data = parse(answer) || {};
     applyRules(parse(data.ReqVals));
+    // After the rules: the flow needs a status whenever there is a choice.
+    showStatuses(parse(data.ClosedStatuses), data.CurrentStatus);
     markOptional();
     drawCase(data.MemberName || '');
 

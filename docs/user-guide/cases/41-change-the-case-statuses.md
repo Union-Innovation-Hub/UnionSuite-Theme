@@ -35,7 +35,9 @@ The base version ships three rows:
 
 **What Open and Closed change**
 
-- **The status menu** in the banner lists the `Open` statuses, in the table's order. A `Closed` status is never chosen there: a case closes through **Resolve case**, which saves `Complete`.
+- **The status menu** in the banner lists the `Open` statuses, in the table's order. A `Closed` status is never chosen there: a case closes through **Resolve case**.
+- **Resolve case** closes the case with a `Closed` status. With several, its form asks for one (**Status**, required) in the table's order; with one, it uses that one without asking; with none, it saves `Complete`. **Edit resolution** can change the case to another `Closed` status.
+- **Reopen case** goes back to the case's status before it was resolved, from its history, or `InProgress`.
 - **The actions:** an open case offers **Resolve case**; a closed case offers **Edit resolution** and **Reopen case**.
 - **The Overview's Resolution panel** shows only once the case's status is `Closed`.
 
@@ -61,4 +63,6 @@ Each status's colour is a second lookup table, **`i4u_UT_CASE_STATUSCOLOUR`**, m
 - `Closed Status` must be `true` or `false` (`true` when **Expansion** is `Closed`). The page reads `true`, `1`, `yes` or `y` as closed, so the word `Closed` would count as open.
 - `Colour` is the colour table's **Description**, blank for a status without a row. The status menu and the status save use it. The Overview's Resolution gate, `Query Template - Manage Case - Case Resolved` in the same folder, joins the case's status to the table and returns a row only when its **Expansion** is `Closed`. So a new row works everywhere once it is in the table.
 
-> **Tip:** Keep a `Complete` row with Expansion `Closed`. Resolve case saves that code.
+The Resolve case form and its flows read the same IQA for the `Closed` statuses (the prefill for the list, the save to check the choice), so a new closed status shows in the form once it is in the table.
+
+> **Tip:** With no `Closed` row at all, Resolve case still saves `Complete`, but the page then can't tell the case is closed. Keep at least one `Closed` row.

@@ -16,6 +16,7 @@
   const state = {
     prefill: pick('prefill', ['full', 'rules']),
     save: pick('save', ['ok', 'fail']),
+    statuses: pick('statuses', ['several', 'one', 'none']),
     scheme: pick('scheme', ['light', 'dark'])
   };
   document.documentElement.setAttribute('data-us-color-scheme', state.scheme);
@@ -40,6 +41,14 @@
     {FieldName: 'Resolution', Visible: 1, IsRequired: 0, Editable: 1}
   ];
 
+  // The Case Status value list's closed statuses, as the prefill sends
+  // them (?statuses=several|one|none).
+  const CLOSED = {
+    several: [{Code: 'Won', Description: 'Won'}, {Code: 'Lost', Description: 'Lost'}, {Code: 'Withdrawn', Description: 'Withdrawn'}],
+    one: [{Code: 'Complete', Description: 'Complete'}],
+    none: []
+  }[state.statuses];
+
   const editing = params.get('Edit') === 'true';
 
   function answer(flow, body) {
@@ -49,7 +58,7 @@
         // back as the column's zero.
         return {ReqVals: RULES, 'id-val-ResolutionAmount': '0.000000000000', 'id-val-ResolutionWeeks': '0.000000000000'};
       }
-      const full = {ReqVals: RULES, MemberName: 'Tony Andrews', DateOpened: '2025-08-18T00:00:00'};
+      const full = {ReqVals: RULES, MemberName: 'Tony Andrews', DateOpened: '2025-08-18T00:00:00', ClosedStatuses: CLOSED};
       if (!editing) {
         return {...full, 'id-val-ResolutionAmount': '0.000000000000', 'id-val-ResolutionWeeks': '0.000000000000'};
       }
@@ -60,6 +69,7 @@
         'id-val-ResolutionAmount': '4250.000000000000',
         'id-val-ResolutionWeeks': '2.000000000000',
         'id-val-Resolution': 'Employer agreed to back-pay the unpaid overtime, to restore two weeks of personal leave, and to correct the roster rules.',
+        CurrentStatus: CLOSED.length > 1 ? 'Lost' : 'Complete',
         ResolvedBy: 'Sam Carter',
         ResolvedOn: '2026-11-12T15:20:00'
       };
@@ -256,7 +266,7 @@
         run(field, root);
       })), 200);
       autoexecute.forEach(field => run(field, root));
-      log('Rendered ' + form.fields.length + ' fields; prefill: ' + state.prefill + ', edit: ' + editing + ', save: ' + state.save);
+      log('Rendered ' + form.fields.length + ' fields; prefill: ' + state.prefill + ', closed statuses: ' + state.statuses + ', edit: ' + editing + ', save: ' + state.save);
     })
     .catch(error => log('Could not load dist/Imports/Resolve-Case-Form.json: build it first. ' + error));
 })();

@@ -8,16 +8,23 @@
    definitionId and versionId, so importing the output overwrites them:
 
    - US Case Form Prefill: Resolve Case   POST /Cases/US/Resolve/Prefill
-     Only its Success HTTP Response is changed: ReqVals as before;
-     DateOpened (FirstCreatedOn) and MemberName when the case row has them;
-     with Edit=true the saved values as id-val-*, blanks and zero amounts
-     left empty. Without Edit it sends no values: the old answer wrote
-     1970-01-01 (a blank date run through formatDate) and 0.000000000000
-     into the empty form.
+     Its steps are kept, with IQA_StatusList (the Case Status value list)
+     added once between the case read and the answer. Its Success HTTP
+     Response: ReqVals as before; DateOpened (FirstCreatedOn) and
+     MemberName when the case row has them; ClosedStatuses, the value
+     list's closed statuses as {Code, Description}, for the form's Status
+     dropdown (owner, 17 November 2026); with Edit=true the saved values as
+     id-val-*, blanks and zero amounts left empty, and CurrentStatus.
+     Without Edit it sends no values: the old answer wrote 1970-01-01 (a
+     blank date run through formatDate) and 0.000000000000 into the empty
+     form.
 
    - US Case Form: Resolve Case           POST /Cases/US/Resolve
      Everything inside it is replaced (owner, 17 November 2026): no email is
      sent from CloudToolz. In order:
+       0. the status it closes with, from the value list's closed
+          statuses: none, Complete; one, that one; several, the form's
+          choice (refused if it isn't one of them);
        1. the case in iMIS (i4u_UT_Cases);
        2. the case in CloudToolz (Cases.i4u_UT_Cases);
        3. the change log (LogChangesToIMIS);
@@ -77,6 +84,14 @@ const build = {
     property('Parameters', javascript(parameters), 'JavaScript'),
     property('Timeout', none()),
     property('StrictlySelectOnly', none())
+  ]],
+
+  iqa: (iqaPath, parameters, limit) => ['IntelligentQueryArchitectData', [
+    property('IqaPath', literal(iqaPath)),
+    property('Parameters', javascript(parameters), 'JavaScript'),
+    property('Offset', none()),
+    property('Limit', literal(String(limit))),
+    property('CollectionName', none())
   ]],
 
   insert: (dataSource, mapping) => ['InsertIntoDataSource', [
@@ -247,15 +262,78 @@ var json = {
   "MemberName": text(row.PrimaryContactName ?? row.MemberName ?? row.FullName)
 };
 
+// The closed statuses (Closed Status true in the Case Status value list),
+// for the form's Status dropdown. None or one: the form hides it and sends
+// that one, or Complete. Columns are matched whatever their case, spaces or
+// underscores, as Set Status matches them.
+var key = function (name) { return String(name).replace(/[\\s_]/g, '').toLowerCase(); };
+var get = function (item, name) {
+  var column = Object.keys(item || {}).find(function (each) { return key(each) === key(name); });
+  return column === undefined ? undefined : item[column];
+};
+var statuses = [];
+try {
+  statuses = Array.from(activities.IQA_StatusList.ResultSet() || []);
+} catch (error) {
+  statuses = [];
+}
+json["ClosedStatuses"] = statuses
+  .filter(function (item) { return /^(true|1|yes|y)$/i.test(text(get(item, 'Closed Status'))); })
+  .map(function (item) { return {Code: text(get(item, 'Code')), Description: text(get(item, 'Description')) || text(get(item, 'Code'))}; })
+  .filter(function (item) { return item.Code !== ''; });
+
 if (editing) {
   json["id-val-ResolutionType"] = text(row.ResolutionType);
   json["id-val-ResolutionDate"] = day(row.ResolutionDate);
   json["id-val-ResolutionAmount"] = number(row.ResolutionAmount);
   json["id-val-ResolutionWeeks"] = number(row.ResolutionWeeks);
   json["id-val-Resolution"] = text(row.Resolution);
+  json["CurrentStatus"] = text(row.Status);
 }
 
 return json;`);
+
+// The Case Status value list, read after the case and before the answer.
+// Added once: a later export already has it, and only its settings are set.
+const STATUS_LIST_IQA = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Value List - Case Status';
+const statusListProperties = () => [
+  {name: 'IqaPath', syntax: null, expressions: {Literal: STATUS_LIST_IQA}},
+  {name: 'Parameters', syntax: null, expressions: {}},
+  {name: 'Offset', syntax: null, expressions: {}},
+  {name: 'Limit', syntax: null, expressions: {Literal: '100'}},
+  {name: 'CollectionName', syntax: null, expressions: {}}
+];
+const prefillCaseRead = prefill.flow.activities.find(entry => entry.name === 'CaseDetailsCurrentQ');
+const prefillStatuses = prefill.flow.activities.find(entry => entry.name === 'IQA_StatusList');
+if (prefillStatuses) {
+  prefillStatuses.properties = statusListProperties();
+} else {
+  const added = {
+    activityId: stableId('resolve-case-prefill', 'IQA_StatusList'),
+    type: 'IntelligentQueryArchitectData',
+    name: 'IQA_StatusList',
+    displayName: 'IQA: Case Status Value List',
+    description: null,
+    x: prefillCaseRead.x + 235,
+    y: prefillCaseRead.y + 133,
+    persistWorkflow: false,
+    loadWorkflowContext: false,
+    saveWorkflowContext: false,
+    properties: statusListProperties(),
+    propertyStorageProviders: {}
+  };
+  prefill.flow.activities.push(added);
+  const toAnswer = prefill.flow.connections.find(entry => entry.sourceActivityId === prefillCaseRead.activityId && entry.outcome === 'True');
+  if (!toAnswer || toAnswer.targetActivityId !== prefillResponse.activityId) {
+    throw new Error(PREFILL + ': CaseDetailsCurrentQ True does not lead to the Success HTTP Response');
+  }
+  toAnswer.targetActivityId = added.activityId;
+  // A list that can't be read still answers: the form then hides Status.
+  prefill.flow.connections.push(
+    {sourceActivityId: added.activityId, targetActivityId: prefillResponse.activityId, outcome: 'True'},
+    {sourceActivityId: added.activityId, targetActivityId: prefillResponse.activityId, outcome: 'False'}
+  );
+}
 
 /* ======================================================================
    Resolve: one save, in order. Before iMIS is written, a problem answers an
@@ -320,8 +398,40 @@ LEFT JOIN [Cases].[i4u_UT_Cases] AS C
   AND C.CaseID = @CaseID;
 `;
 
-// Blank amounts, weeks and date save as NULL. Resolving also completes the
-// case; editing changes the resolution only.
+// The status the case closes with (owner, 17 November 2026), chosen once
+// from the Case Status value list's closed statuses (Closed Status true):
+// - none: Complete, as before;
+// - one: that one, whatever the form sent;
+// - several: the form's choice, which must be one of them.
+// Editing changes the status only to a closed status the form sent, and
+// otherwise keeps it. Blank: keep the status; the save is refused only when
+// resolving needs a choice (IF_StatusChosen).
+const CHOOSE_STATUS = `
+var key = function (name) { return String(name).replace(/[\\s_]/g, '').toLowerCase(); };
+var get = function (row, name) {
+  var column = Object.keys(row || {}).find(function (each) { return key(each) === key(name); });
+  return column === undefined ? undefined : row[column];
+};
+var text = function (value) { return String(value ?? '').trim(); };
+var editing = ${EDITING};
+
+var closed = Array.from(activities.IQA_StatusList.ResultSet() || [])
+  .filter(function (row) { return /^(true|1|yes|y)$/i.test(text(get(row, 'Closed Status'))); })
+  .map(function (row) { return text(get(row, 'Code')); })
+  .filter(function (code) { return code !== ''; });
+var sent = text(${BODY}.Status);
+var chosen = closed.find(function (code) { return code.toLowerCase() === sent.toLowerCase(); }) || '';
+
+var status = editing ? chosen
+  : closed.length === 0 ? 'Complete'
+  : closed.length === 1 ? closed[0]
+  : chosen;
+setVariable('ResolveStatus', status);
+`;
+const STATUS = "String(getVariable('ResolveStatus') ?? '')";
+
+// Blank amounts, weeks and date save as NULL. The status changes only when
+// one was chosen (CHOOSE_STATUS); a blank @Status keeps it.
 const UPDATE_SQL = `
 UPDATE [Cases].[i4u_UT_Cases]
 SET ResolutionType = @ResolutionType,
@@ -329,7 +439,7 @@ SET ResolutionType = @ResolutionType,
   ResolutionAmount = NULLIF(@ResolutionAmount, ''),
   ResolutionWeeks = NULLIF(@ResolutionWeeks, ''),
   Resolution = @Resolution,
-  [Status] = CASE WHEN @Resolving = '1' THEN 'Complete' ELSE [Status] END,
+  [Status] = CASE WHEN @Status <> '' THEN @Status ELSE [Status] END,
   LastUpdatedBy = @LoggedInUser,
   LastUpdateOn = @LocalTimestamp
 WHERE Ordinal = CAST(@CaseOrdinal AS int)
@@ -337,7 +447,7 @@ WHERE Ordinal = CAST(@CaseOrdinal AS int)
 `;
 
 // One change-log entry for the save: the five resolution fields, and the
-// status when resolving. New and old values are written the same way
+// status when it was set. New and old values are written the same way
 // (dates yyyy-mm-dd, amounts plain numbers, zero as blank), so only real
 // changes show in the case's history.
 const LOG_CONTEXT = `
@@ -365,16 +475,28 @@ var now = {
     "ResolutionWeeks": number(body.ResolutionWeeks),
     "Resolution": text(body.Resolution)
 };
+// The values before the save, from iMIS (IQA_CaseBefore, read before the
+// update): what the case page shows. A re-resolved case logged its old
+// values as empty when they came from CloudToolz (owner, 17 November 2026).
+// CloudToolz's copy only stands in if the iMIS read failed.
+var imis = null;
+try {
+    imis = activities.IQA_CaseBefore.ResultSet()[0] || null;
+} catch (error) {
+    imis = null;
+}
+var was = function (field) { return imis ? imis[field] : before['Old' + field]; };
 var old = {
-    "ResolutionType": text(before.OldResolutionType),
-    "ResolutionDate": day(before.OldResolutionDate),
-    "ResolutionAmount": number(before.OldResolutionAmount),
-    "ResolutionWeeks": number(before.OldResolutionWeeks),
-    "Resolution": text(before.OldResolution)
+    "ResolutionType": text(was('ResolutionType')),
+    "ResolutionDate": day(was('ResolutionDate')),
+    "ResolutionAmount": number(was('ResolutionAmount')),
+    "ResolutionWeeks": number(was('ResolutionWeeks')),
+    "Resolution": text(was('Resolution'))
 };
-if (!editing) {
-    now.Status = "Complete";
-    old.Status = text(before.OldStatus);
+var status = text(getVariable('ResolveStatus'));
+if (status !== '') {
+    now.Status = status;
+    old.Status = text(was('Status'));
 }
 
 // Names must match the keys in logBody.
@@ -445,6 +567,31 @@ return {
 };
 `), 1, 4],
 
+  // The status the case closes with: the value list's closed statuses.
+  ['IQA_StatusList', 'IQA: Case Status Value List', build.iqa(STATUS_LIST_IQA, "''", 100), 0, 5],
+
+  ['Response_StatusListFailed', 'HTTP Response - Status List Failure', build.respond(`
+return {
+  "Error": true,
+  "class-html-Message": ${MESSAGE('error', "'The case statuses couldn’t be read. Nothing was saved; try again.'")}
+};
+`), 1, 5],
+
+  ['JS_ChooseStatus', 'JS: Choose The Status', build.script(CHOOSE_STATUS), 0, 6],
+
+  ['IF_StatusChosen', 'IF: Status Chosen', build.when(`${STATUS} !== '' || ${EDITING}`), 0, 7],
+
+  ['Response_ChooseStatus', 'HTTP Response - Choose The Status', build.respond(`
+return {
+  "Error": true,
+  "class-html-Message": ${MESSAGE('error', "'Choose the status the case closes with. Nothing was saved.'")}
+};
+`), 1, 7],
+
+  // The case in iMIS as it is now, for the change log's old values.
+  ['IQA_CaseBefore', 'IQA: Case Before The Save', build.iqa(
+    '$/_i4u_/Core/Cases/Get Case Details', `'&parameter=' + ${BODY}.CaseID`, 1), 0, 7.5],
+
   // 1. The case in iMIS.
   ['iMIS_Update', 'iMIS Update - i4u_UT_Cases', build.updateSingle('i4u_UT_Cases', `(function () {
   var body = ${BODY};
@@ -458,11 +605,12 @@ return {
     {Name: "ResolutionWeeks", Value: text(body.ResolutionWeeks)},
     {Name: "Resolution", Value: text(body.Resolution)}
   ];
-  if (!${EDITING}) {
-    map.push({Name: "Status", Value: "Complete"});
+  var status = ${STATUS};
+  if (status !== '') {
+    map.push({Name: "Status", Value: status});
   }
   return JSON.stringify(map);
-})()`, `${BODY}.CaseNum`), 0, 5],
+})()`, `${BODY}.CaseNum`), 0, 8],
 
   // 2. The case in CloudToolz.
   ['SQL_Update', 'SQL: CT Update - i4u_UT_Cases', build.sql(UPDATE_SQL, sqlParameters([
@@ -473,10 +621,10 @@ return {
     ['@ResolutionAmount', `String(${BODY}.ResolutionAmount ?? '').trim()`],
     ['@ResolutionWeeks', `String(${BODY}.ResolutionWeeks ?? '').trim()`],
     ['@Resolution', `String(${BODY}.Resolution ?? '').trim()`],
-    ['@Resolving', `${EDITING} ? '0' : '1'`],
+    ['@Status', STATUS],
     ['@LoggedInUser', ME],
     ['@LocalTimestamp', `${CASE}.Timestamp`]
-  ])), 0, 6],
+  ])), 0, 9],
 
   ['Response_PartlySaved', 'HTTP Response - Partly Saved', build.respond(`
 return {
@@ -485,32 +633,32 @@ return {
   "Detail": String(activities.SQL_Update.Exception() ?? ''),
   "class-html-Message": ${MESSAGE('error', "'The resolution was saved in iMIS but not in CloudToolz. Save again to finish it; if it keeps happening, contact an administrator.'")}
 };
-`), 1, 6],
+`), 1, 9],
 
   // 3. The change log.
-  ['JS_CreateLogContext', 'JS: Create Log Context', build.script(LOG_CONTEXT), 0, 7],
+  ['JS_CreateLogContext', 'JS: Create Log Context', build.script(LOG_CONTEXT), 0, 10],
 
   ['LogChangesToIMIS', 'Log Changes To IMIS', build.runWorkflow(
-    "getWorkflowDefinitionIdByName('LogChangesToIMIS')", "getVariable('logChanges')"), 0, 8],
+    "getWorkflowDefinitionIdByName('LogChangesToIMIS')", "getVariable('logChanges')"), 0, 11],
 
   // 4. The automation triggers, only when resolving.
-  ['IF_Resolving', 'IF: Resolving (Not Editing)', build.when('!' + EDITING), 0, 9],
+  ['IF_Resolving', 'IF: Resolving (Not Editing)', build.when('!' + EDITING), 0, 12],
 
-  ['IF_TriggerContact', 'IF: Tell The Primary Contact', build.when(`${on('EmailPrimaryContact')} && ${has('PrimaryContactID')}`), 0, 10],
+  ['IF_TriggerContact', 'IF: Tell The Primary Contact', build.when(`${on('EmailPrimaryContact')} && ${has('PrimaryContactID')}`), 0, 13],
 
-  ['iMIS_TriggerContact', 'iMIS Insert - i4u_UT_AutomationTrigger (Primary Contact)', trigger('PrimaryContactID', TRIGGER_TYPE_CONTACT), 1, 10],
+  ['iMIS_TriggerContact', 'iMIS Insert - i4u_UT_AutomationTrigger (Primary Contact)', trigger('PrimaryContactID', TRIGGER_TYPE_CONTACT), 1, 13],
 
   ['JS_ContactNotQueued', 'JS: Note The Contact Trigger Failed', build.script(`
 setVariable('ContactNotQueued', true);
-`), 2, 10],
+`), 2, 13],
 
-  ['IF_TriggerStaff', 'IF: Tell The Staff Lead', build.when(`${on('EmailPrimaryStaff')} && ${has('StaffLeadID')}`), 0, 11],
+  ['IF_TriggerStaff', 'IF: Tell The Staff Lead', build.when(`${on('EmailPrimaryStaff')} && ${has('StaffLeadID')}`), 0, 14],
 
-  ['iMIS_TriggerStaff', 'iMIS Insert - i4u_UT_AutomationTrigger (Staff Lead)', trigger('StaffLeadID', TRIGGER_TYPE_STAFF), 1, 11],
+  ['iMIS_TriggerStaff', 'iMIS Insert - i4u_UT_AutomationTrigger (Staff Lead)', trigger('StaffLeadID', TRIGGER_TYPE_STAFF), 1, 14],
 
   ['JS_StaffNotQueued', 'JS: Note The Staff Trigger Failed', build.script(`
 setVariable('StaffNotQueued', true);
-`), 2, 11],
+`), 2, 14],
 
   // 5. The answer. The case is saved either way; a trigger that failed is
   // named, so someone can send that email by hand.
@@ -536,9 +684,9 @@ return {
   "Success": true,
   "class-html-Message": ${MESSAGE('success', "(editing ? 'Resolution updated.' : 'Case resolved.')")}
 };
-`), 0, 12],
+`), 0, 15],
 
-  ['Finish', 'Finish', build.finish(), 0, 13]
+  ['Finish', 'Finish', build.finish(), 0, 16]
 ], [
   ['Endpoint', 'Done', 'RequestAuthorization'],
   ['RequestAuthorization', 'True', 'IF_Valid'],
@@ -551,7 +699,17 @@ return {
 
   ['SQL_Case', 'Done', 'IF_CaseFound'],
   ['SQL_Case', 'Error', 'Response_Failed'],
-  ['IF_CaseFound', 'True', 'iMIS_Update'],
+  ['IF_CaseFound', 'True', 'IQA_StatusList'],
+  ['IQA_StatusList', 'True', 'JS_ChooseStatus'],
+  ['IQA_StatusList', 'False', 'Response_StatusListFailed'],
+  ['Response_StatusListFailed', 'Done', 'Finish'],
+  ['JS_ChooseStatus', 'Done', 'IF_StatusChosen'],
+  ['IF_StatusChosen', 'True', 'IQA_CaseBefore'],
+  // A failed read still saves: the log then falls back to CloudToolz.
+  ['IQA_CaseBefore', 'True', 'iMIS_Update'],
+  ['IQA_CaseBefore', 'False', 'iMIS_Update'],
+  ['IF_StatusChosen', 'False', 'Response_ChooseStatus'],
+  ['Response_ChooseStatus', 'Done', 'Finish'],
   ['IF_CaseFound', 'False', 'Response_NotFound'],
   ['Response_NotFound', 'Done', 'Finish'],
 

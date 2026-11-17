@@ -32,6 +32,13 @@ imported or run on iMIS.
   number: they start empty instead of `0.000000000000` and accept "$4,250"
   or "2 weeks". The form sends plain numbers (`4250`, `2`), and blank for
   nothing awarded.
+- **Status** (owner, 17 November 2026): the status the case closes with,
+  from the Case Status value list's closed statuses, which the prefill
+  sends. Several: a required list above Outcome type, starting on "Choose
+  the status" (the case's own when editing). One: hidden, and the case
+  takes it. None: hidden, and the case takes `Complete`, as before. The
+  field is built with `Complete` as its one option, so a form whose
+  prefill never answers still sends that.
 - The FormFields rules the prefill returns (`ReqVals`) still apply: Visible
   0 hides a field, IsRequired requires it, Editable 0 disables it. A field
   without a rule stays as built.
@@ -60,7 +67,8 @@ record, so take a fresh export first if the form changed since.
 
 To try it first: build, start the `static-node` preview and open
 `/prototypes/wip/resolve-case-form/beyondformz/preview.html`
-(`?OpenTasks=2`, `?Edit=true`, `?prefill=full|rules`, `?save=ok|fail`).
+(`?OpenTasks=2`, `?Edit=true`, `?prefill=full|rules`,
+`?statuses=several|one|none`, `?save=ok|fail`).
 
 ## The flows
 
@@ -85,6 +93,10 @@ with the Flowz builder's validator.
   `Edit=true` the saved values as `id-val-ResolutionType`,
   `id-val-ResolutionDate`, `id-val-ResolutionAmount`,
   `id-val-ResolutionWeeks` and `id-val-Resolution` (zero amounts blank).
+  `ClosedStatuses` (`{Code, Description}` for each closed status in `API -
+  Value List - Case Status`, read by `IQA_StatusList`, which the build adds
+  once between the case read and the answer; a failed read sends none) and,
+  when editing, `CurrentStatus`.
   When resolving it sends no values: the old answer wrote `1970-01-01` (a
   blank date through `formatDate`) and `0.000000000000` into the new form.
   `ResolvedBy` and `ResolvedOn` are not sent: the case keeps no "resolved
@@ -101,15 +113,25 @@ with the Flowz builder's validator.
      `PrimaryContctID`, `StaffLeadID`), the two Cases / Resolution switches
      (`EmailPrimaryContact`, `EmailPrimaryStaff`, Entity `DEMO`) and the
      entity's local time. No case: "This case couldn't be found."
+     Then the status (`IQA_StatusList`, `JS_ChooseStatus`): the value
+     list's closed statuses; none, `Complete`; one, that one; several, the
+     form's `Status`, which must be one of them ("Choose the status the
+     case closes with", nothing saved). Editing changes the status only to
+     a closed status sent, and otherwise keeps it. A list that can't be
+     read refuses the save. Then `IQA_CaseBefore`: the case in iMIS before
+     the save (Get Case Details), for the log's old values.
   3. `iMIS_Update`: `i4u_UT_Cases` by `CaseNum`, the five fields and
-     `LastUpdatedOn`/`By`, plus Status `Complete` when resolving.
+     `LastUpdatedOn`/`By`, plus the chosen Status.
   4. `SQL_Update`: the same in `Cases.i4u_UT_Cases` (blank date, amount and
      weeks as NULL). If it fails, iMIS is already saved: the answer says so
      with `Error`, the form stays open, and saving again finishes it.
   5. `LogChangesToIMIS` (fire and forget): Note `Case C49: Resolved` or
      `…: Resolution Edited`, Table `i4u_UT_Cases`, the five fields and
-     Status (resolving only), old and new written alike so only real
-     changes show.
+     Status (when set), old and new written alike so only real changes
+     show. The old values come from iMIS (`IQA_CaseBefore`): from
+     CloudToolz, a case resolved again after Reopen logged them as empty
+     (owner, 17 November 2026). CloudToolz stands in only if that read
+     fails.
   6. When resolving (not `Edit=true`), one `i4u_UT_AutomationTrigger` row
      per switch that is `1`, if the case has that person: the primary
      contact (Type `Case Resolved - Primary Contact`) and the staff lead

@@ -175,6 +175,10 @@
       <button type="button" data-value="open">2 tasks open</button>
       <button type="button" data-value="none">No open tasks</button>
     </div>
+    <div class="rf-segmented" role="group" aria-label="Closed statuses" data-control="statuses">
+      <button type="button" data-value="several">3 closed statuses</button>
+      <button type="button" data-value="one">One closed status</button>
+    </div>
   </div>
 
   <main class="rf-stage">
@@ -187,6 +191,7 @@
       <ol>
         <li><strong>Resolving and closing are one step</strong> (C16). Saving records the outcome and closes the case; the page reloads with the resolution first on the Overview.</li>
         <li><strong>Open tasks are said in the form,</strong> above the fields, instead of a browser confirm before it opens. They stay open after the case closes, as now. One less dialog, and the warning is still there when you save.</li>
+        <li><strong>Status</strong> (owner, 17 November 2026): the status the case closes with, from the case statuses marked closed. With several it is a required list; with one it is hidden and the case takes that one; with none the case takes Complete. Editing starts on the case's own status.</li>
         <li><strong>Outcome type and Closed date are required.</strong> The date starts as today, with Today and Yesterday to hand, and can't be in the future or before the case was opened.</li>
         <li><strong>Amount awarded</strong> (dollars) and <strong>Time awarded</strong> (weeks, such as personal leave) are separate and both optional, so a case can win both. They start empty: blank means nothing awarded and saves as empty, never 0. Cents and part weeks (1.5) are fine. They are the live <code>ResolutionAmount</code> and <code>ResolutionWeeks</code>.</li>
         <li><strong>Outcome</strong> says what happened in words, for the next person to read.</li>
@@ -215,6 +220,8 @@
 
     const CASE = {id: 'C49', member: 'Tony Andrews', opened: '2025-08-18'};
     const OUTCOME_TYPES = ['Won', 'Settled', 'Partially successful', 'Unsuccessful', 'Withdrawn', 'No further action'];
+    // The case statuses marked closed (Closed Status true): samples.
+    const CLOSED_STATUSES = ['Won', 'Lost', 'Withdrawn'];
     // The live case fields' names (ResolutionDate, ResolutionType,
     // ResolutionAmount, ResolutionWeeks, Resolution).
     const EXISTING = {
@@ -223,6 +230,7 @@
       ResolutionAmount: '4250',
       ResolutionWeeks: '2',
       Resolution: 'Employer agreed to back-pay the unpaid overtime from March to September, to restore two weeks of personal leave, and to correct the roster rules from the next pay period.',
+      Status: 'Lost',
       ResolvedBy: 'Sam Carter',
       ResolvedOn: '12 Nov 2026'
     };
@@ -232,7 +240,8 @@
     const params = new URLSearchParams(location.search);
     const state = {
       mode: params.get('mode') === 'edit' ? 'edit' : 'resolve',
-      tasks: params.get('tasks') === 'none' ? 'none' : 'open'
+      tasks: params.get('tasks') === 'none' ? 'none' : 'open',
+      statuses: params.get('statuses') === 'one' ? 'one' : 'several'
     };
     document.querySelectorAll('[data-control]').forEach(group => {
       const key = group.getAttribute('data-control');
@@ -265,7 +274,8 @@
 
     /* ── The form ────────────────────────────────────────────── */
 
-    const values = editing ? EXISTING : {ResolutionType: '', ResolutionDate: iso(new Date()), ResolutionAmount: '', ResolutionWeeks: '', Resolution: ''};
+    const values = editing ? EXISTING : {Status: '', ResolutionType: '', ResolutionDate: iso(new Date()), ResolutionAmount: '', ResolutionWeeks: '', Resolution: ''};
+    const choosing = state.statuses === 'several';
     const host = document.getElementById('rf-host');
     const root = host.attachShadow({mode: 'open'});
     root.innerHTML = `
@@ -319,6 +329,18 @@
           <div class="rf-tasks" role="note">${icon('info')}
             <p><strong>2 tasks are still open.</strong> <span>They stay open after the case closes. Finish them first if nothing should be left hanging.</span></p>
           </div>` : ''}
+
+          ${choosing ? `
+          <div class="usf__row">
+            <div class="usf__field" data-field="Status">
+              <div class="usf__head"><label class="usf__label" for="rf-status">Status <span class="usf__required" aria-hidden="true">*</span></label></div>
+              <select class="usf__input" id="rf-status" name="Status" required>
+                <option value="">Choose the status</option>
+                ${CLOSED_STATUSES.map(status => `<option${status === values.Status ? ' selected' : ''}>${status}</option>`).join('')}
+              </select>
+            </div>
+            <div></div>
+          </div>` : `<input type="hidden" name="Status" value="Complete">`}
 
           <div class="usf__row">
             <div class="usf__field" data-field="ResolutionType">
@@ -397,9 +419,10 @@
 
     // Blank means nothing was awarded and saves as empty, never 0.
     function validate() {
-      ['ResolutionType', 'ResolutionDate', 'ResolutionAmount', 'ResolutionWeeks'].forEach(clear);
+      [...(choosing ? ['Status'] : []), 'ResolutionType', 'ResolutionDate', 'ResolutionAmount', 'ResolutionWeeks'].forEach(clear);
       const data = Object.fromEntries(new FormData(form));
       const problems = [];
+      if (!data.Status) problems.push(['Status', 'Choose the status the case closes with.']);
       if (!data.ResolutionType) problems.push(['ResolutionType', 'Choose the outcome type.']);
       if (!data.ResolutionDate) problems.push(['ResolutionDate', 'Enter the date the case closed.']);
       else if (data.ResolutionDate > iso(new Date())) problems.push(['ResolutionDate', 'The closed date can’t be in the future.']);
