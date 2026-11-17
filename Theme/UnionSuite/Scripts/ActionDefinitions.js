@@ -1871,17 +1871,19 @@
       Nothing can be removed until the check answers, whether it succeeds
       or fails.
 
-   2a. Nothing to warn about: the card closes up at once and a notice says
-      "<name> removed from the case." with Undo. The save waits until the
-      notice runs out (UNDO_MS; the countdown pauses while the pointer is
-      on the notice or the user moves focus into it; the theme focusing
-      Undo when the notice opens doesn't count), so Undo only cancels the
-      wait: nothing was saved and nothing is logged (owner: change-log
-      entries cannot be deleted). The ZenToken is stored as the card closes,
-      so the save itself goes at once when it is due. Leaving or hiding the
-      page saves anything still waiting at once (keepalive), on that token:
-      waiting for a new one then, the save was never sent. A failed save
-      brings the card back with an error.
+   2a. Nothing to warn about: the card closes up at once and a line opens
+      in its place in the Case team (owner, 17 November 2026, as the task
+      added message): "<name> / Removed from the case" with Undo, and a bar
+      that runs down. The save waits until it runs out (UNDO_MS; the
+      countdown and bar pause while the pointer is on the line or the user
+      moves focus into it; the theme focusing Undo as the line opens
+      doesn't count), so Undo only cancels the wait: nothing was saved and
+      nothing is logged (owner: change-log entries cannot be deleted). The
+      ZenToken is stored as the card closes, so the save itself goes at
+      once when it is due. Leaving or hiding the page saves anything still
+      waiting at once (keepalive), on that token: waiting for a new one
+      then, the save was never sent. A failed save brings the card back,
+      with a line under it saying so.
 
    2b. Something to warn about, or the check failed: the card asks on
       itself (no dialog), "Remove <name> from this case?" ("Remove
@@ -2067,35 +2069,66 @@
 
   // Removals waiting out their Undo, by case staff ordinal.
   const waiting = new Map();
-  let notices = null;
 
-  function noticeArea() {
-    if (notices?.isConnected) return notices;
-    notices = element('div', 'us-undo-notices');
-    notices.setAttribute('role', 'status');
-    notices.setAttribute('aria-live', 'polite');
-    document.body.append(notices);
-    return notices;
+  // What a screen reader hears. The line below is new to the page, and a
+  // live region added along with its text is often not read.
+  let live = null;
+  function say(text) {
+    if (!live?.isConnected) {
+      live = element('p', 'sr-only');
+      live.setAttribute('role', 'status');
+      live.setAttribute('aria-live', 'polite');
+      document.body.append(live);
+    }
+    live.textContent = '';
+    requestAnimationFrame(() => { live.textContent = text; });
   }
 
-  function showNotice(text, actionsList) {
-    const notice = element('div', 'us-undo-notice');
-    notice.append(element('span', 'us-undo-notice__text', text));
-    actionsList.forEach(({label, run}) => {
-      const button = element('button', 'us-undo-notice__button', label);
-      button.type = 'button';
-      button.addEventListener('click', run);
-      notice.append(button);
-    });
-    noticeArea().append(notice);
-    return notice;
+  // The line that takes the card's place in the Case team, as a saved
+  // entry's holding row takes its place in a list (owner, 17 November
+  // 2026: "similar to the task added message"): the name, what happened,
+  // one button and, while the removal waits, a bar that runs down.
+  function undoLine(name, status, {label, run}, tone) {
+    const line = element('div', 'us-staff-undo' + (tone ? ' us-staff-undo--' + tone : ''));
+    const text = element('span', 'us-staff-undo__text');
+    text.append(element('strong', 'us-staff-undo__name', name), element('span', 'us-staff-undo__status', status));
+    const button = element('button', 'us-staff-undo__button', label);
+    button.type = 'button';
+    button.addEventListener('click', run);
+    line.append(icon(tone === 'error' ? 'ti-alert-circle' : 'ti-user-minus'), text, button);
+    if (!tone) {
+      const timer = element('span', 'us-staff-undo__timer');
+      timer.setAttribute('aria-hidden', 'true');
+      line.style.setProperty('--us-staff-undo-ms', UNDO_MS + 'ms');
+      line.append(timer);
+    }
+    return line;
   }
 
-  function closeNotice(notice) {
-    if (!notice?.isConnected) return;
-    if (reducedMotion() || !notice.animate) { notice.remove(); return; }
-    notice.animate([{opacity: 1}, {opacity: 0, transform: 'translateY(6px)'}], {duration: 160, easing: EASE})
-      .finished.then(() => notice.remove(), () => notice.remove());
+  // The line opens where the card was, or closes up and goes.
+  function openLine(line) {
+    if (reducedMotion() || !line.animate) return;
+    const height = line.getBoundingClientRect().height;
+    line.animate([{height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px'}, {height: height + 'px', opacity: 1}],
+      {duration: 200, easing: EASE});
+  }
+
+  function closeLine(line) {
+    if (!line?.isConnected) return;
+    if (reducedMotion() || !line.animate) { line.remove(); return; }
+    const height = line.getBoundingClientRect().height;
+    line.style.overflow = 'hidden';
+    line.animate([{height: height + 'px', opacity: 1}, {height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px'}],
+      {duration: 180, easing: EASE}).finished.then(() => line.remove(), () => line.remove());
+  }
+
+  // The bar starts again from full each time the countdown does.
+  function restartTimer(line) {
+    const timer = line.querySelector('.us-staff-undo__timer');
+    if (!timer) return;
+    timer.style.animation = 'none';
+    void timer.offsetWidth;
+    timer.style.removeProperty('animation');
   }
 
   // The card's result section closes up, then stays hidden.
@@ -2138,45 +2171,57 @@
   async function removeWithUndo(env, card, name) {
     const ordinal = String(env.context.ordinal);
     const item = card.closest('.QueryTemplateSet > section') || card;
-    const entry = {env, item, name, notice: null, timer: 0, state: 'waiting'};
+    const entry = {env, item, name, line: null, timer: 0, state: 'waiting'};
     waiting.set(ordinal, entry);
     // Confirmed: store the ZenToken now, so the save can go at once later,
     // even as the page closes (save). If this fails, save stores a new one.
     window.UnionSuiteAgreements?.prepareCloudToolz?.()
       .catch(error => console.warn('[cases.remove-staff] The ZenToken could not be stored in advance:', error.message));
-    await hideItem(item);
 
     const undo = () => {
       if (entry.state !== 'waiting') return;
       entry.state = 'undone';
       clearTimeout(entry.timer);
       waiting.delete(ordinal);
-      closeNotice(entry.notice);
-      const current = currentItem(ordinal) || item;
+      entry.line.remove();
+      const current = currentItem(ordinal) || entry.item;
       showItem(current);
       current.querySelector('.us-action-cases-remove-staff')?.focus({preventScroll: true});
+      say(name + ' is back on the case.');
     };
-    entry.notice = showNotice(name + ' removed from the case.', [{label: 'Undo', run: undo}]);
+    const line = entry.line = undoLine(name, 'Removed from the case', {label: 'Undo', run: undo});
 
-    // The countdown pauses while the pointer is on the notice or someone
+    // The countdown pauses while the pointer is on the line or someone
     // moves focus into it, and starts again in full once neither holds it.
     const holds = new Set();
-    const run = () => { clearTimeout(entry.timer); entry.timer = setTimeout(() => commit(ordinal), UNDO_MS); };
-    const hold = reason => { holds.add(reason); clearTimeout(entry.timer); };
-    const release = reason => { if (holds.delete(reason) && !holds.size) run(); };
+    const run = () => {
+      clearTimeout(entry.timer);
+      line.removeAttribute('data-held');
+      restartTimer(line);
+      entry.timer = setTimeout(() => commit(ordinal), UNDO_MS);
+    };
+    const hold = reason => { holds.add(reason); clearTimeout(entry.timer); line.setAttribute('data-held', ''); };
+    const release = reason => { if (holds.delete(reason) && !holds.size && entry.state === 'waiting') run(); };
     let placingFocus = false;
-    entry.notice.addEventListener('pointerenter', () => hold('pointer'));
-    entry.notice.addEventListener('pointerleave', () => release('pointer'));
-    entry.notice.addEventListener('focusin', () => { if (!placingFocus) hold('focus'); });
-    entry.notice.addEventListener('focusout', event => {
-      if (!entry.notice.contains(event.relatedTarget)) release('focus');
+    line.addEventListener('pointerenter', () => hold('pointer'));
+    line.addEventListener('pointerleave', () => release('pointer'));
+    line.addEventListener('focusin', () => { if (!placingFocus) hold('focus'); });
+    line.addEventListener('focusout', event => {
+      if (!line.contains(event.relatedTarget)) release('focus');
     });
+
+    // The card closes up and the line opens in its place.
+    await hideItem(item);
+    if (entry.state !== 'waiting') return;
+    (currentItem(ordinal) || item).after(line);
+    openLine(line);
+    say(name + ' removed from the case. Undo is available for a few seconds.');
     run();
     // Focus would otherwise fall to the page: Undo is the next thing to do.
     // Placing it there is the theme's move, not the user's, so it doesn't
     // pause the countdown (it did, and the save waited until focus left).
     placingFocus = true;
-    entry.notice.querySelector('button')?.focus({preventScroll: true});
+    line.querySelector('button')?.focus({preventScroll: true});
     placingFocus = false;
   }
 
@@ -2191,20 +2236,29 @@
     if (!entry || entry.state !== 'waiting') return;
     entry.state = 'saving';
     clearTimeout(entry.timer);
-    closeNotice(entry.notice);
+    const line = entry.line;
+    // Saving: the line stays, without its Undo, until the list reloads.
+    line.setAttribute('data-saving', '');
+    line.querySelector('.us-staff-undo__button').disabled = true;
     try {
       const response = await save(entry.env.context, {keepalive});
       if (response && response.ok === false) throw new Error('HTTP ' + response.status);
       waiting.delete(ordinal);
-      if (!keepalive) await afterSave(entry.env);
+      if (keepalive) return;
+      await afterSave(entry.env);
+      closeLine(line);
     } catch (error) {
       waiting.delete(ordinal);
       console.error('[cases.remove-staff] The removal could not be saved:', error);
       if (keepalive) return;
-      showItem(currentItem(ordinal) || entry.item);
-      const notice = showNotice(entry.name + " couldn't be removed. Check your connection and try again.",
-        [{label: 'Dismiss', run: () => closeNotice(notice)}]);
-      notice.classList.add('us-undo-notice--error');
+      // The card comes back, with the line under it saying why.
+      const current = currentItem(ordinal) || entry.item;
+      showItem(current);
+      const failed = undoLine(entry.name, "Couldn't be removed. Check your connection and try again.",
+        {label: 'Dismiss', run: () => closeLine(failed)}, 'error');
+      line.remove();
+      current.after(failed);
+      say(entry.name + " couldn't be removed from the case. Try again.");
     }
   }
 
@@ -2217,12 +2271,16 @@
   window.addEventListener?.('pagehide', flushAll);
 
   // A list refreshed by another action brings back a card still waiting
-  // out its Undo: hide it again.
+  // out its Undo, and drops the line that stood in for it: hide the card
+  // again and put the line back in its place.
   globalThis.document?.addEventListener?.('us:query-template-refreshed', () => {
     waiting.forEach((entry, ordinal) => {
       if (entry.state !== 'waiting') return;
       const item = currentItem(ordinal);
-      if (item) { item.hidden = true; entry.item = item; }
+      if (!item) return;
+      item.hidden = true;
+      entry.item = item;
+      if (entry.line && item.nextElementSibling !== entry.line) item.after(entry.line);
     });
   });
 

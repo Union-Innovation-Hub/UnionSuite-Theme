@@ -23782,60 +23782,106 @@ a[data-us-comms-log-held] {
   gap: var(--space-2);
 }
 
-/* The Undo notice (removal with nothing to warn about): the theme's
-   command notice look, bottom left, one per removal, stacked. The save
-   waits until it runs out; Undo cancels it. */
-.us-undo-notices {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: var(--z-tooltip);
-  display: grid;
-  gap: var(--space-2);
-  max-width: min(480px, calc(100vw - 40px));
-}
-
-.us-undo-notices:empty {
-  display: none;
-}
-
-.us-undo-notice {
+/* The Undo line (removal with nothing to warn about; owner, 17 November
+   2026: "similar to the task added message"). The card closes up and this
+   opens in its place in the Case team, framed as the cards are but
+   quieter, as a saved entry's holding row is (US-INLINE-COMPOSER): the
+   name, "Removed from the case" and Undo. The bar along its foot runs down
+   while the removal waits, and stops while the pointer or the user's
+   focus holds it. Once saved, the list reloads without the person. */
+.us-case-staff .us-staff-undo {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: 10px 12px 10px 16px;
-  border: 1px solid var(--border);
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: 8px 8px 8px 12px;
+  overflow: hidden;
+  border: 1px dashed var(--border);
   border-radius: var(--radius);
-  background: var(--bg-surface);
-  color: var(--text-strong);
-  box-shadow: var(--shadow-lg);
-  font: 13px/1.5 var(--font-ui);
-  animation: us-staff-remove-in 180ms cubic-bezier(.2, 0, 0, 1) both;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font: var(--fs-sm)/1.4 var(--font-ui);
 }
 
-.us-undo-notice__text {
+.us-case-staff .us-staff-undo > .ti {
+  flex: none;
+  font-size: 18px;
+}
+
+.us-case-staff .us-staff-undo__text {
+  display: grid;
   flex: 1 1 auto;
+  min-width: 0;
 }
 
-.us-undo-notice__button {
+.us-case-staff .us-staff-undo__name {
+  overflow: hidden;
+  color: var(--text-base);
+  font-weight: var(--fw-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.us-case-staff .us-staff-undo__status {
+  font-size: var(--fs-xs);
+}
+
+.us-case-staff .us-staff-undo__button {
   flex: none;
   padding: 4px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--bg-subtle);
+  background: var(--bg-surface);
   color: var(--text-link);
-  font: inherit;
-  font-weight: var(--fw-medium);
+  font: var(--fw-medium) var(--fs-sm) var(--font-ui);
   cursor: pointer;
 }
 
-.us-undo-notice__button:is(:hover, :focus-visible) {
+.us-case-staff .us-staff-undo__button:is(:hover, :focus-visible) {
   border-color: currentColor;
 }
 
-/* A save that failed after the wait: the card is back, and this says why. */
-.us-undo-notice--error {
+/* Saving: Undo has gone by, so it steps back until the list reloads. */
+.us-case-staff .us-staff-undo[data-saving] .us-staff-undo__button {
+  visibility: hidden;
+}
+
+.us-case-staff .us-staff-undo__timer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: color-mix(in srgb, var(--text-link) 45%, transparent);
+  transform-origin: left;
+  animation: us-staff-undo-countdown var(--us-staff-undo-ms, 6000ms) linear forwards;
+}
+
+.us-case-staff .us-staff-undo[data-held] .us-staff-undo__timer {
+  animation-play-state: paused;
+}
+
+.us-case-staff .us-staff-undo[data-saving] .us-staff-undo__timer {
+  display: none;
+}
+
+@keyframes us-staff-undo-countdown {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* A save that failed after the wait: the card is back, and this, under
+   it, says why. */
+.us-case-staff .us-staff-undo--error {
+  border-style: solid;
   border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+  background: color-mix(in srgb, var(--danger) 6%, var(--bg-surface));
+}
+
+.us-case-staff .us-staff-undo--error > .ti {
+  color: var(--danger);
 }
 
 @keyframes us-staff-remove-in {
@@ -23850,10 +23896,14 @@ a[data-us-comms-log-held] {
   }
 }
 
+/* Reduced motion: no bar running down; the line just waits. */
 @media (prefers-reduced-motion: reduce) {
-  .us-staff-remove,
-  .us-undo-notice {
+  .us-staff-remove {
     animation: none;
+  }
+
+  .us-case-staff .us-staff-undo__timer {
+    display: none;
   }
 }
 
@@ -23864,13 +23914,7 @@ a[data-us-comms-log-held] {
     min-height: 44px;
   }
 
-  .us-undo-notices {
-    right: 16px;
-    left: 16px;
-    max-width: none;
-  }
-
-  .us-undo-notice__button {
+  .us-case-staff .us-staff-undo__button {
     min-height: 44px;
     padding-inline: 16px;
   }

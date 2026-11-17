@@ -22,12 +22,12 @@ The case is checked first, so the bin shows a spinner for a moment.
 
 **Most of the time: removed, with Undo**
 
-Their card goes straight away and a message at the bottom left says *Dani Sundara removed from the case.* with **Undo**.
+Their card closes up straight away, and in its place a line says *Dani Sundara · Removed from the case* with **Undo**. A thin bar along its foot runs down while it waits.
 
 - Press **Undo** to put them back. Nothing has changed: it isn't saved, and it doesn't appear in the case's history.
-- Do nothing, and the removal saves when the message goes, after about 6 seconds. The message waits while your pointer or keyboard is on it.
-- If you leave the page before then, the removal saves straight away.
-- If it couldn't save, their card comes back with a message. Try again.
+- Do nothing, and the removal saves when the bar runs out, after about 6 seconds. It waits while your pointer or keyboard is on the line.
+- If you leave or refresh the page before then, the removal saves straight away.
+- If it couldn't save, their card comes back with a red line under it saying so. Press **Dismiss** and try again.
 
 **When the card asks you first**
 
