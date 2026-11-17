@@ -26,7 +26,8 @@
  *   and falls back to built-in token matching when it is absent.
  * - Saves bookmarks to the iMIS business object i4u_UT_UserSettings under the
  *   SettingsKey below: one row per user holding a JSON array of destination ids.
- * - Reads Recents from four IQAs through GET /api/query.
+ * - Reads Recents from four IQAs through GET /api/query, and offers Recents
+ *   only to users the roles IQA (userRolesQuery) lists with recentsRole.
  * - Opens Recents items with the iMIS page function ShowDialog_NoReturnValue.
  *
  * Known limits of this trial:
@@ -56,6 +57,18 @@
         sitewide: '$/_i4u_/Core/Admin/Taskbar/Recent Content Pages - All'
       }
     },
+    // The signed-in user's roles: one row per role, its name in the Role
+    // column. Shared with other checks, so it is read once per page.
+    userRolesQuery: '$/_i4u_/Core/Admin/API - Logged In Users Roles',
+    userRolesLimit: 500,
+    // Recents lists IQAs and content pages, which only administrators edit, so
+    // its button shows only to users holding this role. No such row, or a read
+    // that fails, leaves Recents out. Set '' to show Recents to every
+    // signed-in user.
+    recentsRole: 'SysAdmin',
+    // A granted answer is kept for the browser session so the button is there
+    // as soon as the next page draws. Every page still asks again.
+    recentsAccessStoragePrefix: 'union-suite:taskbar-recents-access:',
     // iMIS opens both editors in its own dialog; IsPopup=true gives popup chrome.
     editorUrls: {
       iqa: '/iMIS/QueryBuilder/Design.aspx?iMode=Edit&TemplateType=E&iUniformKey={key}&iOperation=Edit&DocumentTypeCode=IQD&IsPopup=true',
@@ -212,6 +225,11 @@
   let stopped = false;
   let toastTimer = null;
   let recentsVersion = 0;
+  // The pending or settled read of the signed-in user's roles, or null.
+  let userRoles = null;
+  // 'unknown' until the roles query answers, then 'granted' or 'denied'.
+  let recentsAccess = 'unknown';
+  let recentsAccessVersion = 0;
   let paletteResults = [];
   let activeResult = 0;
   let paletteDrag = null;
@@ -1596,6 +1614,7 @@
   }
 
   function openPanel(name, trigger) {
+    if (name === 'recents' && recentsAccess !== 'granted') return;
     closePanels();
     if (name === 'recents' && !barVisible) {
       // A programmatic Recents entry must reveal the bar before positioning.
@@ -1714,7 +1733,7 @@
       ));
     }
     nav.append(barItems);
-    if (mounted && mounted.recentsButton) nav.append(mounted.recentsButton);
+    if (mounted && mounted.recentsButton && recentsAccess === 'granted') nav.append(mounted.recentsButton);
     bar.append(nav);
   }
 
@@ -2108,6 +2127,92 @@
     frame = requestAnimationFrame(tick);
   }
 
+  /* ── recents access ──────────────────────────────────── */
+
+  function recentsAccessKey() {
+    const partyId = loggedInPartyId();
+    return partyId ? settings.recentsAccessStoragePrefix + partyId : '';
+  }
+
+  // Only a grant is remembered, so a user who is given access later is not
+  // held out by an old refusal. Storage can be blocked; the query still runs.
+  function readRecentsAccess() {
+    const key = recentsAccessKey();
+    if (!key) return 'unknown';
+    try {
+      return window.sessionStorage.getItem(key) === 'granted' ? 'granted' : 'unknown';
+    } catch (_) {
+      return 'unknown';
+    }
+  }
+
+  function writeRecentsAccess(granted) {
+    const key = recentsAccessKey();
+    if (!key) return;
+    try {
+      if (granted) window.sessionStorage.setItem(key, 'granted');
+      else window.sessionStorage.removeItem(key);
+    } catch (_) {
+      /* The answer lasts this document only when storage is unavailable. */
+    }
+  }
+
+  function setRecentsAccess(granted) {
+    const next = granted ? 'granted' : 'denied';
+    if (recentsAccess === next) return;
+    recentsAccess = next;
+    const panel = query('#us-tb-recents');
+    if (!granted && panel && !panel.hidden) closePanels();
+    if (mounted) renderBookmarks();
+  }
+
+  const roleKey = name => String(name == null ? '' : name).trim().toLowerCase();
+
+  /**
+   * The signed-in user's roles, lower-cased, read once and shared by every
+   * check on the page. A failed read rejects and is not kept, so a later check
+   * asks again.
+   */
+  function loadUserRoles() {
+    if (!userRoles) {
+      const path = '/api/query?queryname=' + encodeURIComponent(settings.userRolesQuery) +
+        '&limit=' + settings.userRolesLimit;
+      const read = apiFetch(path).then(data => {
+        const rows = (data && data.Items && data.Items.$values) || [];
+        return new Set(rows.map(row => roleKey(row.Role)).filter(Boolean));
+      });
+      userRoles = read;
+      read.catch(() => {
+        if (userRoles === read) userRoles = null;
+      });
+    }
+    return userRoles;
+  }
+
+  // Role names match whatever their case. A failed read is "no".
+  function userHasRole(name) {
+    return loadUserRoles().then(roles => roles.has(roleKey(name)), () => false);
+  }
+
+  /**
+   * Offers Recents only to users holding settings.recentsRole. A user without
+   * it and a failed read (the IQA is missing, or iMIS refuses it) are both a
+   * no, so Recents is never shown on a guess. This only decides whether the
+   * button is offered; the Recents IQAs' own security still decides what runs.
+   */
+  function checkRecentsAccess() {
+    const version = ++recentsAccessVersion;
+    if (!settings.recentsRole) {
+      setRecentsAccess(true);
+      return;
+    }
+    userHasRole(settings.recentsRole).then(granted => {
+      if (stopped || version !== recentsAccessVersion) return;
+      writeRecentsAccess(granted);
+      setRecentsAccess(granted);
+    });
+  }
+
   /* ── recents ─────────────────────────────────────────── */
 
   const recentsSections = [
@@ -2435,9 +2540,11 @@
   function initialise() {
     stopped = false;
     barVisible = readBarVisible();
+    recentsAccess = readRecentsAccess();
     if (!mount()) return;
 
     loadBookmarks();
+    checkRecentsAccess();
 
     document.addEventListener('click', onDocumentClick);
     document.addEventListener('keydown', onDocumentKeydown);
@@ -2458,6 +2565,9 @@
     stopped = true;
     bookmarkLoadVersion++;
     bookmarkLoadState = 'idle';
+    recentsAccessVersion++;
+    recentsAccess = 'unknown';
+    userRoles = null;
     closePanels();
     if (observer) {
       observer.disconnect();

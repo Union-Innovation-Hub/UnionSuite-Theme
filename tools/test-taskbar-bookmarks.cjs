@@ -21,7 +21,12 @@ async function fixture(browser) {
     document.getElementById('__ClientContext').value = JSON.stringify({ loggedInPartyId: '123', websiteRoot: 'https://fixture.test/' });
     window.requests = [];
     window.reads = [];
+    window.accessReads = [];
     window.fetch = (url, options) => {
+      // The roles read behind Recents is held apart so bookmark reads keep their indexes.
+      if (String(url).includes(encodeURIComponent('Admin/API - Logged In Users Roles'))) {
+        return new Promise(resolve => accessReads.push({ url: String(url), resolve }));
+      }
       requests.push({ url: String(url), method: options.method, body: options.body });
       if (options.method === 'GET') return new Promise(resolve => reads.push(resolve));
       return Promise.resolve(new Response(JSON.stringify({ Ordinal: 9 }), { status: 200 }));
@@ -149,5 +154,46 @@ function savedIds(request) {
       assert.deepEqual(replacementPage.errors, []);
       console.log('PASS: a read from a destroyed instance cannot overwrite a later instance.');
     } finally { await replacementPage.close(); }
+
+    // Recents is offered only once the roles IQA lists SysAdmin.
+    const recentsButtons = page => page.locator('#us-tb-bookmarks-bar [data-open="recents"]').count();
+    const settleAccess = (page, index, rows, status = 200) => page.evaluate(({ index, rows, status }) => {
+      accessReads[index].resolve(new Response(JSON.stringify({ Items: { $values: rows } }), { status }));
+    }, { index, rows, status });
+    const openRecents = page => page.evaluate(() => {
+      document.querySelector('#us-tb-palette').close();
+      document.querySelector('#us-tb-bookmarks-toggle').click();
+    });
+
+    const grantedPage = await fixture(browser);
+    try {
+      await openRecents(grantedPage);
+      assert.equal(await grantedPage.evaluate(() => accessReads.length), 1, 'one roles read per load');
+      assert.match(await grantedPage.evaluate(() => accessReads[0].url), /\/api\/query\?queryname=.*API%20-%20Logged%20In%20Users%20Roles&limit=500$/);
+      assert.equal(await recentsButtons(grantedPage), 0, 'no Recents while access is unknown');
+      await settleAccess(grantedPage, 0, [{ Role: 'Call Team', 'User ID': '123' }, { Role: 'SysAdmin', 'User ID': '123' }]);
+      await grantedPage.waitForFunction(() => document.querySelector('#us-tb-bookmarks-bar [data-open="recents"]'));
+      await grantedPage.evaluate(() => {
+        const bar = document.getElementById('injected-taskbar');
+        bar.replaceWith(bar.cloneNode(true));
+      });
+      await grantedPage.waitForFunction(() => document.querySelector('#us-tb-bookmarks-bar [data-open="recents"]'));
+      assert.equal(await grantedPage.evaluate(() => accessReads.length), 1, 'partial remount keeps the answer');
+      assert.deepEqual(grantedPage.errors, []);
+      console.log('PASS: Recents waits for the roles IQA and shows once it lists SysAdmin.');
+    } finally { await grantedPage.close(); }
+
+    for (const [label, rows, status] of [['no roles', [], 200], ['other roles only', [{ Role: 'Agreement Team' }, { Role: 'Call Team' }], 200], ['a refused read', [], 403]]) {
+      const deniedPage = await fixture(browser);
+      try {
+        await openRecents(deniedPage);
+        await settleAccess(deniedPage, 0, rows, status);
+        await deniedPage.evaluate(() => new Promise(resolve => setTimeout(resolve, 50)));
+        assert.equal(await recentsButtons(deniedPage), 0, 'no Recents after ' + label);
+        assert.equal(await deniedPage.locator('#us-tb-bookmarks-bar').isVisible(), true, 'the bookmarks bar still shows');
+        assert.deepEqual(deniedPage.errors, []);
+      } finally { await deniedPage.close(); }
+    }
+    console.log('PASS: no roles, other roles and a refused read all leave Recents out, and the bar stays.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
