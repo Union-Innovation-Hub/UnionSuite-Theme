@@ -345,4 +345,148 @@ Do not add CSS here. Rebuild with node Theme/UnionSuite-Guides/usage/build/build
   function start(){refresh();new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['data-us-status-colour','class']});}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
+
+/* US-BANNER-STATUS-COLOUR — a two-row record banner's status colour from
+   its data (owner, 17 November 2026: the case statuses' colours are the
+   i4u_UT_CASE_STATUSCOLOUR lookup table).
+   On a us-banner__surface--rows us-banner__surface--status header,
+   data-us-status-colour (any CSS colour: #14b514, orange, rgb(…)) sets the
+   status pill's tint, its text and dot, and the left rail, in place of the
+   theme's list of status names. The pill's tint is the colour over the
+   surface (--bg-surface, so it follows dark mode); the text, dot and rail
+   are the colour, darkened (light mode) or lightened (dark mode) only as far
+   as the pill's text needs for 4.5:1. Blank or not a colour leaves the
+   status name list in charge. The case page's status list fills the
+   attribute (Scripts/ActionDefinitions.js, cases.set-status). */
+(function () {
+  'use strict';
+  if (window.UnionSuiteStatusColour) {
+    window.UnionSuiteStatusColour.refresh();
+    return;
+  }
+
+  const SELECTOR = '.us-banner .us-banner__surface--rows.us-banner__surface--status';
+  const APPLIED = 'data-us-status-colour-applied';
+  const TINT = 14;
+  const MINIMUM_CONTRAST = 4.5;
+
+  // A CSS colour (#14b514, orange, rgb(…), hsl(…)) as [r, g, b], 0–255;
+  // null when it is not one. A canvas reads it without touching the page,
+  // which would wake every observer. It ignores a value it cannot read, so
+  // a value read the same from two different starting colours is a colour.
+  let context = null;
+  function parse(value) {
+    if (!value) return null;
+    context = context || document.createElement('canvas').getContext('2d');
+    if (!context) return null;
+    const read = start => {
+      context.fillStyle = start;
+      context.fillStyle = value;
+      return context.fillStyle;
+    };
+    const result = read('#000000');
+    if (result !== read('#ffffff')) return null;
+    const hexadecimal = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(result);
+    if (hexadecimal) return hexadecimal.slice(1, 4).map(part => parseInt(part, 16));
+    const rgb = /rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(result);
+    return rgb ? rgb.slice(1, 4).map(part => Math.round(parseFloat(part))) : null;
+  }
+
+  function luminance(rgb) {
+    const [r, g, b] = rgb.map(channel => {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    return r * 0.2126 + g * 0.7152 + b * 0.0722;
+  }
+
+  function contrast(first, second) {
+    const [light, dark] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+    return (light + 0.05) / (dark + 0.05);
+  }
+
+  const mix = (from, to, amount) => from.map((channel, index) => Math.round(channel + (to[index] - channel) * amount));
+  const hex = rgb => '#' + rgb.map(channel => channel.toString(16).padStart(2, '0')).join('');
+
+  // The least change towards black (a light tint) or white (a dark one)
+  // that reads at 4.5:1 on the tint.
+  function readable(colour, tint) {
+    if (contrast(colour, tint) >= MINIMUM_CONTRAST) return colour;
+    const target = luminance(tint) > 0.18 ? [0, 0, 0] : [255, 255, 255];
+    let low = 0;
+    let high = 1;
+    for (let step = 0; step < 20; step += 1) {
+      const middle = (low + high) / 2;
+      if (contrast(mix(colour, target, middle), tint) >= MINIMUM_CONTRAST) high = middle;
+      else low = middle;
+    }
+    return mix(colour, target, high);
+  }
+
+  function clear(surface) {
+    if (!surface.hasAttribute(APPLIED)) return;
+    surface.style.removeProperty('--record-tone');
+    surface.style.removeProperty('--record-tone-bg');
+    surface.removeAttribute(APPLIED);
+  }
+
+  // Writes only what changed, so the theme's other observers stay quiet.
+  function set(surface, name, value) {
+    if (surface.style.getPropertyValue(name) !== value) surface.style.setProperty(name, value);
+  }
+
+  function apply(surface) {
+    if (surface.closest('.us-report-no-styling')) return clear(surface);
+    const colour = parse((surface.getAttribute('data-us-status-colour') || '').trim());
+    if (!colour) return clear(surface);
+    // The surface token (white in light mode, dark in dark mode); white
+    // when it is not a plain colour.
+    const background = parse(getComputedStyle(surface).getPropertyValue('--bg-surface').trim()) || [255, 255, 255];
+    const tint = mix(background, colour, TINT / 100);
+    const tone = hex(readable(colour, tint));
+    set(surface, '--record-tone-bg', hex(tint));
+    set(surface, '--record-tone', tone);
+    if (surface.getAttribute(APPLIED) !== tone) surface.setAttribute(APPLIED, tone);
+  }
+
+  function refresh() {
+    document.querySelectorAll(SELECTOR).forEach(apply);
+    // A surface that lost its rows/status classes keeps no stale tone.
+    document.querySelectorAll('[' + APPLIED + ']').forEach(surface => {
+      if (!surface.matches(SELECTOR)) clear(surface);
+    });
+  }
+
+  // Once per batch of changes, straight after them: not on the next frame,
+  // which a background tab never draws.
+  let pending = false;
+  function schedule() {
+    if (pending) return;
+    pending = true;
+    queueMicrotask(() => {
+      pending = false;
+      refresh();
+    });
+  }
+
+  function start() {
+    refresh();
+    new MutationObserver(schedule).observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-us-status-colour', 'class']
+    });
+    // Light and dark mode change the tint, so the text is worked out again.
+    new MutationObserver(schedule).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-us-color-scheme', 'class']
+    });
+    window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change', schedule);
+  }
+
+  window.UnionSuiteStatusColour = {refresh};
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once: true});
+  else start();
+})();
 </script>

@@ -116,13 +116,15 @@
   // The case Status value list (owner, 28 October 2026): Code is what the
   // case stores, Description what shows, Closed Status whether the row
   // closes the case. "Hold" shows as "On hold", so the menu's mapping
-  // shows; Complete is what Resolve case saves.
+  // shows; Complete is what Resolve case saves. Colour is the
+  // i4u_UT_CASE_STATUSCOLOUR lookup's (owner, 17 November 2026); On hold and
+  // Withdrawn have none, so they keep the theme's tone by name.
   const caseStatuses = [
-    {Code: 'New', Description: 'New', 'Closed Status': 'false'},
-    {Code: 'Open', Description: 'Open', 'Closed Status': 'false'},
-    {Code: 'In progress', Description: 'In progress', 'Closed Status': 'false'},
+    {Code: 'New', Description: 'New', 'Closed Status': 'false', Colour: 'red'},
+    {Code: 'Open', Description: 'Open', 'Closed Status': 'false', Colour: '#1f6feb'},
+    {Code: 'In progress', Description: 'In progress', 'Closed Status': 'false', Colour: 'orange'},
     {Code: 'Hold', Description: 'On hold', 'Closed Status': 'false'},
-    {Code: 'Complete', Description: 'Complete', 'Closed Status': 'true'},
+    {Code: 'Complete', Description: 'Complete', 'Closed Status': 'true', Colour: '#14b514'},
     {Code: 'Withdrawn', Description: 'Withdrawn', 'Closed Status': 'true'}
   ];
   // The open case's status, as the quick status change saves it.

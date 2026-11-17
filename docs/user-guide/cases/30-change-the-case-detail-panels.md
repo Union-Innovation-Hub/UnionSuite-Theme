@@ -14,7 +14,7 @@ related: [where-case-settings-live, field-group-columns, update-case-details, re
 | Panel | IQA (in `$/_i4u_/Client/Cases/UnionSuite/Layouts`) | Where it shows |
 | --- | --- | --- |
 | Case details | `API - Manage Case - Case Details` | The **Details** tab |
-| Resolution | `API - Manage Case - Resolution` | The **Details** tab and the **Overview** |
+| Resolution | `API - Manage Case - Resolution` | The **Details** tab, and the **Overview** once the case is closed |
 
 **Filter:** a prompted filter named `CaseNum`. One row.
 

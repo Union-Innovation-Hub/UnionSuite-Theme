@@ -1398,7 +1398,7 @@
   const flag = value => /^(true|1|yes|y)$/i.test(String(value ?? '').trim());
   const loadCaseStatuses = once(async () => {
     caseStatuses = (await query(CASE_STATUSES, {limit: '100'}))
-      .map(row => ({code: String(column(row, 'Code') ?? '').trim(), label: String(column(row, 'Description') ?? '').trim(), closed: flag(column(row, 'Closed Status'))}))
+      .map(row => ({code: String(column(row, 'Code') ?? '').trim(), label: String(column(row, 'Description') ?? '').trim(), closed: flag(column(row, 'Closed Status')), colour: String(column(row, 'Colour') ?? '').trim()}))
       .filter(status => status.code)
       .map(status => ({...status, label: status.label || status.code}));
     return caseStatuses;
@@ -1480,12 +1480,27 @@
   // closed case offers Edit resolution and Reopen case instead.
   const statusSurface = () => document.querySelector('.us-banner__surface[data-us-record-status]');
 
+  // The banner's colour is the status's Colour from the value list (owner,
+  // 17 November 2026: the i4u_UT_CASE_STATUSCOLOUR lookup table), which
+  // US-BANNER-STATUS-COLOUR in zUnionSuite.js turns into the pill and rail.
+  // Once the list has any colour it owns the attribute: a status without
+  // one goes back to the theme's tone by name. A list with no colours
+  // leaves the template's own attribute, if it has one.
+  function showStatusColour() {
+    const surface = statusSurface();
+    if (!surface || !caseStatuses?.some(status => status.colour)) return;
+    const colour = statusEntry(surface.getAttribute('data-us-record-status'))?.colour;
+    if (colour) surface.setAttribute('data-us-status-colour', colour);
+    else surface.removeAttribute('data-us-status-colour');
+  }
+
   function showStatus(code) {
     const surface = statusSurface();
     if (!surface) return;
     surface.setAttribute('data-us-record-status', code);
     const pill = surface.querySelector('.us-case-status > .us-actions__toggle');
     if (pill) pill.textContent = statusEntry(code)?.label || code;
+    showStatusColour();
     markCurrentStatus();
   }
 
@@ -1530,6 +1545,7 @@
     const pill = surface?.querySelector('.us-case-status > .us-actions__toggle');
     const entry = statusEntry(surface?.getAttribute('data-us-record-status'));
     if (pill && entry) pill.textContent = entry.label;
+    showStatusColour();
     markCurrentStatus();
     // The new items are actions, and closed or open may have changed.
     if (added || entry) window.UnionSuiteActions?.refresh();

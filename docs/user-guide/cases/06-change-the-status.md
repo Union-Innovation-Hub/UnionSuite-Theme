@@ -12,7 +12,7 @@ keywords: [status, change status, on hold, in progress, pill, update status]
 related: [resolve-and-close, reopen-or-edit-resolution, read-the-banner]
 ---
 1. In the banner, select the **status** (it has a small arrow).
-2. Choose the new status. The current one is ticked.
+2. Choose the new status. The current one is ticked. The menu only lists statuses for an open case.
 3. It saves at once, and you see *Status updated.*
 
 To close the case, choose **Resolve case** from the same menu. See [Resolve and close a case](#resolve-and-close).

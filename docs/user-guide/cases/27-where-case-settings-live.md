@@ -29,6 +29,13 @@ The case page is built from two sets of folders. **Core** is the same on every s
 | `@/_i4u_/Client/Cases/UnionSuite/Manage-Case/Popups` and `Forms` | Kept for the site's own popups and forms. Nothing reads them yet |
 | `@/_i4u_/Core/Cases/UnionSuite` | The Manage Case page, its core tabs, popups and the Create case form. Core: don't change |
 
+**Lookup tables**
+
+| Table | What it is |
+| --- | --- |
+| `i4u_UT_CASE_STATUS` | The case statuses, and whether each is open or closed. See [Add or change the case statuses](#change-the-case-statuses) |
+| `i4u_UT_CASE_STATUSCOLOUR` | Each status's colour in the case banner |
+
 **Rules for every client IQA**
 
 - Keep its name and folder. The page finds it by its path.

@@ -21,7 +21,7 @@ verify:
 | --- | --- |
 | `API - Manage Case - Primary Contacts Workplaces` | Choosing the case's workplace |
 | `API - Manage Case - Contact List - Primary Workplace` | **Add party**'s list |
-| `API - Value List - Case Status` | The status menu (`Code`, `Description`, `Closed Status`) |
+| `API - Value List - Case Status` | The status menu, open or closed, and the banner's status colour (`Code`, `Description`, `Closed Status`, `Colour`), from the lookup tables `i4u_UT_CASE_STATUS` and `i4u_UT_CASE_STATUSCOLOUR`. See [Add or change the case statuses](#change-the-case-statuses) |
 | `API - Communication Recipient List - Parties` | **Email parties**' recipients |
 | `API - Case Email Logs` | Matching a sent email to the case |
 | `$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Case Value List - Case Contact Types` | **Add staff**'s roles, and the role menu on a staff card (`value`, `label`; was `Get Case Staff Member Types`) |

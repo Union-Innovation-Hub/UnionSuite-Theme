@@ -9,7 +9,10 @@ asks:
   - which iParts are on the case page
   - what does the CaseTab parameter do
 keywords: [technical, architecture, page, ipart, iparts, query template, CCO, CaseTab, shortcut, theme, layout, build]
-related: [change-the-case-tabs, case-queries-and-endpoints, case-shortcuts-and-popups]
+related: [change-the-case-tabs, case-queries-and-endpoints, case-shortcuts-and-popups, change-the-case-statuses]
+verify:
+  - The Overview's Resolution gate (Query Template - Manage Case - Case Resolved) is being set up on 17 November 2026, replacing the Content HTML. Confirm it is live on 1.Overview.
+  - The rule that hides an iPart holding us-case-unresolved (C6) is not in zUnionSuite.css yet. Until it is, an open case shows an empty Resolution panel unless the site's Override.css has it.
 ---
 **The page:** `@/_i4u_/Core/Cases/UnionSuite/Manage-Case/Manage Case`, opened through the shortcut `Cases_ManageCase` with `CaseID` in the address. Its wrapper classes are `us-banner-page us-case-page`.
 
@@ -22,13 +25,15 @@ related: [change-the-case-tabs, case-queries-and-endpoints, case-shortcuts-and-p
 
 | Tab | Holds |
 | --- | --- |
-| `1.Overview` | Resolution (Content HTML), and Query Templates for tasks, meetings, recent activity, the primary party, recent attachments and staff |
+| `1.Overview` | Query Templates for the resolution, tasks, meetings, recent activity, the primary party, recent attachments and staff |
 | `2.Details` | Case details and Resolution panels (Content HTML that runs the client IQAs) |
 | `3.Activity` | The activity feed, notes details and change history (Query Templates), and meetings and changelog report views (Query Menus) |
 | `4.Parties` | The parties list (Query Template) |
 | `Attachments` | Every attachment (Query Template) |
 
 The Query Templates are in `$/_i4u_/Core/Cases/UnionSuite/Manage Case`.
+
+**The Overview's Resolution panel** shows only once the case is closed. It is a Query Template Display (CSS class `us-query-template us-case-resolved`, one row) whose IQA, `Query Template - Manage Case - Case Resolved`, is a gate: one row when the case's status has Expansion `Closed` in `i4u_UT_CASE_STATUS`, none while it is open. Its template runs the client `API - Manage Case - Resolution` for the fields. Its No results field holds `<span class="us-case-unresolved" hidden></span>`, which hides the whole iPart. See [Add or change the case statuses](#change-the-case-statuses).
 
 **The theme's part** (`Theme/UnionSuite`)
 
