@@ -7571,6 +7571,21 @@ body:not(.EasyEdit) .WebPartZone > .ContentItemContainer:empty {
   display: none;
 }
 
+/* US-CASE-RESOLVED:START — the case page's Overview Resolution panel, hidden
+   while the case is open (C6; owner, 8 October 2026). The iPart (CSS class
+   us-query-template us-case-resolved) runs a gate IQA that returns no row
+   until the case's status is closed, and its No results field holds the
+   authored marker <span class="us-case-unresolved" hidden></span>. The
+   marker, not an empty result, hides it, so a failed query is not taken for
+   an open case. The innermost container holding the marker is the iPart's
+   own, so a tab or CCO around it stays. The page editor keeps it, so the
+   iPart can still be edited. */
+body:not(.EasyEdit) .ContentItemContainer:has(.us-case-unresolved):not(:has(.ContentItemContainer .us-case-unresolved)) {
+  display: none;
+}
+
+/* US-CASE-RESOLVED:END */
+
 /* US-HOME-WELCOME:START — authored Content HTML, independent of the iPart shell. */
 
 /* iPart CSS class: iMIS creates this owner immediately around the panel.

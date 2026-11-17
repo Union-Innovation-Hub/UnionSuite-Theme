@@ -11,17 +11,10 @@
    (14 October 2026): US-CASE-MEMBER and US-CASE-PARTIES in
    zUnionSuite.css, US-CASE-PARTIES in zUnionSuite.js. */
 
-/* ── C6 Resolved panel, hidden while open ──────────────────────
-   The Overview's Resolution panel sits above Tasks once the case is
-   resolved (owner, 8 October 2026). Its source IQA returns no row while
-   the case is open, and the iPart's No results field holds the marker
-   <span class="us-case-unresolved" hidden></span>, so the whole iPart is
-   hidden rather than showing an empty panel. The marker is authored, as
-   the theme's Home tasks empty marker is, so a failed query is not taken
-   for an open case. Target: zUnionSuite.css, beside US-PANEL-FILL. */
-:is(.ContentItemContainer, .ContentItemContainer > div):has(> .panel .us-case-unresolved) {
-  display: none;
-}
+/* C6 Resolved panel, hidden while open: in the theme (US-CASE-RESOLVED in
+   zUnionSuite.css, beside US-PANEL-FILL; 17 November 2026). It now hides
+   the iPart's own container, the innermost one holding the marker, and
+   not in Easy Edit. */
 
 /* ── C2 Party membership badge ───────────────────────────
    The member's standing beside the name on a party tile (the
