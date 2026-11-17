@@ -415,7 +415,7 @@ fieldset[disabled] :is(a, button, input):is(.TextButton, .btn, .PrimaryButton, .
 
 :is(a, button, input):is(.PrimaryButton, .UsePrimaryButton .TextButton):not(:where(.us-icon-button, .Facebook, .LinkedIn, .FeatureButton, .DangerButton, .SuccessButton, .AccentButton)):active:not(:where(:disabled, [disabled], .disabled, .aspNetDisabled, [aria-disabled=true], fieldset[disabled] *)):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   --button-current-bg: var(--accent-100);
-  --button-current-text: var(--text-on-accent);
+  --button-current-text: var(--brand-900);
 }
 
 :is(a, button, input):is(.PrimaryButton, .UsePrimaryButton .TextButton):not(:where(.us-icon-button, .Facebook, .LinkedIn, .FeatureButton, .DangerButton, .SuccessButton, .AccentButton)):focus-visible:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
@@ -441,7 +441,9 @@ fieldset[disabled] :is(a, button, input):is(.TextButton, .btn, .PrimaryButton, .
 }
 
 :is(a, button, input):is(.TextButton, .btn, .PrimaryButton, .AccentButton, .DangerButton, .SuccessButton):not(:where(.us-icon-button, .LinkButton, .btn-link, .Facebook, .LinkedIn, .FeatureButton)):is(.PrimaryButton, .UsePrimaryButton .TextButton):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
-  --button-hover-text: var(--text-on-accent);
+  /* Hover and press sit on the surface, not the accent: --text-on-accent
+     can be white for a client, so the text there takes the dark brand stop. */
+  --button-hover-text: var(--brand-900);
   --button-border: var(--accent);
   --button-pressed-bg: var(--accent-100);
 }
@@ -5641,7 +5643,8 @@ table.DataDisplay .DataValue {
   color: var(--text-strong);
 }
 
-[data-gridid] .RadGrid :is(.rgRow, .rgAltRow) a:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+/* Links only: a link styled as a button keeps its button colours. */
+[data-gridid] .RadGrid :is(.rgRow, .rgAltRow) a:not(:where(.TextButton, .btn, .us-report-no-styling, .us-report-no-styling *)) {
   color: var(--text-link);
 }
 
@@ -5700,7 +5703,7 @@ table.DataDisplay .DataValue {
   --button-bg: var(--accent);
   --button-text: var(--text-on-accent);
   --button-border: var(--accent);
-  --button-hover-text: var(--text-on-accent);
+  --button-hover-text: var(--brand-900);
   --button-pressed-bg: var(--accent-100);
 }
 

@@ -35,15 +35,27 @@
   --face-ui: "Averta", system-ui, sans-serif;
 }
 
+/* PSA: dark maroon banner, the dark end of the coral ramp and the same
+   family as the navigation. The full coral gradient was too strong behind a
+   whole record header (owner, 18 November 2026); coral now marks the top
+   edge, the current tab and the primary action. One stop darker than the
+   theme's default banner: on the lighter stop the red priority badge and
+   the coral accent lose contrast. */
 :root .us-banner:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
-  --banner-bg: #e95461;
-  --banner-bg-end: #ee7a58;
-  --banner-accent: #ffffff;
-  --banner-on-accent: #1c1c1c;
-  --banner-accent-hover: #f4f4f4;
+  --banner-bg: var(--brand-900);
+  --banner-bg-end: var(--brand-800);
+  --banner-border: var(--brand-700);
+  --banner-soft-bg: var(--brand-900);
+  --banner-hover-bg: var(--brand-800);
+  --banner-accent: var(--accent);
+  --banner-on-accent: var(--text-on-accent);
+  --banner-accent-hover: var(--accent-hover);
 }
 
-/* PSA: two-tone loader, brand coral outer ring and logo orange inner ring */
-.section-loader-spinning-circles:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+/* PSA: two-tone loader. The brand and accent seeds are the same coral, so
+   without this both ring colours match: coral outer and inner rings, logo
+   orange middle ring. :root outranks the theme's rule whatever the order
+   the stylesheets load in. */
+:root .section-loader-spinning-circles:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   --color-2: #ff9900;
 }

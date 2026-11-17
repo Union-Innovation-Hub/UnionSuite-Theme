@@ -364,8 +364,8 @@ a,
 .RadGrid.RadGrid .rgRow a,
 .RadGrid.RadGrid .rgAltRow a,
 .RadGrid.RadGrid .rgEditForm a,
-.k-grid.k-grid a,
-.RadToolTip.RadToolTip a {
+.k-grid.k-grid a:not(:where(.TextButton, .btn)),
+.RadToolTip.RadToolTip a:not(:where(.TextButton, .btn)) {
   color: #006f94;
   text-decoration: none;
 }
@@ -375,8 +375,8 @@ a:visited,
 .RadGrid.RadGrid .rgRow a:visited,
 .RadGrid.RadGrid .rgAltRow a:visited,
 .RadGrid.RadGrid .rgEditForm a:visited,
-.k-grid.k-grid a:visited,
-.RadToolTip.RadToolTip a:visited {
+.k-grid.k-grid a:not(:where(.TextButton, .btn)):visited,
+.RadToolTip.RadToolTip a:not(:where(.TextButton, .btn)):visited {
   color: #003242;
 }
 
@@ -395,12 +395,12 @@ a:active,
 .RadGrid.RadGrid .rgEditForm a:hover,
 .RadGrid.RadGrid .rgEditForm a:focus,
 .RadGrid.RadGrid .rgEditForm a:active,
-.k-grid.k-grid a:hover,
-.k-grid.k-grid a:focus,
-.k-grid.k-grid a:active,
-.RadToolTip.RadToolTip a:hover,
-.RadToolTip.RadToolTip a:focus,
-.RadToolTip.RadToolTip a:active {
+.k-grid.k-grid a:not(:where(.TextButton, .btn)):hover,
+.k-grid.k-grid a:not(:where(.TextButton, .btn)):focus,
+.k-grid.k-grid a:not(:where(.TextButton, .btn)):active,
+.RadToolTip.RadToolTip a:not(:where(.TextButton, .btn)):hover,
+.RadToolTip.RadToolTip a:not(:where(.TextButton, .btn)):focus,
+.RadToolTip.RadToolTip a:not(:where(.TextButton, .btn)):active {
   color: #004861;
   text-decoration: underline;
 }
