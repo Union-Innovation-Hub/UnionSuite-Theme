@@ -3371,7 +3371,7 @@ function createRelationshipWorkspace() {
     .iqa-relations-hidden{display:none!important}
     .iqa-join-tree.is-list{padding:10px 18px}
     .iqa-join-type select{width:100%!important;min-width:0!important;max-width:none;height:28px;margin:0!important;padding:0 26px 0 10px;border-radius:999px;font-size:12px;line-height:26px}
-    .iqa-join-type.is-optional select{border-color:transparent;background-color:var(--info-bg,#e4f0f4);color:var(--text-link,#006f94)}
+    .iqa-join-type.is-optional select{border-color:transparent;background-color:var(--info-bg,#e4f0f4);color:var(--info,#006f94)}
     .iqa-join-type.is-filter select{border-style:dotted}
     .iqa-join-type.is-exclude select{border:1px dotted var(--danger,#d03528);background-color:var(--danger-bg,#fbe4e2);color:var(--danger,#d03528)}
     .iqa-join-node>*,.iqa-join-note>*{flex-shrink:0}
@@ -3397,7 +3397,7 @@ function createRelationshipWorkspace() {
     .iqa-join-node>.iqa-join-add{margin-left:auto;flex:none}
     .iqa-join-add{padding:2px 10px;border:1px solid var(--border-strong,#94a3b8);border-radius:999px;background:var(--bg-surface,#fff);color:var(--text-link,#006f94);font:inherit;font-size:12px;cursor:pointer}
     .iqa-join-add::before{content:"+ "}
-    .iqa-join-add:hover{background:var(--info-bg,#e4f0f4)}
+    .iqa-join-add:hover{background:var(--brand-50,#e4f0f4)}
     .iqa-join-node.is-linked{background-color:var(--info-bg,#e4f0f4)}
     table tr.iqa-source-linked[class]>td{background-color:var(--info-bg,#e4f0f4)!important}
     @media(prefers-reduced-motion:reduce){.iqa-join-warning,.iqa-join-tree:not(.show-warnings) .iqa-join-warning{transition:none}}
@@ -3414,7 +3414,7 @@ function createRelationshipWorkspace() {
     .iqa-join-object{font-size:12px;font-style:italic;color:var(--text-muted,#545962)}
     .iqa-join-fields{font-size:12px;color:var(--text-muted,#545962)}
     .iqa-join-pill{display:inline-block;padding:1px 8px;border:1px solid var(--border-strong,#94a3b8);border-radius:999px;font-size:12px;line-height:1.5;white-space:nowrap;background:var(--bg-surface,#fff)}
-    .iqa-join-pill.is-optional{border-color:transparent;background:var(--info-bg,#e4f0f4);color:var(--text-link,#006f94)}
+    .iqa-join-pill.is-optional{border-color:transparent;background:var(--info-bg,#e4f0f4);color:var(--info,#006f94)}
     .iqa-join-pill.is-filter{border-style:dotted}
     .iqa-join-branch{position:relative;margin-left:11px;padding-left:20px;border-left:1.5px solid var(--border-strong,#94a3b8)}
     .iqa-join-branch:last-child{border-left-color:transparent}
