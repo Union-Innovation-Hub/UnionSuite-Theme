@@ -415,7 +415,7 @@ fieldset[disabled] :is(a, button, input):is(.TextButton, .btn, .PrimaryButton, .
 
 :is(a, button, input):is(.PrimaryButton, .UsePrimaryButton .TextButton):not(:where(.us-icon-button, .Facebook, .LinkedIn, .FeatureButton, .DangerButton, .SuccessButton, .AccentButton)):active:not(:where(:disabled, [disabled], .disabled, .aspNetDisabled, [aria-disabled=true], fieldset[disabled] *)):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   --button-current-bg: var(--accent-100);
-  --button-current-text: var(--brand-900);
+  --button-current-text: var(--accent-hover);
 }
 
 :is(a, button, input):is(.PrimaryButton, .UsePrimaryButton .TextButton):not(:where(.us-icon-button, .Facebook, .LinkedIn, .FeatureButton, .DangerButton, .SuccessButton, .AccentButton)):focus-visible:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
@@ -441,9 +441,12 @@ fieldset[disabled] :is(a, button, input):is(.TextButton, .btn, .PrimaryButton, .
 }
 
 :is(a, button, input):is(.TextButton, .btn, .PrimaryButton, .AccentButton, .DangerButton, .SuccessButton):not(:where(.us-icon-button, .LinkButton, .btn-link, .Facebook, .LinkedIn, .FeatureButton)):is(.PrimaryButton, .UsePrimaryButton .TextButton):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
-  /* Hover and press sit on the surface, not the accent: --text-on-accent
-     can be white for a client, so the text there takes the dark brand stop. */
-  --button-hover-text: var(--brand-900);
+  /* The primary button reverses on hover: the fill becomes the surface and
+     the text and border take the accent (owner, 18 November 2026). Never
+     --text-on-accent here: it can be white for a client, and the hover
+     fill is white. Pressed, the text deepens to --accent-hover on the
+     --accent-100 tint. */
+  --button-hover-text: var(--accent);
   --button-border: var(--accent);
   --button-pressed-bg: var(--accent-100);
 }
@@ -5703,7 +5706,7 @@ table.DataDisplay .DataValue {
   --button-bg: var(--accent);
   --button-text: var(--text-on-accent);
   --button-border: var(--accent);
-  --button-hover-text: var(--brand-900);
+  --button-hover-text: var(--accent);
   --button-pressed-bg: var(--accent-100);
 }
 
