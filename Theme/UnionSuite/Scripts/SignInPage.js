@@ -86,14 +86,15 @@
     },
     // Shown above the gravity well as the share of caught stars passes each
     // mark, once per browser session each. The counter shows from the mark
-    // with showCount. A mark with no text shows nothing; 75% only starts the
-    // counter (owner, 8 October 2026; it said "You can do it!").
+    // with showCount. A mark with no text shows nothing: 40% and 90% are
+    // blank and 75% only starts the counter (owner, 17 November 2026; they
+    // said "I see you're determined", "Almost there\u2026" and "Nailed it!").
     milestones: [
-      { at: 0.2, text: "This is unexpected" },
-      { at: 0.4, text: "I see you\u2019re determined" },
+      { at: 0.2, text: "A curious mind, I see" },
+      { at: 0.4, text: "" },
       { at: 0.75, text: "", showCount: true },
-      { at: 0.9, text: "Almost there\u2026" },
-      { at: 1, text: "Nailed it!" }
+      { at: 0.9, text: "" },
+      { at: 1, text: "Every star caught. Stay curious." }
     ]
   };
 
@@ -171,8 +172,12 @@
 
   var CARD_SELECTOR = ".SignIn-Container";
   var LOGO_SELECTOR = ".SignIn-Container > .iMIS-WebPart:first-child img";
-  var FIELD_SELECTOR = ".SignInPage .forgot-link-field input";
-  var SUBMIT_SELECTOR = ".SignInPage .SignIn input[type='submit']";
+  // The Sign In iPart renders a classic form (.SignIn, .forgot-link-field)
+  // or, where OpenID Connect is on for the website, an email-first form
+  // ([id$='_OpenIdSignInPanel'], .PanelFieldValue), whose second step can
+  // add an iMIS password field with its own Sign In. All are matched.
+  var FIELD_SELECTOR = ".SignInPage :is(.forgot-link-field, .PanelFieldValue) input:not([type='hidden'])";
+  var SUBMIT_SELECTOR = ".SignInPage :is(.SignIn, [id$='_OpenIdCommandButtonPanel'], [id$='_OpenIdPasswordPanel']) input[type='submit']";
   var MESSAGES_SELECTOR = "[id$='_UserMessagesUpdatePanel']";
   var ERROR_SELECTOR = MESSAGES_SELECTOR + " .AsiMessage li.AsiError";
   var ERROR_SHAKE_MS = 480;      // just past the CSS shake (420ms)
@@ -965,7 +970,7 @@
 
   /* Supernova (every star caught) */
 
-  // The caught stars collapse into one point under "Nailed it!", then burst
+  // The caught stars collapse into one point under the 100% message, then burst
   // back out to their homes with a flash.
   function burstSupernova(now) {
     supernova.burst = true;
@@ -1632,7 +1637,6 @@
     if (!document.querySelector(CARD_SELECTOR)) {
       clearTimeout(failSafe);
       root.classList.remove("hub-signin", "hub-signin-intro");
-      style.remove();
       return;
     }
 

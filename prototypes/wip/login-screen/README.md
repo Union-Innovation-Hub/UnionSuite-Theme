@@ -86,6 +86,40 @@ either field clears it. Reduced motion keeps the colour and drops the shake;
 an error already there when the page loads marks the fields without a shake.
 The mockup's Fails control shows the native markup captured from the live page.
 
+## OpenID Connect (Entra) sign-in
+
+With OpenID Connect on, the same Sign In iPart renders a different form,
+chosen per website (found on a client UAT site, 17 November 2026):
+
+- **OIDC is global:** Settings > Contacts > Open ID Connect (Disabled, Test
+  mode or Enabled; "Require OIDC for" Staff Only or Staff & Public Users).
+- **Per website:** a website whose access settings allow staff gets the
+  email-first form: Email and Continue (`[id$="_OpenIdSignInPanel"]`).
+  Continue goes to Entra or, for a system administrator (or in Test mode),
+  offers "Sign in using iMIS password" with a Password field and Sign In.
+  A website locked to administrators gets the classic Username and Password
+  form; submitting a staff user's credentials there redirects to Entra.
+  The sign-in page and content item are the same either way.
+
+The theme styles both forms from the markup, never the URL: the field rules
+match `.forgot-link-field` (classic) or `.PanelFieldValue` (OpenID), the
+button rules `.SignIn` or `[id$="_OpenIdCommandButtonPanel"]`, and the
+OpenID panel's native border is removed. `SignInPage.js` uses the same
+selectors for the focus pulse, sparks, busy state and error marking.
+
+After Continue, a system administrator sees (`?SysAdmin=True`) the email
+as read-only text (`[id$="_OpenIdReservedUserDiv"]`, a `span.Label` and a
+`span.PanelFieldValue`), Continue again (to the identity provider), and
+`[id$="_OpenIdPasswordPanel"]`: a "Sign in using iMIS password" link that
+opens a Bootstrap collapse holding a classic Password field
+(`.forgot-link-field`) and its own Sign In (`#ReservedUserCommandButtons`).
+The theme centres the link in muted text with a chevron that turns up while
+open, clears the native float that shrank the email row, and gives the
+Sign In the card's button. What a non-administrator sees after Continue
+(probably straight to Entra) has not been captured.
+
+Mockup: `openid/index.html` (email step) and `openid/?step=password`.
+
 iMIS's page-wide "Loading" box (`#ctl00_TemplateFillLoadingPanel` >
 `#FillProgressDiv`, captured 8 October 2026) appeared at the top of the page
 while signing in. The card already shows that, so it is hidden on this page
@@ -187,6 +221,7 @@ so screenshots taken straight after a load can show the intro's hidden state.
 - `Theme/UnionSuite/Scripts/SignInPage.js`: the sign-in page design
 - `Theme/UnionSuite/index.js`: the loader entry (`signin` module)
 - `v2/index.html`, `v2/hub-logo.png`: the mockup
+- `openid/index.html`: the v2 card with the OpenID Connect form, both steps
 - `eggs/`: the easter eggs mockup (the v2 card with controls that show each egg)
 - `ideas/`: the background explorations, including the constellation
 - `redesign/index.html`, `redesign/redesign.css`, `login.js`: the design mockup

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<!-- Sign-in mockup, OpenID Connect form: the v2 card with the Sign In iPart's
+     email-first form, as iMIS renders it when OIDC is on and the website's
+     access settings allow staff (captured from a client UAT site, 17 November
+     2026; trimmed, server scripts and state removed). The classic form is in
+     ../v2/. Mockup controls (bottom right) are not part of the embed. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign-in OpenID mockup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../../../Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css">
+  <link rel="stylesheet" href="../../../../Theme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../../Theme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../../Theme/UnionSuite/zzDarkMode.css">
+  <script src="../../../../Theme/UnionSuite/index.js"></script>
+  <style>
+    /* Mockup controls only. */
+    .mockup-controls {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 10;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      background: rgba(0, 20, 28, 0.82);
+      color: rgba(255, 255, 255, 0.85);
+      font: 12px/1.4 "Open Sans", Arial, sans-serif;
+    }
+
+    .mockup-controls button {
+      padding: 4px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body id="MainBody" class="fade HubWrapper-StaffSignIn">
+<form method="post" action="#" id="aspnetForm" onsubmit="return false;">
+<div id="MainPanel">
+<div id="ctl00_ContentPanel" class="EmptyMasterContentPanel" style="overflow:auto;">
+  <div id="ctl00_UserMessagesUpdatePanel"></div>
+  <div id="ctl00_TemplateBody_PublishUpdatePanel"></div>
+  <div>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="ContentItemContainer">
+          <div id="WebPartZone1_Page1" class="WebPartZone SignIn-Container">
+            <div class="iMIS-WebPart">
+              <div id="ste_container_ciLogo" class="ContentItemContainer"><div class="EmbedLogo EmbeddedCCO"><div class="panel">
+                <div class="panel-heading"></div>
+                <div class="panel-body-container"><div class="panel-body">
+                  <div class="WebPartZone">
+                    <div id="ste_container_Logo" class="ContentItemContainer"><img alt="Union Innovation Hub" src="../v2/hub-logo.png"></div>
+                    <div id="ste_container_Tagline" class="ContentItemContainer"><div class="Tagline">Powered by the ACTU</div></div>
+                  </div>
+                </div></div>
+              </div></div></div>
+            </div>
+            <div class="iMIS-WebPart">
+              <div id="ste_container_ciSignIn" class="ContentItemContainer"><div class="SignInPage"><div class="panel panel-border">
+                <div class="panel-heading Distinguish"><h2 class="panel-title">Sign In</h2></div>
+                <div class="panel-body-container"><div class="panel-body">
+                  <div id="x_SignInRefreshPanel" style="display: block;"></div>
+                  <div id="x_OpenIdSignInPanel">
+                    <div id="x_OpenIdContentPanel" class="StandardPanel" style="background-color:Transparent;border-style:None;">
+                      <div style="clear: both;"></div>
+                      <div id="x_OpenIdSignInDiv">
+                        <div class="PanelField Top">
+                          <label id="x_OpenIdUserNameLabel" for="x_OpenIdUserName">Email</label>
+                          <div class="PanelFieldValue">
+                            <input type="text" id="x_OpenIdUserName" class="FullWidth" autocomplete="off">
+                            <span id="x_RegExpTextEmailFormat" class="ValidationError" style="display:none;"><br>Invalid email address</span>
+                            <span id="x_RegExpTextEmailLength" class="ValidationError" style="display:none;">Invalid input</span>
+                          </div>
+                          <span id="x_OpenIdUserNameRequired" class="Error ValidationError" role="alert" style="display:none;">Required</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="x_OpenIdCommandButtonPanel">
+                      <div id="OpenIdCommandButtons" class="pt-4">
+                        <input type="submit" value="Continue" id="x_OpenIdSubmitButton" class="TextButton PrimaryButton SignInButton">
+                      </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                  </div>
+                </div></div>
+              </div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</form>
+
+<!-- After Continue, for a system administrator (captured 17 November 2026,
+     ?SysAdmin=True&ReservedUser=False): the email as read-only text,
+     Continue to the identity provider, and a Bootstrap collapse with the iMIS
+     password and its own Sign In. The email is a placeholder. -->
+<template id="password-step">
+  <div id="x_OpenIdContentPanel" class="StandardPanel" style="background-color:Transparent;border-style:None;">
+    <div style="clear: both;"></div>
+    <div id="x_OpenIdReservedUserDiv">
+      <div class="PanelField Left ReadOnly AutoWidth">
+        <span id="x_ReservedUserLabel" class="Label pr-4">Email</span>
+        <span id="x_ReservedUserEmail" class="PanelFieldValue BreakWord">name@example.org</span>
+      </div>
+    </div>
+  </div>
+  <div id="x_OpenIdCommandButtonPanel">
+    <div id="OpenIdCommandButtons" class="pt-4">
+      <input type="submit" value="Continue" id="x_OpenIdSubmitButton" class="TextButton PrimaryButton SignInButton">
+    </div>
+  </div>
+  <div id="x_OpenIdPasswordPanel">
+    <div id="x_OpenIdLinkPanel" class="pb-2">
+      <a id="x_OpenIdPasswordLink" class="text-white" role="button" aria-expanded="false" aria-controls="x_OpenIdPasswordInput" data-toggle="collapse" href="#x_OpenIdPasswordInput"><span>Sign in using iMIS password</span><span class="caret"></span></a>
+      <div id="x_OpenIdPasswordInput" class="collapse">
+        <div class="PanelField">
+          <label id="x_OpenIdPasswordLabel" class="contact-signin-label" for="x_OpenIdPassword">Password</label>
+          <div class="forgot-link-field">
+            <input id="x_OpenIdPassword" type="password" autocomplete="off">
+            <a id="x_SysAdminForgotPassword" href="#" aria-label="Click this link if you forgot your pasword.">Forgot?</a>
+            <span id="x_OpenIdPasswordRequired" class="Error ValidationError" role="alert" style="display:none;">Required</span>
+          </div>
+        </div>
+        <div id="ReservedUserCommandButtons" class="PanelField pt-4">
+          <input type="submit" value="Sign In" id="x_ReservedUserSubmitButton" class="TextButton PrimaryButton SignInButton">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="clear: both;"></div>
+</template>
+
+<div class="mockup-controls" aria-label="Mockup controls">
+  <span>Step</span>
+  <button type="button" data-step="email">Email</button>
+  <button type="button" data-step="password">Password</button>
+  <span>Intro</span>
+  <button type="button" data-replay>Replay</button>
+</div>
+
+<script>
+  // Mirrors the native "graceful loading" script.
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.classList.add("loaded", "in");
+  });
+
+  // ?step=password shows the step after Continue in place of the email step.
+  (function () {
+    var step = /step=password/.test(location.search) ? "password" : "email";
+    if (step === "password") {
+      var panel = document.getElementById("x_OpenIdSignInPanel");
+      panel.textContent = "";
+      panel.appendChild(document.getElementById("password-step").content.cloneNode(true));
+    }
+    document.querySelectorAll("[data-step]").forEach(function (button) {
+      button.setAttribute("aria-pressed", String(button.dataset.step === step));
+      button.addEventListener("click", function () {
+        location.search = button.dataset.step === "password" ? "?step=password" : "";
+      });
+    });
+  })();
+
+  // Stand-ins for the native behaviour: the validators (empty shows
+  // "Required", a value without an @ the format message), the button kept
+  // disabled while iMIS would post back (Esc releases it), and Bootstrap's
+  // collapse on the password link.
+  (function () {
+    function holdBusy(button) {
+      setTimeout(function () {
+        button.disabled = true;
+      });
+    }
+
+    var input = document.getElementById("x_OpenIdUserName");
+    var submit = document.getElementById("x_OpenIdSubmitButton");
+    submit.addEventListener("click", function () {
+      if (!input) {
+        holdBusy(submit);
+        return;
+      }
+      var value = input.value.trim();
+      document.getElementById("x_OpenIdUserNameRequired").style.display = value ? "none" : "inline";
+      document.getElementById("x_RegExpTextEmailFormat").style.display =
+        value && value.indexOf("@") === -1 ? "inline" : "none";
+      if (value && value.indexOf("@") !== -1) {
+        holdBusy(submit);
+      }
+    });
+
+    var link = document.getElementById("x_OpenIdPasswordLink");
+    if (link) {
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        var open = link.getAttribute("aria-expanded") !== "true";
+        link.setAttribute("aria-expanded", String(open));
+        link.classList.toggle("collapsed", !open);
+        document.getElementById("x_OpenIdPasswordInput").classList.toggle("in", open);
+      });
+
+      var signIn = document.getElementById("x_ReservedUserSubmitButton");
+      var password = document.getElementById("x_OpenIdPassword");
+      signIn.addEventListener("click", function () {
+        var empty = !password.value;
+        document.getElementById("x_OpenIdPasswordRequired").style.display = empty ? "inline" : "none";
+        if (!empty) {
+          holdBusy(signIn);
+        }
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        document.querySelectorAll(".SignInButton").forEach(function (button) {
+          button.disabled = false;
+        });
+      }
+    });
+
+    document.querySelector("[data-replay]").addEventListener("click", function () {
+      if (window.HubSignIn) {
+        window.HubSignIn.replay();
+      }
+    });
+  })();
+</script>
+</body>
+</html>

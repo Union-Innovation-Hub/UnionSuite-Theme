@@ -34488,7 +34488,14 @@ html.hub-signin .SignIn-Container > .iMIS-WebPart:has(.SignInPage)::before {
   transform-origin: center;
 }
 
-html.hub-signin .SignInPage .SignIn {
+/* The Sign In iPart renders one of two forms, chosen by iMIS per website:
+   - classic (.SignIn): Username and Password, each with a Forgot? link
+   - OpenID Connect ([id$="_OpenIdSignInPanel"]): Email and Continue, shown
+     when OIDC is on and the website's access settings allow staff; Continue
+     goes to the identity provider or offers the iMIS password.
+   The rules below cover both: fields are matched by .forgot-link-field
+   (classic) or .PanelFieldValue (OpenID). */
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdSignInPanel"]) {
   width: 100%;
   max-width: none;
   margin: 0;
@@ -34496,20 +34503,44 @@ html.hub-signin .SignInPage .SignIn {
   font-family: var(--hub-signin-face-body);
 }
 
+/* The OpenID form's panel has a native border and padding the classic one
+   turns off inline. */
+html.hub-signin .SignInPage [id$="_OpenIdContentPanel"] {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
 /* Visible labels, with the Forgot? link lifted onto the label row. */
+/* Native .PanelField floats left (the OpenID email row shrinks to its
+   content), so the float is cleared. */
 html.hub-signin .SignInPage .PanelField {
   position: relative;
   display: grid;
   gap: 6px;
+  float: none;
+  width: auto;
   margin: 0 0 16px;
   padding: 0;
 }
 
-html.hub-signin .SignInPage label.contact-signin-label {
+/* label on the fields; span.Label on the OpenID read-only email row. */
+html.hub-signin .SignInPage .PanelField > :is(label, .Label) {
   position: static;
   left: auto;
+  width: auto;
+  margin: 0;
+  padding: 0;
   color: var(--hub-signin-text-strong);
   font: 600 13px/20px var(--hub-signin-face-body);
+  text-align: left;
+}
+
+html.hub-signin .SignInPage .PanelFieldValue {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 html.hub-signin .SignInPage .forgot-link-field {
@@ -34543,8 +34574,7 @@ html.hub-signin .SignInPage .forgot-link-field > a:focus-visible {
   border-radius: 2px;
 }
 
-html.hub-signin .SignInPage .forgot-link-field input[type="text"],
-html.hub-signin .SignInPage .forgot-link-field input[type="password"] {
+html.hub-signin .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:is([type="text"], [type="email"], [type="password"]) {
   display: block;
   width: 100%;
   height: 44px;
@@ -34567,11 +34597,11 @@ html.hub-signin .SignInPage .forgot-link-field input[type="password"] {
     box-shadow 160ms ease;
 }
 
-html.hub-signin .SignInPage .forgot-link-field input:hover {
+html.hub-signin .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:hover {
   border-color: rgba(255, 255, 255, 0.36);
 }
 
-html.hub-signin .SignInPage .forgot-link-field input:focus {
+html.hub-signin .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:focus {
   border-color: var(--hub-signin-core);
   background: rgba(255, 255, 255, 0.09);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--hub-signin-accent) 30%, transparent);
@@ -34579,13 +34609,13 @@ html.hub-signin .SignInPage .forgot-link-field input:focus {
 
 /* The labels name the fields, so the native placeholders are hidden. The
    input's text fill colour also applies to placeholders, so it is cleared. */
-html.hub-signin .SignInPage .forgot-link-field input::placeholder {
+html.hub-signin .SignInPage :is(.forgot-link-field, .PanelFieldValue) input::placeholder {
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
 
 /* Autofill paints its own background; an inset shadow covers it. */
-html.hub-signin .SignInPage .forgot-link-field input:-webkit-autofill {
+html.hub-signin .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:-webkit-autofill {
   box-shadow: 0 0 0 40px #0a3140 inset;
   -webkit-box-shadow: 0 0 0 40px #0a3140 inset;
   caret-color: #fff;
@@ -34596,24 +34626,108 @@ html.hub-signin .SignInPage .ValidationError {
   font-size: 12px;
 }
 
-/* A field showing its "Required" message gets a red outline. The ASP.NET
-   validator toggles the message's inline display between none and inline. */
-html.hub-signin .SignInPage .PanelField:has(> .ValidationError:not([style*="none"])) .forgot-link-field input,
-html.hub-signin .SignInPage .PanelField:has(> .ValidationError:not([style*="none"])) .forgot-link-field input:hover {
+/* A field showing a validator message ("Required", or the OpenID email
+   format checks inside .PanelFieldValue) gets a red outline. The ASP.NET
+   validators toggle the message's inline display between none and inline. */
+html.hub-signin .SignInPage .PanelField:has(.ValidationError:not([style*="none"])) :is(.forgot-link-field, .PanelFieldValue) input,
+html.hub-signin .SignInPage .PanelField:has(.ValidationError:not([style*="none"])) :is(.forgot-link-field, .PanelFieldValue) input:hover {
   border-color: #ff8a7a;
 }
 
-html.hub-signin .SignInPage .PanelField:has(> .ValidationError:not([style*="none"])) .forgot-link-field input:focus {
+html.hub-signin .SignInPage .PanelField:has(.ValidationError:not([style*="none"])) :is(.forgot-link-field, .PanelFieldValue) input:focus {
   border-color: #ff8a7a;
   box-shadow: 0 0 0 3px rgba(255, 138, 122, 0.25);
 }
 
+/* The OpenID email validators each start with a <br>; the grid gap already
+   spaces the message from the field. */
+html.hub-signin .SignInPage .PanelFieldValue > .ValidationError > br {
+  display: none;
+}
+
+html.hub-signin .SignInPage .PanelFieldValue > .ValidationError:not([style*="none"]) {
+  display: block !important;
+  margin-top: 6px;
+}
+
 /* The native pt-4 utility is !important, so this has to be too. */
-html.hub-signin .SignInPage [id$="_commandButtons"] {
+html.hub-signin .SignInPage :is([id$="_commandButtons"], #OpenIdCommandButtons, #ReservedUserCommandButtons) {
   padding-top: 8px !important;
 }
 
-html.hub-signin .SignInPage .SignIn input[type="submit"] {
+html.hub-signin .SignInPage #ReservedUserCommandButtons {
+  margin: 0;
+}
+
+/* OpenID, after Continue for a system administrator: the email as read-only
+   text, Continue (to the identity provider), then a link that opens the
+   iMIS password field and its own Sign In (Bootstrap collapse). */
+html.hub-signin .SignInPage [id$="_OpenIdReservedUserDiv"] .PanelFieldValue {
+  padding: 0;
+  color: #fff;
+  font: 15px/22px var(--hub-signin-face-body);
+  overflow-wrap: anywhere;
+}
+
+/* The native pb-2 utility is !important, so this has to be too. */
+html.hub-signin .SignInPage [id$="_OpenIdLinkPanel"] {
+  margin: 16px 0 0;
+  padding: 0 !important;
+  text-align: center;
+}
+
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"] {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--hub-signin-text-muted) !important;
+  font: 13px/20px var(--hub-signin-face-body);
+  text-decoration: none;
+}
+
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"]:hover,
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"][aria-expanded="true"] {
+  color: var(--hub-signin-text-strong) !important;
+}
+
+/* Bootstrap's a:focus ring would show on a click; only keyboard focus
+   gets one. */
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"]:focus {
+  outline: none;
+}
+
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"]:focus-visible {
+  outline: 2px solid var(--hub-signin-core);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* The native caret becomes a chevron that turns up while the field is open. */
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"] .caret {
+  width: 6px;
+  height: 6px;
+  margin: 0;
+  border: 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 200ms var(--hub-signin-ease);
+}
+
+html.hub-signin .SignInPage [id$="_OpenIdPasswordLink"][aria-expanded="true"] .caret {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+/* Inside the centred link row, so the field is set back to the left. */
+html.hub-signin .SignInPage [id$="_OpenIdPasswordInput"] {
+  text-align: left;
+}
+
+html.hub-signin .SignInPage [id$="_OpenIdPasswordInput"] > .PanelField:first-child {
+  margin-top: 16px;
+}
+
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"] {
   display: block;
   width: 100%;
   height: 44px;
@@ -34633,25 +34747,25 @@ html.hub-signin .SignInPage .SignIn input[type="submit"] {
     transform 160ms var(--hub-signin-ease);
 }
 
-html.hub-signin .SignInPage .SignIn input[type="submit"]:hover,
-html.hub-signin .SignInPage .SignIn input[type="submit"]:focus {
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"]:hover,
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"]:focus {
   background: color-mix(in srgb, var(--hub-signin-accent) 85%, #ffffff);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   color: var(--hub-signin-on-accent);
 }
 
-html.hub-signin .SignInPage .SignIn input[type="submit"]:active {
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"]:active {
   transform: translateY(1px);
 }
 
-html.hub-signin .SignInPage .SignIn input[type="submit"]:focus-visible {
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"]:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
 
 /* Signing in: the native code disables the button while the request runs.
    A light sweep crosses it; the theme's busy ring keeps the label. */
-html.hub-signin .SignInPage .SignIn input[type="submit"]:disabled {
+html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"]:disabled {
   background-color: var(--hub-signin-accent);
   background-image: linear-gradient(100deg,
     transparent 30%,
@@ -34795,17 +34909,17 @@ html.hub-signin [id$="_UserMessagesUpdatePanel"] .AsiMessage li:is(.AsiWarning, 
    stay quieter than it (owner, 8 October 2026). Solid coral is kept for a
    "Required" field, which does name the field; its rule outranks these. The
    type selectors outrank the base field rules above. */
-html.hub-signin.hub-signin-error .SignInPage .forgot-link-field input:is([type="text"], [type="password"]),
-html.hub-signin.hub-signin-error .SignInPage .forgot-link-field input:is([type="text"], [type="password"]):hover {
+html.hub-signin.hub-signin-error .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:is([type="text"], [type="email"], [type="password"]),
+html.hub-signin.hub-signin-error .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:is([type="text"], [type="email"], [type="password"]):hover {
   border-color: rgba(255, 138, 122, 0.5);
 }
 
-html.hub-signin.hub-signin-error .SignInPage .forgot-link-field input:is([type="text"], [type="password"]):focus {
+html.hub-signin.hub-signin-error .SignInPage :is(.forgot-link-field, .PanelFieldValue) input:is([type="text"], [type="email"], [type="password"]):focus {
   border-color: #ff8a7a;
   box-shadow: 0 0 0 3px rgba(255, 138, 122, 0.25);
 }
 
-html.hub-signin-error-shake .SignInPage .forgot-link-field input {
+html.hub-signin-error-shake .SignInPage :is(.forgot-link-field, .PanelFieldValue) input {
   animation: hub-signin-field-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
@@ -34852,7 +34966,7 @@ html.hub-signin-error-shake .SignInPage .forgot-link-field input {
     transition: none;
   }
 
-  html.hub-signin-error-shake .SignInPage .forgot-link-field input {
+  html.hub-signin-error-shake .SignInPage :is(.forgot-link-field, .PanelFieldValue) input {
     animation: none;
   }
 }
@@ -34946,7 +35060,7 @@ html.hub-signin .SignIn-Container > .iMIS-WebPart:has(.SignInPage)::before {
 }
 
 /* The form arrives a row at a time: username, password, button, links. */
-html.hub-signin .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_LinkPanel"]) {
+html.hub-signin .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_OpenIdCommandButtonPanel"], [id$="_LinkPanel"], [id$="_OpenIdLinkPanel"]) {
   transition:
     opacity 1000ms var(--hub-signin-ease-soft),
     transform 1000ms var(--hub-signin-ease-soft);
@@ -34960,11 +35074,11 @@ html.hub-signin .SignInPage .PanelField:nth-child(2) {
   transition-delay: 1070ms;
 }
 
-html.hub-signin .SignInPage [id$="_commandButtons"] {
+html.hub-signin .SignInPage :is([id$="_commandButtons"], [id$="_OpenIdCommandButtonPanel"]) {
   transition-delay: 1190ms;
 }
 
-html.hub-signin .SignInPage [id$="_LinkPanel"] {
+html.hub-signin .SignInPage :is([id$="_LinkPanel"], [id$="_OpenIdLinkPanel"]) {
   transition-delay: 1310ms;
 }
 
@@ -34997,7 +35111,7 @@ html.hub-signin-intro .SignIn-Container :is(.Tagline, .TagLine) {
   clip-path: inset(0 100% 0 0);
 }
 
-html.hub-signin-intro .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_LinkPanel"]) {
+html.hub-signin-intro .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_OpenIdCommandButtonPanel"], [id$="_LinkPanel"], [id$="_OpenIdLinkPanel"]) {
   opacity: 0;
   transform: translateY(10px);
 }
@@ -35020,7 +35134,7 @@ html.hub-signin-intro .hub-signin-neon {
   .hub-signin-neon,
   html.hub-signin .SignIn-Container > .iMIS-WebPart:first-child img,
   html.hub-signin .SignIn-Container > .iMIS-WebPart:has(.SignInPage)::before,
-  html.hub-signin .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_LinkPanel"]) {
+  html.hub-signin .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_OpenIdCommandButtonPanel"], [id$="_LinkPanel"], [id$="_OpenIdLinkPanel"]) {
     transition: opacity 300ms ease;
   }
 
@@ -35029,7 +35143,7 @@ html.hub-signin-intro .hub-signin-neon {
   html.hub-signin-intro .hub-signin-neon,
   html.hub-signin-intro .SignIn-Container > .iMIS-WebPart:first-child img,
   html.hub-signin-intro .SignIn-Container > .iMIS-WebPart:has(.SignInPage)::before,
-  html.hub-signin-intro .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_LinkPanel"]) {
+  html.hub-signin-intro .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_OpenIdCommandButtonPanel"], [id$="_LinkPanel"], [id$="_OpenIdLinkPanel"]) {
     transform: none;
     filter: none;
   }
@@ -35043,7 +35157,7 @@ html.hub-signin-intro .hub-signin-neon {
   html.hub-signin .ContentItemContainer:has(> .SignIn-Container)::before,
   html.hub-signin-busy .ContentItemContainer:has(> .SignIn-Container)::before,
   .hub-signin-neon::before,
-  html.hub-signin .SignInPage .SignIn input[type="submit"]:disabled {
+  html.hub-signin .SignInPage :is(.SignIn, [id$="_OpenIdCommandButtonPanel"], [id$="_OpenIdPasswordPanel"]) input[type="submit"]:disabled {
     animation: none;
   }
 }
@@ -35060,7 +35174,7 @@ html.hub-signin-intro .hub-signin-neon,
 html.hub-signin-intro .SignIn-Container > .iMIS-WebPart:has(.SignInPage)::before,
 html.hub-signin-intro .SignIn-Container > .iMIS-WebPart:first-child img,
 html.hub-signin-intro .SignIn-Container :is(.Tagline, .TagLine),
-html.hub-signin-intro .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_LinkPanel"]) {
+html.hub-signin-intro .SignInPage :is(.PanelField, [id$="_commandButtons"], [id$="_OpenIdCommandButtonPanel"], [id$="_LinkPanel"], [id$="_OpenIdLinkPanel"]) {
   transition: none;
 }
 
