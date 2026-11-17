@@ -44,6 +44,84 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+/* US-FILTER-VALUE:START — a filter value a template wrote into a data
+   attribute, made safe to send to /api/query. An iMIS Query Template
+   placeholder ({#query.Ordinal}) writes an integer with thousands
+   separators once it reaches 1,000 ("54,698"), and an integer filter then
+   fails with HTTP 400 or 500 (PSANZ UAT, case 54698, 18 November 2026; the
+   dev tenant's case numbers were all under 1,000). A value that is only
+   digits in comma-separated groups of three loses its commas; anything
+   else is returned as it is. Callers use
+   window.UnionSuiteFilterValue?.(value) ?? value: standalone builds and
+   tests take single sections without this one. */
+(function () {
+  'use strict';
+
+  const GROUPED_INTEGER = /^-?\d{1,3}(?:,\d{3})+$/;
+
+  function filterValue(value) {
+    const text = value == null ? '' : String(value).trim();
+    return GROUPED_INTEGER.test(text) ? text.replace(/,/g, '') : text;
+  }
+
+  window.UnionSuiteFilterValue = filterValue;
+})();
+/* US-FILTER-VALUE:END */
+
+/* US-ORDINAL-ATTRIBUTES:START — a record's ordinal, as a Query Template
+   wrote it into a row's data attribute, kept as plain digits. The same
+   placeholder formatting as US-FILTER-VALUE: {#query.Ordinal} writes
+   "1,234" from 1,000, and the row actions accept digits only ("Invalid
+   record ordinal"), send the value to flows and find the row again by it
+   ([data-ordinal="1234"]). So the attribute itself is rewritten, once, as
+   the row arrives: on load, when iMIS or the theme adds rows, and in a
+   page the theme reads without showing (a Query Template refresh, a CCO
+   tab), which calls UnionSuiteOrdinals.normalise(doc) because no observer
+   sees it. This section comes first, so its observer runs before any
+   other section's and every reader sees plain digits. Only a value that
+   is digits in comma-separated groups of three changes. */
+(function () {
+  'use strict';
+
+  const ATTRIBUTES = [
+    'data-ordinal',
+    'data-us-contact-ordinal',
+    'data-us-task-ordinal',
+    'data-us-milestone-ordinal',
+    'data-us-term-ordinal',
+    'data-us-increase-ordinal',
+  ];
+  const SELECTOR = ATTRIBUTES.map(name => '[' + name + '*=","]').join(',');
+  const GROUPED_INTEGER = /^-?\d{1,3}(?:,\d{3})+$/;
+
+  function fix(element) {
+    for (const name of ATTRIBUTES) {
+      const value = (element.getAttribute(name) || '').trim();
+      if (GROUPED_INTEGER.test(value)) element.setAttribute(name, value.replace(/,/g, ''));
+    }
+  }
+
+  // root: a document, a fragment or an element; its own attributes count.
+  function normalise(root) {
+    if (!root || typeof root.querySelectorAll !== 'function') return;
+    if (typeof root.matches === 'function' && root.matches(SELECTOR)) fix(root);
+    root.querySelectorAll(SELECTOR).forEach(fix);
+  }
+
+  normalise(document);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => normalise(document), {once: true});
+
+  new MutationObserver(records => {
+    for (const record of records) {
+      if (record.type === 'attributes') fix(record.target);
+      else record.addedNodes.forEach(node => { if (node.nodeType === 1) normalise(node); });
+    }
+  }).observe(document.documentElement, {childList: true, subtree: true, attributes: true, attributeFilter: ATTRIBUTES});
+
+  window.UnionSuiteOrdinals = {normalise};
+})();
+/* US-ORDINAL-ATTRIBUTES:END */
+
 /* US-DATE-LOCALE:START — the locale the theme shows dates in: the website's
    iMIS culture (gCurrentCultureCode, set per website, e.g. en-AU or en-US),
    so a US client's site shows US dates (owner, 4 November 2026). Without
@@ -598,6 +676,8 @@ SOFTWARE.
     if (response.redirected || (response.url && new URL(response.url).href !== url.href)) throw new Error('Query Template refresh returned a different page.');
     const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
     if (doc.querySelector('input.SignInButton')) throw new Error('Sign in again before refreshing the Query Template.');
+    // Not in the page, so US-ORDINAL-ATTRIBUTES' observer does not see it.
+    window.UnionSuiteOrdinals?.normalise(doc);
     return doc;
   }
   // The parts of the one iPart with this ID on a page read.
@@ -9264,7 +9344,7 @@ SOFTWARE.
   function config(root) {
     const query = text(root.dataset.usAlertsQuery);
     const filter = text(root.dataset.usAlertsFilter);
-    const value = text(root.dataset.usAlertsValue);
+    const value = window.UnionSuiteFilterValue?.(text(root.dataset.usAlertsValue)) ?? text(root.dataset.usAlertsValue);
     // Unsubstituted template placeholders mean the banner has no record yet.
     if (!/^\$\/.+/.test(query) || !filter || !value || /^[\[{]/.test(value)) return null;
     return { query, filter, value, scope: query + '|' + value, tab: text(root.dataset.usAlertsTab) };
@@ -9766,7 +9846,7 @@ SOFTWARE.
   function config(root) {
     const query = text(root.dataset.usPositionsQuery);
     const filter = text(root.dataset.usPositionsFilter);
-    const value = text(root.dataset.usPositionsValue);
+    const value = window.UnionSuiteFilterValue?.(text(root.dataset.usPositionsValue)) ?? text(root.dataset.usPositionsValue);
     // Unsubstituted template placeholders mean the banner has no record yet.
     if (!/^\$\/.+/.test(query) || !filter || !value || /^[\[{]/.test(value)) return null;
     const [group, section] = text(root.dataset.usPositionsSection).split(':');
@@ -10051,7 +10131,7 @@ SOFTWARE.
   function config(details) {
     const query = text(details.dataset.usFactsQuery);
     const filter = text(details.dataset.usFactsFilter);
-    let filterValue = text(details.dataset.usFactsValue);
+    let filterValue = window.UnionSuiteFilterValue?.(text(details.dataset.usFactsValue)) ?? text(details.dataset.usFactsValue);
     if (!filterValue && filter) filterValue = text(new URLSearchParams(location.search).get(filter));
     // Unsubstituted placeholders mean the banner has no record yet.
     if (!/^\$\/.+/.test(query) || !filter || !filterValue || /^[\[{]/.test(filterValue)) return null;
@@ -10312,7 +10392,7 @@ SOFTWARE.
   function config(element) {
     const query = text(element.dataset.usValueQuery);
     const filter = text(element.dataset.usValueFilter);
-    let value = text(element.dataset.usValueFilterValue);
+    let value = window.UnionSuiteFilterValue?.(text(element.dataset.usValueFilterValue)) ?? text(element.dataset.usValueFilterValue);
     if (!value && filter) value = text(new URLSearchParams(location.search).get(filter));
     // Unsubstituted placeholders mean the page has no record yet.
     if (!/^\$\/.+/.test(query) || (filter && (!value || /^[\[{]/.test(value)))) return null;
@@ -10665,7 +10745,7 @@ SOFTWARE.
   function config(root) {
     const query = text(root.dataset.usFieldsQuery);
     const filter = text(root.dataset.usFieldsFilter);
-    let filterValue = text(root.dataset.usFieldsValue);
+    let filterValue = window.UnionSuiteFilterValue?.(text(root.dataset.usFieldsValue)) ?? text(root.dataset.usFieldsValue);
     if (!filterValue && filter) filterValue = text(new URLSearchParams(location.search).get(filter));
     // Unsubstituted placeholders mean the page has no record yet.
     if (!/^\$\/.+/.test(query) || !filter || !filterValue || /^[\[{]/.test(filterValue)) return null;
@@ -17386,7 +17466,7 @@ SOFTWARE.
     const source = document.querySelector(COUNTS);
     const query = text(source?.dataset.usCountsQuery);
     const filterName = text(source?.dataset.usCountsFilter);
-    const value = text(source?.dataset.usCountsValue);
+    const value = window.UnionSuiteFilterValue?.(text(source?.dataset.usCountsValue)) ?? text(source?.dataset.usCountsValue);
     // Unsubstituted template placeholders mean the banner has no record yet.
     if (!/^\$\/.+/.test(query) || !filterName || !value || /^[\[{]/.test(value)) {
       counts = new Map();
@@ -18500,6 +18580,8 @@ SOFTWARE.
     if (!response.ok || !samePage(landed.pathname, location.pathname)) throw new FallbackError('Unexpected tab response (' + response.status + ').');
     const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
     if (doc.querySelector('input.SignInButton') && !document.querySelector('input.SignInButton')) throw new FallbackError('The tab response is a sign-in page.');
+    // Not in the page, so US-ORDINAL-ATTRIBUTES' observer does not see it.
+    window.UnionSuiteOrdinals?.normalise(doc);
     const fetchedForm = doc.getElementById(target.form.id);
     const fetchedView = doc.getElementById(views(target.cco)[target.index].id);
     const parsed = parseInitialize(doc);
@@ -22171,7 +22253,7 @@ SOFTWARE.
   function config(root) {
     const folder = text(root.dataset.usActivityFolder).replace(/\/+$/, '');
     const filter = text(root.dataset.usActivityFilter);
-    const value = text(root.dataset.usActivityValue);
+    const value = window.UnionSuiteFilterValue?.(text(root.dataset.usActivityValue)) ?? text(root.dataset.usActivityValue);
     // Unsubstituted template placeholders mean the page has no record yet.
     if (!/^\$\/.+/.test(folder) || !filter || !value || /^[\[{]/.test(value)) return null;
 

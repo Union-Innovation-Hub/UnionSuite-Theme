@@ -97,7 +97,10 @@ body.loaded .col-secondary {
 
 .sidebar-fixed .nav-expanded .col-secondary:after {
   content: '';
-  background: linear-gradient(0deg, #002632 50%, rgba(0, 38, 50, 0) 90%);
+  /* The fade over the last navigation items takes the navigation's own
+     colour (--nav-bg, set on #SideBarPanel in zUnionSuite.css), so it
+     follows a client's brand; it was a fixed dark teal. */
+  background: linear-gradient(0deg, var(--nav-bg, #002632) 50%, transparent 90%);
   position: absolute;
   bottom: 0;
   left: 0;
