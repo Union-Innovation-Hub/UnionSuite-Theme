@@ -2,7 +2,7 @@
 id: case-shortcuts-and-popups
 title: Shortcuts and popups the case page opens
 section: Technical
-answer: Most case forms open through `Cases_` shortcuts, such as `Cases_CreateNote` and `Cases_EditCase`. Three still open a page path directly: **Email parties**, the upload form and note details.
+answer: Most case forms open through `Cases_` shortcuts, such as `Cases_CreateNote` and `Cases_EditCase`. Two still open a page path directly: **Email parties** and the upload form.
 asks:
   - which shortcuts does the case page use
   - what pages do the case popups open
@@ -19,7 +19,8 @@ verify:
 | `Cases_ManageCase` | The case page |
 | `Cases_CreateCase` | The Create case form (`@/_i4u_/Core/Cases/UnionSuite/Forms/Create-Case-Staff-Form`) |
 | `Cases_NoAccess` | The no-access page |
-| `Cases_CreateNote`, `Cases_CreateTask`, `Cases_CreateMeeting` | **Add note**, **Add task** and **Add meeting**'s full forms |
+| `Cases_CreateNote` | **Add note** and **Add task**'s full form, and **Edit note** and **Edit task**: one note and task form (`UnionSuite Cases: Note`), opened on Note, on Task with `Type=task`, or on a saved one with `Ordinal` |
+| `Cases_CreateMeeting` | **Add meeting**'s full form |
 | `Cases_EditCase`, `Cases_ResolveCase` | **Update case details**, **Resolve case** and **Edit resolution** |
 | `Cases_ManageStaff` | **Add staff**'s full form |
 | `Cases_EditStaff` | Not needed once the role menu is live (C44): a staff member's role is changed on their card |
@@ -32,7 +33,6 @@ verify:
 | --- | --- |
 | **Email parties** | `/_i4u_/Core/Cases/UnionSuite/Manage-Case/Popups/Send-Email-Parties.aspx` |
 | **Upload**'s full form | `/_i4u_/Core/Zidebar/Add-Note-New.aspx` |
-| Note details | `/_i4u_/Core/Zidebar/NoteDetails.aspx` |
 
 A direct path breaks if its page moves. A shortcut only needs its target updated.
 

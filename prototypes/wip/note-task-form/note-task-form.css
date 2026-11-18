@@ -1,0 +1,230 @@
+/* Note and task form mock-up: the parts the forms runtime doesn't have yet,
+   adopted into the form's shadow root after Forms/UnionSuiteForms.css and
+   written in its --usf-* tokens. If the design is approved these move into
+   UnionSuiteForms.css as field types (kind choice, files, access). */
+
+/* A closed reveal would still take the body's 20px grid gap (a grid track
+   can't be pulled shut by a margin), so the body spaces its fields with
+   margins instead, and a closed reveal drops its own. */
+.usf__body {
+  row-gap: 0;
+}
+
+.usf__body > * + * {
+  margin-top: 20px;
+}
+
+.usf__body > .usf__reveal {
+  transition:
+    grid-template-rows 220ms var(--usf-ease),
+    opacity 180ms,
+    margin-top 220ms var(--usf-ease);
+}
+
+.usf__body > .usf__reveal[data-closed] {
+  margin-top: 0;
+}
+
+/* The top line: the record, then Note | Task. Chosen before typing, so what
+   it opens never moves text already written. */
+.usf__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.usf__top .usf__record {
+  flex: 1 1 220px;
+}
+
+.usf__kind {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--usf-radius);
+  background: var(--usf-sunken);
+}
+
+.usf__kind button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--usf-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.usf__kind button[aria-checked="true"] {
+  background: var(--usf-surface);
+  color: var(--usf-text-strong);
+  box-shadow: 0 1px 2px rgb(0 0 0 / .08);
+}
+
+.usf__kind button:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: var(--usf-focus-ring);
+}
+
+/* Touch: a full-height target. */
+@media (max-width: 950px) {
+  .usf__kind button {
+    min-height: 44px;
+  }
+}
+
+/* What was done: under Completed, inset like Details. */
+.usf__done-notes {
+  grid-column: 1 / -1;
+}
+
+/* The record's extras (attachments, access) below a rule: rarely changed,
+   so last. */
+.usf__section {
+  display: grid;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--usf-border);
+}
+
+/* Attachments: a drop zone, then the files added. */
+.usf__drop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px dashed var(--usf-border-strong);
+  border-radius: var(--usf-radius);
+  background: var(--usf-subtle);
+  color: var(--usf-text-muted);
+  font-size: 13px;
+}
+
+.usf__drop-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usf__drop button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--usf-link);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.usf__files {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each file: its name line, then its own attachment tags (the attachment tag
+   list, not the note's). */
+.usf__file {
+  display: grid;
+  gap: 8px;
+  padding: 8px 8px 10px 10px;
+  border: 1px solid var(--usf-border);
+  border-radius: var(--usf-radius);
+  color: var(--usf-text-strong);
+  font-size: 13px;
+}
+
+.usf__file-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.usf__file-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.usf__file-tags:empty {
+  display: none;
+}
+
+/* Add tags sits under the file's name, lined up with it. */
+.usf__file > .usf__link {
+  justify-self: start;
+}
+
+.usf__file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usf__file-size {
+  color: var(--usf-text-muted);
+  font-size: 12px;
+}
+
+.usf__file-head > .usf__chip-remove {
+  width: 24px;
+  height: 24px;
+}
+
+/* Access: a plain select and what it means. */
+.usf__access {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+@container (max-width: 520px) {
+  .usf__access {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.usf__native {
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 1px solid var(--usf-border-strong);
+  border-radius: var(--usf-radius);
+  background: var(--usf-surface);
+  color: var(--usf-text-strong);
+  font: inherit;
+}
+
+.usf__native:focus {
+  border-color: var(--usf-focus);
+  outline: 2px solid transparent;
+  box-shadow: var(--usf-focus-glow);
+}
+
+.usf__access-hint {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  color: var(--usf-text-muted);
+  font-size: 13px;
+}
+
+.usf__access-hint .usf-icon {
+  margin-top: 3px;
+}

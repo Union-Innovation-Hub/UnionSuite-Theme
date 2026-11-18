@@ -713,8 +713,16 @@
   // 2026). CloudToolz knows the user from the call, as for complete-task,
   // checks the note's access (Open, Individual, Team) and answers
   // {Access: 'Granted' | 'Restricted', Note}; the text comes only when granted.
+  // A case's note asks the cases flow (owner, 18 November 2026), which checks
+  // the note's own case as well as the note; it reads the case from the
+  // note, and the page's CaseID and CaseNum only go with it.
   async function noteAccess(ordinal) {
-    const response = await cloudToolz('/ca/note-access', {method: 'POST', body: JSON.stringify({NoteOrdinal: ordinal})});
+    const page = new URLSearchParams(location.search);
+    const caseId = page.get('CaseID') || '';
+    const response = caseId
+      ? await cloudToolz('/cases/quick/note-access', {method: 'POST',
+        body: JSON.stringify({NoteOrdinal: ordinal, CaseID: caseId, CaseNum: page.get('CaseNum') || ''})})
+      : await cloudToolz('/ca/note-access', {method: 'POST', body: JSON.stringify({NoteOrdinal: ordinal})});
     return response.json();
   }
 
@@ -870,7 +878,8 @@
    - The CloudToolz call (UnionSuiteAgreements). The case task tick posts
      through it to the cases flow /cases/complete-task (cases.item-status
      below), not the agreements /ca/complete-task.
-   - The restricted note loader (/ca/note-access), defined once for the page.
+   - The restricted note loader, defined once for the page; on a case page
+     it asks /cases/quick/note-access (owner, 18 November 2026).
    - Attachment View, Download and Edit: they read only the row, so the case
      template keeps the agreements.*-attachment classes. */
 (function () {
@@ -1003,9 +1012,11 @@
   const CATEGORIES = ['Case', 'Employer', 'Membership', 'Intake', 'Meeting'];
 
   // Notes (C34): a follow-up note is also a task (owner, 9 October 2026).
+  // More options is the case note and task form (UnionSuite Cases: Note,
+  // owner 18 November 2026), opened on Note.
   composer('cases.add-note', {
     label: 'Add note',
-    form: {href: ({context}) => page('/Cases_CreateNote', {CaseID: context.caseId}), title: 'Add note'},
+    form: {href: ({context}) => page('/Cases_CreateNote', {CaseID: context.caseId, CaseNum: context.caseNum}), title: 'Add note'},
     lists: values => values.FollowUp ? ['us-action-cases-add-note', 'us-action-cases-add-task'] : ['us-action-cases-add-note'],
     arrive: 'top',
     composer: {
@@ -1024,12 +1035,12 @@
   });
 
   // Tasks (C40): stays open for the next one; the server assigns the lead
-  // staff member. More options is the case task form once its page is set
-  // (UnionSuiteTaskForms); until then the proposed Cases_CreateTask page.
+  // staff member. More options is the same note and task form as Add note,
+  // opened on Task (owner, 18 November 2026: a task is a note with
+  // follow-up).
   composer('cases.add-task', {
     label: 'Add task',
-    form: {href: ({context}) => window.UnionSuiteTaskForms?.href('case', {ModuleID: context.caseId, ModuleOrdinal: context.caseNum}) ||
-      page('/Cases_CreateTask', {Task: 'true', CaseID: context.caseId}), title: 'Add task'},
+    form: {href: ({context}) => page('/Cases_CreateNote', {CaseID: context.caseId, CaseNum: context.caseNum, Type: 'task'}), title: 'Add task'},
     lists: () => ['us-action-cases-add-task', 'us-action-cases-add-note'],
     // Oldest outstanding first: a new task is the last of them.
     arrive: 'bottom',
@@ -1074,19 +1085,20 @@
   // Attachments (C39): files dropped or chosen and their tags (owner, 21
   // October 2026: tags in place of the Sensitive flag). The files go as
   // Base64, as CloudToolz downloads return them (its helper sends JSON).
-  // The tags come from CloudToolz POST /zidebar/sharepoint/tagsprefill,
-  // read once for the page. ITS ANSWER IS TO CONFIRM: a list of tags, bare
-  // or under Items (.$values), each read from the first of TAG_VALUE and
-  // TAG_LABEL it has.
+  // The tags come from CloudToolz GET /cases/quick-add/AttachmentTagList
+  // (owner, 18 November 2026; was the Zidebar tag editor's tagsprefill,
+  // whose answer is a Tabulator table's settings), read once for the page.
+  // It answers [{Ordinal, TagName}] from ZideBar.Zen_Tags; a list under
+  // Items (.$values) is read too. Each tag is read from the first of
+  // TAG_VALUE and TAG_LABEL it has.
   const TAG_VALUE = ['TagOrdinal', 'Ordinal', 'TagID', 'ID', 'Value', 'Code'];
   const TAG_LABEL = ['TagName', 'Name', 'Label', 'Description', 'Tag'];
   const firstColumn = (row, names) => names.map(name => column(row, name)).find(value => value != null && value !== '');
 
   const attachmentTags = once(async () => {
-    const query = new URLSearchParams(location.search);
-    const response = await post('/zidebar/sharepoint/tagsprefill', {CaseID: query.get('CaseID') || '', CaseNum: query.get('CaseNum') || ''});
+    const response = await callCloudToolz('/cases/quick-add/AttachmentTagList', {method: 'GET'});
     const data = await response.json();
-    const rows = Array.isArray(data) ? data : data?.Items?.$values || data?.Items || data?.Tags || [];
+    const rows = Array.isArray(data) ? data : data?.Items?.$values || data?.Items || [];
     return rows.map(row => typeof row === 'object'
       ? {value: String(firstColumn(row, TAG_VALUE) ?? firstColumn(row, TAG_LABEL) ?? ''), label: String(firstColumn(row, TAG_LABEL) ?? firstColumn(row, TAG_VALUE) ?? '')}
       : {value: String(row), label: String(row)})
@@ -1110,7 +1122,7 @@
       fields: [{type: 'multiselect', name: 'Tags', label: 'Tags', placeholder: 'Add tags…', options: attachmentTags,
         empty: term => term ? 'No tags match “' + term + '”.' : 'No more tags.'}],
       // The tags as ordinals and names, comma-separated, as the attachment
-      // editor's /ca/update-attachment takes them.
+      // editor's /cases/quick-update/attachment takes them.
       submit: async (values, context) => {
         const tags = (await attachmentTags()).filter(tag => values.Tags.includes(tag.value));
         return send('/cases/quick-add/attachment', {CaseID: context.caseId, CaseNum: context.caseNum,
@@ -1153,11 +1165,13 @@
     arrive: 'bottom',
     composer: {
       kind: 'staff', label: 'New staff member', save: 'Add', keepOpen: true,
-      main: {type: 'combobox', name: 'StaffID', label: 'Staff member', placeholder: 'Search staff…', avatars: true,
+      // 15 at a time (owner, 18 November 2026; was 8), the list saying how
+      // many matched; typing narrows it.
+      main: {type: 'combobox', name: 'StaffID', label: 'Staff member', placeholder: 'Search staff…', avatars: true, limit: 15,
         required: 'Choose someone from the list.',
         search: async ({term, wrapper}) => {
           const taken = onCase(wrapper);
-          return staffMatching(await staffList(), term).slice(0, 8).map(person => {
+          return staffMatching(await staffList(), term).map(person => {
             const disabled = taken.has(String(person.StaffID));
             return {value: person.StaffID, name: person.StaffName, meta: disabled ? 'On the case' : '', disabled};
           });
@@ -1723,17 +1737,14 @@
         refresh: {when: 'close', run: refreshRow}}
     });
   }
-  // The shared note details popup the agreement page uses, with CaseID.
-  const noteDetails = mode => ({context}) => page('/_i4u_/Core/Zidebar/NoteDetails.aspx', {
-    NoteOrdinal: context.ordinal, CaseID: context.caseId, ...(mode ? {[mode]: 'true'} : {})
+  // A note or a task opens in the case note and task form with its Ordinal
+  // (owner, 18 November 2026), as Add note and Add task do: one row in
+  // Zen_CloudFiles_Notes, so the form knows which it is.
+  const noteForm = ({context}) => page('/Cases_CreateNote', {
+    CaseID: context.caseId, CaseNum: context.caseNum, Ordinal: context.ordinal
   });
-  rowPopup('cases.edit-note', 'Edit note', noteDetails(''), 'Note');
-  // Tasks open the case task form with the task's Ordinal once its page is
-  // set (UnionSuiteTaskForms); until then the note details page.
-  const taskForm = args => window.UnionSuiteTaskForms?.href('case', {
-    ModuleID: args.context.caseId, ModuleOrdinal: args.context.caseNum, Ordinal: args.context.ordinal
-  }) || noteDetails('Task')(args);
-  rowPopup('cases.edit-task', 'Edit task', taskForm, window.UnionSuiteTaskForms?.pages.case ? 'Edit task' : 'Task');
+  rowPopup('cases.edit-note', 'Edit note', noteForm, 'Edit note');
+  rowPopup('cases.edit-task', 'Edit task', noteForm, 'Edit task');
   rowPopup('cases.edit-meeting', 'Edit meeting',
     ({context}) => page('/Cases_EditMeeting', {CaseID: context.caseId, CaseOrdinal: context.caseNum, MeetingOrdinal: context.ordinal}),
     'Edit meeting');

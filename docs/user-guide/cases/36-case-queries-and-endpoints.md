@@ -27,7 +27,7 @@ verify:
 | `$/_i4u_/Core/Cases/Value Lists/Case - Form Data/Case Value List - Case Contact Types` | **Add staff**'s roles, and the role menu on a staff card (`value`, `label`; was `Get Case Staff Member Types`) |
 | `API - Manage Case - Staff Removal Check` (proposed) | **Remove from case**'s check: one row per staff member, prompt `CaseNum`; `Ordinal`, `IsLead`, `CaseAccess` (Open, Team or Individual), optional `CanOpen` ('false' for a row that doesn't let that person open an Individual case) |
 | `$/_i4u_/Core/Shared/API - Communication Details` | A sent email's recipients on its activity card |
-| `$/_i4u_/Core/Shared/API - Zen Attachment Tags` | Attachment tag suggestions |
+| `$/_i4u_/Core/Shared/API - Zen Attachment Tags` | Attachment tag suggestions in the Add note form, and in an attachment's edit when `/cases/quick-add/AttachmentTagList` cannot be reached |
 
 The client IQAs are in [Where a site's case settings live](#where-case-settings-live).
 
@@ -37,12 +37,16 @@ The client IQAs are in [Where a site's case settings live](#where-case-settings-
 | --- | --- |
 | `/cases/quick-add/note`, `task`, `meeting`, `attachment`, `contact`, `staff` | The add forms' saves |
 | `/cases/quick-add/StaffList` | The case's staff, for pickers |
+| `/cases/quick-add/AttachmentTagList` | The attachment tags (`[{Ordinal, TagName}]`), for **Upload** and an attachment's edit |
+| `/cases/quick-update/attachment` | An attachment's edit: `{CaseID, CaseNum, FileOrdinal, FileName, NewTagOrdinals, RemovedTagOrdinals}`; checks the case, logs *Case <CaseID>: Update Attachment (<name>)* against it. Agreements keep `/ca/update-attachment` |
 | `/cases/quick-update/set-status`, `set-lead-staff`, `set-primary-party`, `set-primary-workplace` | Changes made in place |
 | `/cases/quick-update/set-staff-role` (proposed) | The role menu on a staff card: `{CaseID, CaseNum, StaffOrdinal, Role}`, logged as *Staff updated* |
 | `/cases/quick-update/remove-staff` (proposed) | **Remove from case**: `{CaseID, CaseNum, StaffID, StaffOrdinal}`; removes the row, clears the case's lead if it was this person, logs *Staff removed* |
 | `/cases/complete-task` | Ticking a task |
 | `/cases/quick-update/reopen` | **Reopen case**: `{CaseID, CaseNum}`. Sets the status the case had before it was resolved (the newest `Status` change in `i4u_UT_Logging`, through `API - Manage Case - Reopen - Get Previous Status`) if that is still an open status, otherwise `InProgress`; keeps the resolution; logs the status change. An already open case answers 200 without a change |
-| `/cases/case-access`, `/cases/attachment-access` | Whether the user may see the case, or a restricted note or file |
+| `/cases/case-access`, `/cases/attachment-access` | Whether the user may see the case, or a restricted file |
+| `/cases/quick/note-access` | **Show note** on a restricted note: `{NoteOrdinal}`. Answers the text only to someone who may open both the note's case and the note (Open: anyone who can open the case; Team: the case team role; Individual: staff assigned to the case; sysadmin and manager always) |
+| `/cases/US/note`, `/cases/US/note/Prefill` | The note and task form (`Cases_CreateNote`): its save and its prefill, with the same access checks |
 
 **How Remove from case's Undo works:** the theme checks the case first (the check IQA above), so changes made in another tab count. With nothing to warn about, the card closes up and a line with **Undo** takes its place in the Case team; the remove request is only sent when it runs out (6 seconds, paused while the pointer or focus is on it). **Undo** cancels the wait, so nothing is sent and nothing is logged: the change log can't be deleted from, so there is no remove-then-re-add. The ZenToken CloudToolz needs is stored as the card closes, so leaving, hiding or refreshing the page sends any waiting removal at once (`fetch` with `keepalive`). A send that fails brings the card back with an error line under it. With a warning (the lead, the last staff on an Individual case, or removing yourself), the card asks first and **Remove** sends straight away.
 

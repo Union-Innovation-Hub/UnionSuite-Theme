@@ -1,17 +1,22 @@
 <!-- Case recent activity · Query Template Display, one record, on the
      Overview: what happened with the member lately, so staff see it before
      they act. The theme's activity feed (US-ACTIVITY-FEED) over notes, emails
-     in and out, and meetings, locked to the last 30 days (owner, 8 October
-     2026); no details updated cards, no timeframe and no Load all: the full
+     in and out, meetings and attachments (owner, 18 November 2026: on the
+     site), locked to the last 30 days (owner, 8 October 2026; still so, 18
+     November 2026); no details updated cards, no timeframe and no Load all: the full
      timeline is All activity on the Activity tab
      (Case-All-Activity-Query-Template.html), and the footer's View all
      activity opens it.
-     iPart CSS class: us-case-recent us-action-cases-add-note
-       (C15: capped and scrolling, with Add note in its heading)
+     iPart CSS class: us-case-recent us-action-cases-add-note us-panel-fill
+       (C15: capped and scrolling, with Add note in its heading; C25:
+       filling the column to the side column's end)
      Native title: [[activity]] Recent activity. Display in cards: unchecked.
-     Rows per page: 1. Source IQA: any one-row IQA on @url:CaseID that
-     returns the case's Ordinal, unaliased (Get Case Details;
-     owner, 21 October 2026). The feed sends it as the CaseNum filter.
+     Rows per page: 1. Header, footer and No results: empty (the feed draws
+     its own count, footer link and empty state).
+     Source IQA: $/_i4u_/Core/Cases/UnionSuite/Manage Case/Query Template -
+     Manage Case - Activity Feed (Recent) (owner, 18 November 2026; was Get
+     Case Details): one row on @url:CaseID with the case's Ordinal,
+     unaliased. The feed sends it as the CaseNum filter.
 
      The 30 days (C19, the theme's fixed window, 21 October 2026):
      data-us-activity-window="30" sends StartDate as 30 days ago to the same
@@ -22,10 +27,13 @@
      The cards match All activity's (Case-All-Activity-Query-Template.html):
      restricted notes with Show note (C29), follow-up badges, the Notes,
      Emails and Meetings Details IQAs in the expanded view, and View email
-     (C28). Base and details IQAs: Activity-Feed-IQA-Build.md. -->
+     (C28), and an attachment's View and Download (its base IQA's
+     Data-us-file-* columns). Base and details IQAs: Activity-Feed-IQA-Build.md.
+     Paste the whole template: a copy of All activity's sends no window
+     (data-us-activity-days="0" is All time) and shows the timeframe. -->
 <div class="us-activity-feed"
   data-us-activity-folder="$/_i4u_/Core/Cases/UnionSuite/Manage Case/Activity Feed - Base"
-  data-us-activity-details-folder="$/_i4u_/Client/Cases - UnionSuite/Layouts/Activity Feed - Details"
+  data-us-activity-details-folder="$/_i4u_/Client/Cases/UnionSuite/Layouts/Activity Feed - Details"
   data-us-activity-filter="CaseNum" data-us-activity-value="{#query.Ordinal}"
   data-us-activity-window="30" data-us-activity-limit="10" data-us-activity-page="5"
   data-us-activity-history="#activity" data-us-activity-history-label="View all activity"
@@ -35,5 +43,6 @@
     <li data-source="emails-sent" data-query="Emails Sent" data-details="Emails Sent Details" data-type="email" data-direction="out" data-comms-recipients="$/_i4u_/Core/Shared/API - Communication Details"></li>
     <li data-source="emails-logged" data-query="Emails Logged" data-details="Emails Logged Details" data-type="email" data-record-actions="agreements.view-attachment agreements.download-attachment"></li>
     <li data-source="meetings" data-query="Meetings" data-details="Meetings Details" data-detail-label="Description" data-type="meeting" data-record-popup="true"></li>
+    <li data-source="attachments" data-query="Attachments" data-type="attachment" data-record-actions="agreements.view-attachment agreements.download-attachment" data-label="Attachment added" data-plural="Attachments" data-section-link="case:attachments" data-section-tab="Attachments" data-section-label="View all attachments"></li>
   </ul>
 </div>

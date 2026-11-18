@@ -293,6 +293,30 @@ if (editing) {
 
 return json;`);
 
+// The FormFields rules (Cases / Resolution). A site without the
+// UnionTemplate.FormFields table yet gets no rules rather than an error,
+// which sent the prefill to its Fault (owner, 18 November 2026: the table
+// isn't on every client yet).
+const prefillRules = prefill.flow.activities.find(entry => entry.name === 'ReqVisbleFields');
+if (!prefillRules) {
+  throw new Error(PREFILL + ' has no ReqVisbleFields step');
+}
+prefillRules.properties.find(entry => entry.name === 'Script').expressions = literal(`-- The FormFields rules for this form: which fields show, are required and
+-- can be changed. Without the UnionTemplate.FormFields table (not on every
+-- site yet) the answer is no rules, and the form shows as designed.
+IF OBJECT_ID(N'UnionTemplate.FormFields', N'U') IS NOT NULL
+  SELECT IsRequired, Visible, FieldName, Editable
+  FROM UnionTemplate.FormFields
+  WHERE Module = 'Cases'
+    AND Area = 'Resolution';
+ELSE
+  SELECT
+    CAST(NULL AS bit) AS IsRequired,
+    CAST(NULL AS bit) AS Visible,
+    CAST(NULL AS varchar(100)) AS FieldName,
+    CAST(NULL AS bit) AS Editable
+  WHERE 1 = 0;`);
+
 // The Case Status value list, read after the case and before the answer.
 // Added once: a later export already has it, and only its settings are set.
 const STATUS_LIST_IQA = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/API - Value List - Case Status';
@@ -343,7 +367,11 @@ if (prefillStatuses) {
    answer; the case is still resolved.
    ====================================================================== */
 
-const resolveExport = flowNamed(RESOLVE);
+// An export of the prefill alone builds just the prefill.
+const resolveExport = exported.flowz.some(entry => entry.displayName === RESOLVE) ? flowNamed(RESOLVE) : null;
+if (!resolveExport) {
+  console.warn('Not in the export, so not built: ' + RESOLVE);
+}
 
 // Checked again here: the form checks before sending, but anything can
 // post to the endpoint.
@@ -529,7 +557,7 @@ const trigger = (idColumn, type) => build.insert('i4u_UT_AutomationTrigger', map
   ['CommunicationLogKey', "''"]
 ]));
 
-const resolve = assemble('resolve-case', [
+const resolve = resolveExport && assemble('resolve-case', [
   ['Endpoint', 'HTTP Endpoint', ['HttpEndpoint', exportedProperties(resolveExport.flow, 'HttpEndpoint')], 0, 0],
 
   ['RequestAuthorization', 'Request Authorization', ['RequestAuthorization', exportedProperties(resolveExport.flow, 'RequestAuthorization')], 0, 1],
@@ -743,12 +771,14 @@ return {
   ['Response_Saved', 'Done', 'Finish']
 ]);
 
-resolveExport.flow.activities = resolve.activities;
-resolveExport.flow.connections = resolve.connections;
+if (resolveExport) {
+  resolveExport.flow.activities = resolve.activities;
+  resolveExport.flow.connections = resolve.connections;
+}
 
 /* ---------- The export ---------- */
 
-const flows = [prefill, resolveExport];
+const flows = [prefill, resolveExport].filter(Boolean);
 const output = {
   ...exported,
   hierarchies: flows.map(entry => entry.hierarchy),

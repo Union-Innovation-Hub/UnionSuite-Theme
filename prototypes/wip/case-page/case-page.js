@@ -94,7 +94,7 @@
   let member, banner, rows, memberDetails, activity, activityDetails, changes, changeFields, lists, detailsFor, caseJob, caseMemberDetails, leadStaff, setLeadStaff;
   // The activity feeds' base and details IQAs (Activity-Feed-IQA-Build.md).
   const activityFolder = '$/_i4u_/Core/Cases/UnionSuite/Manage Case/Activity Feed - Base/';
-  const activityDetailsFolder = '$/_i4u_/Client/Cases - UnionSuite/Layouts/Activity Feed - Details/';
+  const activityDetailsFolder = '$/_i4u_/Client/Cases/UnionSuite/Layouts/Activity Feed - Details/';
   // Notes and tasks saved inline (C34, C35), kept across rebuilds. A note
   // with a follow-up is also a task (owner, 9 October 2026), so it adds a
   // task row too, marked FromNote so the activity lists it once, as the note.
@@ -808,7 +808,9 @@
         const ordinal = JSON.parse(init.body || '{}').AttachmentOrdinal;
         return reply({Access: ordinal === '801' ? 'Restricted' : 'Granted'}, 200, 600);
       }
-      if (target.pathname === '/ca/note-access') {
+      // Show note on a restricted note: the cases flow, which reads the case
+      // from the note.
+      if (target.pathname === '/cases/quick/note-access') {
         return reply({Access: 'Granted', Note: 'Priya disclosed she is on a visa tied to this employer and is worried about raising the complaint. Do not record visa details elsewhere on the case.'}, 200, 600);
       }
       // The add staff composer's people (C38): the whole list, searched in
@@ -838,9 +840,9 @@
         build();
         return reply({Ordinal: String(619 + added.parties.length)}, 200, 500);
       }
-      // The add attachment composer's tags (shape to confirm): the sample
-      // tag list, slow enough to show the list's spinner.
-      if (target.pathname === '/zidebar/sharepoint/tagsprefill') return reply(tags, 200, 900);
+      // The add attachment composer's tags, as CloudToolz answers them
+      // ([{Ordinal, TagName}]), slow enough to show the list's spinner.
+      if (target.pathname === '/cases/quick-add/AttachmentTagList') return reply(tags, 200, 900);
       if (target.pathname === '/cases/quick-add/attachment') {
         const body = JSON.parse(init.body || '{}');
         const by = leadStaff() || "Mary O'Conner";
@@ -922,6 +924,14 @@
         if (!status || status['Closed Status'] === 'true') return reply('Choose an open status.', 400, 400);
         openStatus = code;
         return reply({Status: code}, 200, 700);
+      }
+      // An attachment's quick edit: the case's keys and the file, as the
+      // flow's case check and file lookup need them.
+      if (target.pathname === '/cases/quick-update/attachment') {
+        const body = JSON.parse(init.body || '{}');
+        if (!body.CaseID || !body.CaseNum || !body.FileOrdinal) return reply('Case not valid', 400, 300);
+        toast('Saved attachment ' + body.FileName + ' on case ' + body.CaseID + ' (offline sample).');
+        return reply({Status: 'S'}, 200, 700);
       }
       if (target.pathname === '/cases/quick-update/reopen') {
         const next = new URL(location.href);

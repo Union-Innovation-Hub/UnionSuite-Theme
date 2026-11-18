@@ -1,0 +1,228 @@
+<!doctype html>
+<!--
+  One form for notes and tasks (owner, 18 November 2026): a task is a note
+  with follow-up, so both are one record in Zen_CloudFiles_Notes (Title;
+  Note for a note's text and a task's details; ActionedNotes for what was
+  done). One fixed field order, with Note | Task chosen at the top.
+
+  The form is drawn in a shadow root with the forms runtime's own
+  stylesheet (Theme/UnionSuite/Forms/UnionSuiteForms.css) and this
+  mock-up's additions (note-task-form.css), as the runtime would draw it.
+
+  Everything responds: Note | Task, the flag, quick dates, Assign to, Tags
+  and Subtags, Add details, Completed, the files, Access. Save and Cancel
+  show what the form would send, what would be logged and how it would
+  close; nothing saves.
+
+  ?mode=add|edit&type=note|task&scheme=light|dark
+  Serve the project root (static-node) and open this page.
+-->
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Note and Task Form</title>
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Guides/usage/vendor/10-UltraWaveResponsive.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/99-Orion.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zUnionSuite.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Client/Branding.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite-Client/Override.css">
+  <link rel="stylesheet" href="../../../Theme/UnionSuite/zzDarkMode.css">
+  <style>
+    /* Mock-up page only. */
+    body.nt-page {
+      margin: 0;
+      background: var(--bg-page, #eef0f3);
+      color: var(--text-base, #545962);
+      font: 14px/1.5 var(--font-ui, system-ui, sans-serif);
+    }
+
+    .nt-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border, #e2e5e9);
+      background: var(--bg-surface, #fff);
+    }
+
+    .nt-toolbar h1 {
+      margin: 0 12px 0 0;
+      color: var(--text-strong, #1c2024);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .nt-segmented {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      border-radius: 8px;
+      background: var(--bg-sunken, #f1f3f5);
+    }
+
+    .nt-segmented button {
+      padding: 5px 12px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-base, #545962);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .nt-segmented button[aria-pressed="true"] {
+      background: var(--bg-surface, #fff);
+      color: var(--text-strong, #1c2024);
+      box-shadow: 0 1px 2px rgb(0 0 0 / .08);
+    }
+
+    .nt-stage {
+      display: grid;
+      grid-template-columns: minmax(0, 760px) minmax(260px, 380px);
+      justify-content: center;
+      align-items: start;
+      gap: 24px;
+      padding: 24px 16px 32px;
+    }
+
+    @media (max-width: 1180px) {
+      .nt-stage {
+        grid-template-columns: minmax(0, 760px);
+      }
+    }
+
+    /* The iMIS popup, drawn statically: its title bar holds the title. */
+    .nt-window {
+      border: 1px solid var(--border, #e2e5e9);
+      border-radius: 12px;
+      background: var(--bg-surface, #fff);
+      box-shadow: 0 12px 40px rgb(15 23 42 / .18);
+    }
+
+    .nt-window__title {
+      margin: 0;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border, #e2e5e9);
+      border-radius: 12px 12px 0 0;
+      color: var(--text-strong, #1c2024);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .nt-notes {
+      padding: 16px 20px;
+      border: 1px solid var(--border, #e2e5e9);
+      border-radius: 12px;
+      background: var(--bg-surface, #fff);
+      font-size: 13px;
+    }
+
+    .nt-notes h2 {
+      margin: 0 0 8px;
+      color: var(--text-strong, #1c2024);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nt-notes h2:not(:first-child) {
+      margin-top: 16px;
+    }
+
+    .nt-notes ol,
+    .nt-notes ul {
+      margin: 0;
+      padding-inline-start: 18px;
+    }
+
+    .nt-notes li + li {
+      margin-top: 6px;
+    }
+
+    .nt-notes strong {
+      color: var(--text-strong, #1c2024);
+    }
+
+    .nt-notes pre {
+      overflow-x: auto;
+      margin: 0;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: var(--bg-sunken, #f1f3f5);
+      color: var(--text-strong, #1c2024);
+      font: 12px/1.45 ui-monospace, Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .nt-confirm {
+      margin: 0;
+      padding: 8px 12px 8px 28px;
+      border-radius: 8px;
+      background: var(--warning-bg, #fdf1d8);
+      color: var(--text-strong, #1c2024);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="nt-page">
+  <div class="nt-toolbar">
+    <h1>Note and task form</h1>
+    <div class="nt-segmented" role="group" aria-label="Mode" data-control="mode">
+      <button type="button" data-value="add">Add</button>
+      <button type="button" data-value="edit">Edit</button>
+    </div>
+    <div class="nt-segmented" role="group" aria-label="Opened as" data-control="type">
+      <button type="button" data-value="note">Opened as a note</button>
+      <button type="button" data-value="task">Opened as a task</button>
+    </div>
+    <div class="nt-segmented" role="group" aria-label="Appearance" data-control="scheme">
+      <button type="button" data-value="light">Light</button>
+      <button type="button" data-value="dark">Dark</button>
+    </div>
+  </div>
+
+  <main class="nt-stage">
+    <section class="nt-window" aria-labelledby="nt-title">
+      <p class="nt-window__title" id="nt-title"></p>
+      <div id="nt-host"></div>
+    </section>
+    <aside class="nt-notes">
+      <h2>One form, one order</h2>
+      <ol>
+        <li><strong>Note | Task at the top</strong>, beside the record. It is <code>FollowUpRequired</code>. Chosen before typing, so what it opens never moves text already written. Add note opens it on Note, Add task on Task (<code>Type=</code> in the address); a saved note opens on Note and can still be given follow-up.</li>
+        <li><strong>Task:</strong> What needs doing? (<code>Title</code>, required) and the flag, then <strong>Details</strong> (<code>Note</code>, optional, behind Add details on a new task), then Due date (with <strong>Add time</strong> once there is a date, in 15-minute steps, as the task form has it) and Assign to (optional). Saved as one <code>Deadline</code> datetime; with no time it is midnight, which reads back as the date alone.</li>
+        <li><strong>Note:</strong> <strong>Note</strong> (<code>Note</code>, required) first. The title and the task fields close.</li>
+        <li><strong>Switching</strong> keeps what's typed: a note's text becomes the task's details, and back, until it is saved.</li>
+        <li><strong>Editing a task:</strong> Completed, and under it <strong>What was done</strong> (<code>ActionedNotes</code>, optional), open once ticked or when it has text.</li>
+        <li><strong>A saved task stays a task</strong> (owner, 18 November 2026): editing one has no Note | Task choice.</li>
+        <li><strong>Tags</strong>, then <strong>Attachments</strong> and <strong>Access</strong> below a rule. Each new attachment picks its own <strong>attachment tags</strong> (the attachment tag list, not the note tags); a saved one shows its tags, changed through the attachment's own quick edit.</li>
+        <li><strong>Cases only for now.</strong> Personal tasks get a form of their own; agreements are parked (owner, 18 November 2026).</li>
+        <li><strong>Every change is logged</strong> against the record (LogChangesToIMIS, Table <code>Zen_CloudFiles_Notes</code>): an Add with what was set, an Edit with each column old → new.</li>
+        <li><strong>The save sends the row's columns:</strong> <code>FollowUpRequired</code>, <code>Title</code>, <code>Note</code>, <code>ActionedNotes</code>, <code>Deadline</code>, <code>PrimaryStaffLead</code> (Assign to), <code>HighPriority</code>, <code>Actioned</code> (Completed), <code>Access</code>, with the tags and the case's keys, to <code>POST /cases/US/note</code> (add and edit; owner, 18 November 2026). Saving closes the popup: no Save and add another.</li>
+      </ol>
+
+      <h2>This page's placeholder</h2>
+      <pre data-placeholder></pre>
+
+      <h2>Popup address</h2>
+      <pre data-address></pre>
+
+      <h2>Last action</h2>
+      <pre data-result>Save or Cancel to see what the form would send, what it would log and how it would close.</pre>
+
+      <h2>To confirm</h2>
+      <ul class="nt-confirm">
+        <li>Nothing for the case form. Agreements are parked (owner, 18 November 2026); theirs would link by <code>AgreementOrdinal</code>.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script src="note-task-form.js"></script>
+</body>
+</html>

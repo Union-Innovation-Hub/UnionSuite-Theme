@@ -190,13 +190,24 @@ const MEMBER_WORKPLACES_IQA = '$/_i4u_/Core/Cases/Layouts v2/API - Create Case -
 const prefill = assemble('create-case-prefill', [
   ['EndpointData', 'HTTP Endpoint', build.endpoint('/Cases/US/Create-Case-Staff/Prefill'), 0, 0],
 
+  // A site without the FormFields table yet gets no rules rather than an
+  // error (owner, 18 November 2026: it isn't on every client yet).
   ['SQL_FormFields', 'SQL - Form field rules', build.sql(`
 -- The FormFields rules for this form: which fields show, are required and
--- can be changed.
-SELECT IsRequired, Visible, FieldName, Editable
-FROM UnionTemplate.FormFields
-WHERE Module = 'Cases'
-  AND Area = 'CreateCaseStaff';
+-- can be changed. Without the UnionTemplate.FormFields table (not on every
+-- site yet) the answer is no rules, and the form shows as designed.
+IF OBJECT_ID(N'UnionTemplate.FormFields', N'U') IS NOT NULL
+  SELECT IsRequired, Visible, FieldName, Editable
+  FROM UnionTemplate.FormFields
+  WHERE Module = 'Cases'
+    AND Area = 'CreateCaseStaff';
+ELSE
+  SELECT
+    CAST(NULL AS bit) AS IsRequired,
+    CAST(NULL AS bit) AS Visible,
+    CAST(NULL AS varchar(100)) AS FieldName,
+    CAST(NULL AS bit) AS Editable
+  WHERE 1 = 0;
 `, 'JSON.stringify([])'), 0, 1],
 
   // No ID on the page: no member, and no lookups. Asked with a blank ID,
@@ -930,11 +941,14 @@ return {
 
 /* ---------- The export ---------- */
 
+// A flow the export doesn't hold is left out of the output (an export of
+// the prefill flows alone builds just those), and the build says so.
 function flowFrom(displayName, endpointPath, built) {
   const flow = exported.flowz.find(entry => entry.displayName === displayName);
   const hierarchy = exported.hierarchies.find(entry => entry.displayName === displayName);
   if (!flow || !hierarchy) {
-    throw new Error('Not in the export: ' + displayName);
+    console.warn('Not in the export, so not built: ' + displayName);
+    return null;
   }
   return {
     hierarchy: {...hierarchy, endpointPath, isPublished: true, lastExecutedAt: null, latestInstanceStatus: null},
@@ -945,7 +959,12 @@ function flowFrom(displayName, endpointPath, built) {
 const flows = [
   flowFrom('US Case Form Prefill: Create Case - Staff Form', '/Cases/US/Create-Case-Staff/Prefill', prefill),
   flowFrom('US Case Form: Create Case - Staff Form', '/Cases/US/Create-Case-Staff', create)
-];
+].filter(Boolean);
+
+if (!flows.length) {
+  console.error('The export holds neither Create case flow.');
+  process.exit(1);
+}
 
 const output = {
   ...exported,

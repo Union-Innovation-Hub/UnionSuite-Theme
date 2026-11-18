@@ -1,0 +1,423 @@
+{
+  "hierarchies": [
+    {
+      "id": 1943,
+      "coreOrgId": null,
+      "parentId": 1857,
+      "isFolder": false,
+      "excludeFromWorkflowInstancesDisplay": false,
+      "definitionId": "6ec85785e1e045968cff01013a2cc6d4",
+      "displayName": "Cases: Quick Add Attachment - Value List",
+      "version": 1,
+      "isPublished": true,
+      "createdAt": "2026-11-18T07:26:11.2776105+00:00",
+      "lastExecutedAt": null,
+      "avgRuntime": null,
+      "latestInstanceStatus": null,
+      "protected": false,
+      "cronSetting": null,
+      "endpointPath": "/cases/quick-add/AttachmentTagList",
+      "inMaintenanceWindow": false,
+      "securedEndpoint": "green",
+      "createdBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "updatedBy": "17b7df1b-5e7c-40ea-ad3b-c164fa77e754",
+      "hasChildRecords": false
+    }
+  ],
+  "flowz": [
+    {
+      "definitionId": "6ec85785e1e045968cff01013a2cc6d4",
+      "versionId": "e6927650ebdc4cc5a40c498439d01b5f",
+      "name": "Cases: Quick Add Attachment - Value List",
+      "displayName": "Cases: Quick Add Attachment - Value List",
+      "version": 1,
+      "variables": {
+        "data": {}
+      },
+      "customAttributes": {
+        "data": {}
+      },
+      "isSingleton": false,
+      "persistenceBehavior": "WorkflowBurst",
+      "deleteCompletedInstances": false,
+      "isPublished": true,
+      "isLatest": true,
+      "createdAt": "2026-11-18T07:26:11.2776105Z",
+      "activities": [
+        {
+          "activityId": "65b5433a-1675-415d-904c-b4758e54b7ee",
+          "type": "HttpEndpoint",
+          "displayName": "HTTP Endpoint",
+          "x": 0,
+          "y": 0,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Path",
+              "expressions": {
+                "Literal": "/cases/quick-add/AttachmentTagList"
+              }
+            },
+            {
+              "name": "Methods",
+              "expressions": {
+                "Json": "[\"GET\"]"
+              }
+            },
+            {
+              "name": "ReadContent",
+              "expressions": {}
+            },
+            {
+              "name": "TargetType",
+              "expressions": {}
+            },
+            {
+              "name": "Schema",
+              "syntax": "Literal",
+              "expressions": {
+                "Literal": ""
+              }
+            },
+            {
+              "name": "ValidateCallerUrl",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateImisRequest",
+              "expressions": {}
+            },
+            {
+              "name": "ImisRequestVerificationRole",
+              "expressions": {}
+            },
+            {
+              "name": "Authorize",
+              "expressions": {}
+            },
+            {
+              "name": "Policy",
+              "expressions": {}
+            },
+            {
+              "name": "AuthorizeWithCustomHeader",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderName",
+              "expressions": {}
+            },
+            {
+              "name": "CustomHeaderValue",
+              "expressions": {}
+            },
+            {
+              "name": "ValidateOutlookPluginToken",
+              "expressions": {}
+            },
+            {
+              "name": "RequiredOutlookPluginUsername",
+              "expressions": {}
+            },
+            {
+              "name": "OutlookPluginMailboxEmail",
+              "expressions": {}
+            }
+          ],
+          "propertyStorageProviders": {},
+          "name": "EndpointData"
+        },
+        {
+          "activityId": "f42cb240-73bb-4356-ad9b-9c9d2b27127f",
+          "type": "RequestAuthorization",
+          "displayName": "Request Authorization",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "properties": [
+            {
+              "name": "Role",
+              "expressions": {}
+            },
+            {
+              "name": "HttpRequest",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "activities.EndpointData.Output()"
+              }
+            }
+          ],
+          "propertyStorageProviders": {},
+          "x": 0,
+          "y": 150
+        },
+        {
+          "activityId": "872fc483-441c-4cef-932c-c3f375dcc025",
+          "type": "WriteHttpResponse",
+          "displayName": "Unauthorized",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "Content",
+              "expressions": {}
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "text/plain"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "Unauthorized"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "x": 300,
+          "y": 150
+        },
+        {
+          "activityId": "e0625150-9cfb-4244-a1dc-50203cab45c7",
+          "type": "ExecuteSqlAgainstCloudToolz",
+          "name": "Tags",
+          "displayName": "Tags",
+          "x": 0,
+          "y": 300,
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "ExpectedResults",
+              "expressions": {
+                "Literal": "Result Set"
+              }
+            },
+            {
+              "name": "Script",
+              "expressions": {
+                "Literal": "-- The attachment tags, as the Zidebar tag editor (Zidebar: Tags) lists them:\r\n-- ordinals 1 to 11 are left out there too.\r\nSELECT [Ordinal], [TagName]\r\nFROM [ZideBar].[Zen_Tags]\r\nWHERE [Ordinal] > 11\r\nORDER BY [TagName]"
+              }
+            },
+            {
+              "name": "Parameters",
+              "expressions": {}
+            },
+            {
+              "name": "Timeout",
+              "expressions": {}
+            }
+          ]
+        },
+        {
+          "activityId": "0925d3be-8807-46aa-ad3e-bce428c9b988",
+          "type": "WriteHttpResponse",
+          "displayName": "Tag list",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "// A bare list of {Ordinal, TagName}, read by the case page's attachment composer.\r\nvar rows = activities.Tags.ResultSet() || [];\r\nreturn JSON.stringify(rows.map(function (row) {\r\n  return {Ordinal: row.Ordinal, TagName: row.TagName};\r\n}));"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "application/json"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "OK"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "x": 0,
+          "y": 450
+        },
+        {
+          "activityId": "1550d6d9-64e8-4b35-a599-22e1e5bf2cd1",
+          "type": "WriteHttpResponse",
+          "displayName": "Tags could not be read",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "Content",
+              "syntax": "JavaScript",
+              "expressions": {
+                "JavaScript": "return JSON.stringify({Message: 'The tags could not be read.'});"
+              }
+            },
+            {
+              "name": "ContentType",
+              "expressions": {
+                "Literal": "application/json"
+              }
+            },
+            {
+              "name": "StatusCode",
+              "expressions": {
+                "Literal": "InternalServerError"
+              }
+            },
+            {
+              "name": "CharSet",
+              "expressions": {
+                "Literal": "utf-8"
+              }
+            },
+            {
+              "name": "ResponseHeaders",
+              "expressions": {}
+            }
+          ],
+          "x": 300,
+          "y": 450
+        },
+        {
+          "activityId": "e031138e-93d7-4b8c-930d-5145e5557e6b",
+          "type": "Finish",
+          "displayName": "Finish",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "ActivityOutput",
+              "expressions": {}
+            },
+            {
+              "name": "OutcomeNames",
+              "expressions": {}
+            }
+          ],
+          "x": 0,
+          "y": 600
+        },
+        {
+          "activityId": "1e86c309-504f-4de5-b208-2b14f6446821",
+          "type": "Finish",
+          "displayName": "Finish",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "ActivityOutput",
+              "expressions": {}
+            },
+            {
+              "name": "OutcomeNames",
+              "expressions": {}
+            }
+          ],
+          "x": 300,
+          "y": 600
+        },
+        {
+          "activityId": "fba281cb-a38d-48b9-97f9-8c5cbc7459e1",
+          "type": "Finish",
+          "displayName": "Finish",
+          "persistWorkflow": false,
+          "loadWorkflowContext": false,
+          "saveWorkflowContext": false,
+          "propertyStorageProviders": {},
+          "properties": [
+            {
+              "name": "ActivityOutput",
+              "expressions": {}
+            },
+            {
+              "name": "OutcomeNames",
+              "expressions": {}
+            }
+          ],
+          "x": 600,
+          "y": 600
+        }
+      ],
+      "connections": [
+        {
+          "sourceActivityId": "65b5433a-1675-415d-904c-b4758e54b7ee",
+          "targetActivityId": "f42cb240-73bb-4356-ad9b-9c9d2b27127f",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "f42cb240-73bb-4356-ad9b-9c9d2b27127f",
+          "targetActivityId": "e0625150-9cfb-4244-a1dc-50203cab45c7",
+          "outcome": "True"
+        },
+        {
+          "sourceActivityId": "f42cb240-73bb-4356-ad9b-9c9d2b27127f",
+          "targetActivityId": "872fc483-441c-4cef-932c-c3f375dcc025",
+          "outcome": "False"
+        },
+        {
+          "sourceActivityId": "872fc483-441c-4cef-932c-c3f375dcc025",
+          "targetActivityId": "1e86c309-504f-4de5-b208-2b14f6446821",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "e0625150-9cfb-4244-a1dc-50203cab45c7",
+          "targetActivityId": "0925d3be-8807-46aa-ad3e-bce428c9b988",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "e0625150-9cfb-4244-a1dc-50203cab45c7",
+          "targetActivityId": "1550d6d9-64e8-4b35-a599-22e1e5bf2cd1",
+          "outcome": "Error"
+        },
+        {
+          "sourceActivityId": "0925d3be-8807-46aa-ad3e-bce428c9b988",
+          "targetActivityId": "e031138e-93d7-4b8c-930d-5145e5557e6b",
+          "outcome": "Done"
+        },
+        {
+          "sourceActivityId": "1550d6d9-64e8-4b35-a599-22e1e5bf2cd1",
+          "targetActivityId": "fba281cb-a38d-48b9-97f9-8c5cbc7459e1",
+          "outcome": "Done"
+        }
+      ],
+      "id": "e6927650ebdc4cc5a40c498439d01b5f"
+    }
+  ],
+  "schedules": []
+}

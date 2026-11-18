@@ -10119,7 +10119,7 @@ label:where([class^="us-"], [class*=" us-"]):not(:where(.us-report-no-styling, .
 /* BeyondFormz date fields (US-BEYOND-FORMS) take the same calendar box,
    in place of 99-Orion.css's shorter one. */
 .us-form input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator,
-[data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator {
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 0;
   top: 0;
@@ -10137,7 +10137,7 @@ label:where([class^="us-"], [class*=" us-"]):not(:where(.us-report-no-styling, .
 }
 
 .us-form input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator:hover,
-[data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator:hover {
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *))::-webkit-calendar-picker-indicator:hover {
   background-color: var(--brand-100);
 }
 
@@ -12107,7 +12107,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
 }
 
 /* Room for the native date icon, which 99-Orion.css pins to the right. */
-[data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+[data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   position: relative;
   padding-right: 44px;
 }
@@ -12115,7 +12115,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
 /* Firefox has no pinnable icon: its own sits inside the padding, so the
    room would leave it short of the edge. */
 @supports not selector(::-webkit-calendar-picker-indicator) {
-  [data-beyondformid] .rendered-form .form-group > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  [data-beyondformid] .rendered-form :is(.form-group, .us-bf-affix) > input[type=date]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
     padding-right: 10px;
   }
 }
@@ -12443,7 +12443,12 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   font-size: 13px;
 }
 
-@media (max-width: 950px) {
+/* Touch sizes on a BeyondFormz form follow a phone-width window (600px),
+   not the theme's 950px: the forms open in iMIS popups whose frame is
+   narrower than 950px on a desktop, where the 44px switchers and buttons
+   looked out of place (owner, 19 November 2026). The rules below with
+   600px are these. */
+@media (max-width: 600px) {
   [data-beyondformid] .rendered-form .us-bf-quick button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
     min-height: 32px;
     padding-inline: 12px;
@@ -12728,7 +12733,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   margin: 0;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 600px) {
   [data-beyondformid] .rendered-form .us-bf-check label:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
     min-height: 44px;
   }
@@ -12841,7 +12846,7 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
   margin: 0;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 600px) {
   [data-beyondformid] .rendered-form .us-bf-segmented button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
     min-height: 44px;
   }
@@ -12856,6 +12861,246 @@ select[id*="_AddressEdit_"]:not([multiple]):not(:where(.us-report-no-styling, .u
 @media (max-width: 600px) {
   [data-beyondformid] .rendered-form .us-bf-actions .Message:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
     flex-basis: 100%;
+  }
+}
+
+/* The case note and task form (prototypes/wip/note-task-form, 18 November
+   2026): Note | Task at the end of the record line, the task line with its
+   High priority flag and badge, Add details and Add tags links, the due
+   date and time side by side, and the attachments list. */
+[data-beyondformid] .rendered-form .us-bf-for > .us-bf-segmented:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin-inline-start: auto;
+}
+
+[data-beyondformid] .rendered-form .us-bf-title-row:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+[data-beyondformid] .rendered-form :is(.us-bf-title-row, .us-bf-due) > .us-bf-affix:first-child:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-beyondformid] .rendered-form .us-bf-flag:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    border-color 150ms cubic-bezier(.2, 0, 0, 1),
+    background-color 150ms cubic-bezier(.2, 0, 0, 1),
+    color 150ms cubic-bezier(.2, 0, 0, 1);
+}
+
+[data-beyondformid] .rendered-form .us-bf-flag:hover:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--brand-600);
+  color: var(--text-strong);
+}
+
+[data-beyondformid] .rendered-form .us-bf-flag[aria-pressed=true]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--danger);
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+[data-beyondformid] .rendered-form :is(.us-bf-flag, .us-bf-link, .us-bf-file__remove, .us-bf-drop button):focus-visible:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* "High priority" after the task line's label while the flag is on. */
+[data-beyondformid] .rendered-form .us-bf-badge:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  margin-inline-start: 8px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font: 600 12px/18px var(--font-ui);
+  vertical-align: 1px;
+}
+
+/* A quiet text button under a field: Add details, Add tags. */
+[data-beyondformid] .rendered-form .us-bf-link:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-link);
+  font: 600 13px/20px var(--font-ui);
+  cursor: pointer;
+}
+
+[data-beyondformid] .rendered-form .us-bf-link:hover:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  text-decoration: underline;
+}
+
+/* The due date and its time on one line. */
+[data-beyondformid] .rendered-form .us-bf-due:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  gap: 8px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-due > .us-bf-affix + .us-bf-affix:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: 0 0 130px;
+}
+
+/* Attachments: a drop zone, then the files, each with its own tags. */
+[data-beyondformid] .rendered-form .us-bf-drop:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-drop[data-over]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  border-color: var(--brand-600);
+  background: var(--bg-surface);
+}
+
+[data-beyondformid] .rendered-form .us-bf-drop__text:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-drop button:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-link);
+  font: 600 13px/20px var(--font-ui);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+[data-beyondformid] .rendered-form .us-bf-files:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-beyondformid] .rendered-form .us-bf-files:empty:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: none;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: grid;
+  gap: 8px;
+  padding: 8px 8px 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-strong);
+  font-size: 13px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__head:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__name:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__status:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__status[data-state=failed]:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__remove:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__remove:hover:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  background: var(--bg-subtle);
+  color: var(--danger);
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__label:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  margin: 0;
+  color: var(--text-strong);
+  font: 600 12px/18px var(--font-ui);
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__tags:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file__tag:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-sunken);
+  color: var(--text-strong);
+  font-size: 12px;
+}
+
+[data-beyondformid] .rendered-form .us-bf-file .select2-container:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+  width: 100% !important;
+}
+
+@media (max-width: 600px) {
+  [data-beyondformid] .rendered-form :is(.us-bf-flag, .us-bf-file__remove):not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    width: 44px;
+    height: 44px;
+  }
+
+  [data-beyondformid] .rendered-form .us-bf-link:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 600px) {
+  [data-beyondformid] .rendered-form .us-bf-for > .us-bf-segmented:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
+    margin-inline-start: 0;
   }
 }
 
@@ -22071,13 +22316,18 @@ a[data-us-comms-log-held] {
   box-shadow: var(--field-focus-glow);
 }
 
+/* The input is bare inside the box: no border, fill or Bootstrap's inset
+   .form-control shadow, which drew a line along its top once the chips
+   wrapped it onto its own row. */
 .us-composer__bar .us-composer__multi > input.us-composer__field {
   flex: 1 1 100px;
   min-width: 80px;
   min-height: 26px;
   padding: 0 2px;
   border: 0;
+  border-radius: 0;
   background: transparent;
+  box-shadow: none;
 }
 
 :root .us-composer .us-composer__multi > input.us-composer__field:focus {
@@ -22169,6 +22419,19 @@ a[data-us-comms-log-held] {
   color: var(--text-muted);
   font-size: var(--fs-sm);
   opacity: 1;
+}
+
+/* More matches than the combobox's limit shows: "Showing 15 of 200" at the
+   foot of the list, kept in view as the list scrolls (the negative bottom
+   covers the list's padding, so options don't show through below it). */
+.us-composer__option.us-composer__count {
+  position: sticky;
+  bottom: -4px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg-surface);
+  font-size: var(--fs-xs);
 }
 
 /* A search still running (the first read of a list): the shared button
@@ -23823,13 +24086,17 @@ a[data-us-comms-log-held] {
   font-weight: var(--fw-medium);
 }
 
+/* The theme's alert shape (US-ALERTS, the field group alerts): the tone's
+   pale fill, a border at 35% of the tone and a 4px leading edge in it. */
 .us-staff-remove__warning {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
   margin: 0;
   padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+  border-inline-start: 4px solid var(--warning);
+  border-radius: 6px;
   background: var(--warning-bg);
   color: var(--text-strong);
   font-size: var(--fs-xs);
@@ -23860,8 +24127,9 @@ a[data-us-comms-log-held] {
   gap: var(--space-2);
   margin: 0;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent);
-  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  border-inline-start: 4px solid var(--danger);
+  border-radius: 6px;
   background: var(--danger-bg);
   color: var(--text-strong);
   font-size: var(--fs-xs);
@@ -29666,7 +29934,8 @@ a.us-meeting__tile:is(:hover, :focus-visible) {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--field-focus-colour) 20%, transparent);
 }
 
-/* Incomplete list: the item 9 alert shape (pale border, coloured edge). */
+/* Incomplete list: the theme's alert shape (US-ALERTS, the field group
+   alerts): pale fill, a border at 35% of the tone, a 4px leading edge. */
 .us-activity__notice:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
   display: flex;
   flex-wrap: wrap;
@@ -29674,9 +29943,9 @@ a.us-meeting__tile:is(:hover, :focus-visible) {
   gap: var(--space-2) var(--space-4);
   margin-top: var(--space-3);
   padding: var(--space-2) var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--border));
-  border-inline-start: 4px solid var(--warning-fill);
-  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+  border-inline-start: 4px solid var(--warning);
+  border-radius: 6px;
   background: var(--warning-bg);
   color: var(--text-strong);
 }

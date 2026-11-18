@@ -2088,7 +2088,8 @@ SOFTWARE.
    (UnionSuiteRefresh.queryTemplate with insert) and gains only its new
    rows; a feed asks its sources of the record's types for their newest rows
    (UnionSuiteActivityFeed.reload, quiet). The other lists the save changes
-   follow the same way. Nothing reloads in view (owner, 10 October 2026:
+   follow the same way, and so does every activity feed on the page, by the
+   record's types. Nothing reloads in view (owner, 10 October 2026:
    "save data, row slides down. no report reloading. no flashes").
 
    More options carries the draft into the popup (owner, 11 October 2026:
@@ -2146,7 +2147,9 @@ SOFTWARE.
    or function (context) resolving to either, read when the composer is
    built), search({term, wrapper}) and empty(term), preload(context)
    (combobox: starts reading its list as the composer opens)
-   (combobox: resolves [{value, name, meta, disabled}]), avatars (combobox)}.
+   (combobox: resolves [{value, name, meta, disabled}]), avatars (combobox),
+   limit (combobox: the most options shown; search resolves every match,
+   and the list ends with "Showing 15 of 200" when there are more)}.
    Types: textarea, text, date, time, select, checkbox, files, combobox,
    multiselect. A combobox's value is the option picked, never typed text;
    a multiselect's is the array of values picked (options as a select's,
@@ -2496,7 +2499,7 @@ SOFTWARE.
     }
     const types = spec.feed || [kindOf(spec, composer.dataset.key)];
     const others = listContainers(spec.lists(values)).filter(other => other !== container);
-    await settle([container, ...others], holds, types, spec.pageUrl);
+    await settle(withFeeds([container, ...others]), holds, types, spec.pageUrl);
   }
 
   // ── The new entry ───────────────────────────────────────────────
@@ -2515,6 +2518,25 @@ SOFTWARE.
   // a record just added lands.
   const feedOf = container => container?.querySelector('.us-activity-feed');
   const feedListOf = container => feedOf(container)?.querySelector('.us-records__items');
+
+  // Every activity feed on the page follows a save, not only those whose
+  // iPart carries the composer's class (owner, 18 November 2026: an upload
+  // from Recent attachments left the Overview's Recent activity behind).
+  // The quiet reload asks only the feed's sources of the saved types, so a
+  // feed that shows none of them adds nothing. Each feed is read once.
+  function withFeeds(containers) {
+    const feedContainers = [...document.querySelectorAll('.us-activity-feed')]
+      .map(feed => feed.closest('.ContentItemContainer[id]'))
+      .filter(Boolean);
+    const seen = new Set();
+    return [...new Set([...containers, ...feedContainers])].filter(container => {
+      const feed = feedOf(container);
+      if (!feed) return true;
+      if (seen.has(feed)) return false;
+      seen.add(feed);
+      return true;
+    });
+  }
 
   // A files composer with eachFile saves one file at a time, so a long
   // upload shows how far it has got (owner, 26 October 2026): Save reads
@@ -2753,7 +2775,7 @@ SOFTWARE.
     // goes back to the section's add button.
     if (outcome === 'saved' && waiting) discard(waiting, true);
     const types = spec.feed || [kindOf(spec, key)];
-    const added = await settle(listContainers(spec.lists({})), [], types, spec.pageUrl);
+    const added = await settle(withFeeds(listContainers(spec.lists({}))), [], types, spec.pageUrl);
     if (!waiting || outcome === 'saved' || !waiting.isConnected || waiting.hasAttribute('data-closing')) return;
     if (added > 0) discard(waiting, true);
     else focusMain(waiting, true);
@@ -2922,7 +2944,11 @@ SOFTWARE.
       clearTimeout(loading);
     }
     if (!current()) return;
-    showOptions(input, options || [], field.empty ? field.empty(term) : 'No matches.');
+    // A combobox with a limit shows that many and says how many matched
+    // (owner, 18 November 2026: "showing 15 of 200").
+    const matches = options || [];
+    const limit = !isMulti(input) && field.limit > 0 ? field.limit : matches.length;
+    showOptions(input, matches.slice(0, limit), field.empty ? field.empty(term) : 'No matches.', matches.length);
   }
 
   function showLoading(input) {
@@ -2936,7 +2962,7 @@ SOFTWARE.
     reveal(input, list);
   }
 
-  function showOptions(input, options, emptyText) {
+  function showOptions(input, options, emptyText, total = options.length) {
     const list = listOf(input);
     const avatars = fieldSpec(input)?.avatars;
     list.replaceChildren();
@@ -2973,6 +2999,16 @@ SOFTWARE.
       item.append(name, meta);
       list.append(item);
     });
+    // More matched than show: a note at the foot of the list, which the
+    // arrow keys and clicks pass over (it is disabled).
+    if (total > options.length) {
+      const count = document.createElement('li');
+      count.className = 'us-composer__option is-empty us-composer__count';
+      count.setAttribute('role', 'option');
+      count.setAttribute('aria-disabled', 'true');
+      count.textContent = `Showing ${options.length} of ${total}. Type to narrow the list.`;
+      list.append(count);
+    }
     reveal(input, list);
   }
 
@@ -21164,8 +21200,12 @@ SOFTWARE.
   'use strict';
   if (window.UnionSuiteAttachments) return;
 
-  // Tag list for suggestions: the shared attachment tags IQA (moved out of
-  // SandBox on 5 November 2026; every module's attachments use it).
+  // Tag list for suggestions: CloudToolz GET /cases/quick-add/AttachmentTagList
+  // (owner, 18 November 2026), the list the upload composer's Tags read, so
+  // editing and uploading offer the same tags; it answers [{Ordinal,
+  // TagName}] from ZideBar.Zen_Tags. Where that flow cannot be reached, the
+  // shared attachment tags IQA, as before.
+  const tagEndpoint = '/cases/quick-add/AttachmentTagList';
   const tagQuery = '$/_i4u_/Core/Shared/API - Zen Attachment Tags';
   let tagCache = null;
 
@@ -21182,20 +21222,42 @@ SOFTWARE.
     return key ? unwrap(item[key]) : undefined;
   }
 
+  const toTags = rows => (rows || [])
+    .map(item => ({ordinal: String(propertyValue(item, 'Ordinal') ?? ''), name: String(propertyValue(item, 'TagName') ?? '').trim()}))
+    .filter(tag => tag.name && tag.ordinal);
+
+  async function tagsFromFlow() {
+    const cloudToolz = window.UnionSuiteAgreements?.cloudToolz;
+    if (!cloudToolz) throw new Error('CloudToolz is not available on this page.');
+    const response = await cloudToolz(tagEndpoint, {method: 'GET'});
+    const data = await response.json();
+    const rows = Array.isArray(data) ? data : data?.Items?.$values || data?.Items || [];
+    const tags = toTags(rows);
+    if (!tags.length) throw new Error('The attachment tag list came back empty.');
+    return tags;
+  }
+
+  async function tagsFromQuery() {
+    const token = document.getElementById('__RequestVerificationToken')?.value || '';
+    const params = new URLSearchParams({QueryName: tagQuery, limit: '500'});
+    const response = await fetch('/api/query?' + params, {credentials: 'same-origin', headers: {RequestVerificationToken: token}});
+    if (!response.ok) throw new Error('Attachment tags could not be read (HTTP ' + response.status + ').');
+    const data = await response.json();
+    return toTags(data?.Items?.$values);
+  }
+
   async function loadTags() {
     if (tagCache) return tagCache;
     try {
-      const token = document.getElementById('__RequestVerificationToken')?.value || '';
-      const params = new URLSearchParams({QueryName: tagQuery, limit: '500'});
-      const response = await fetch('/api/query?' + params, {credentials: 'same-origin', headers: {RequestVerificationToken: token}});
-      if (!response.ok) throw new Error('Attachment tags could not be read (HTTP ' + response.status + ').');
-      const data = await response.json();
-      tagCache = (data?.Items?.$values || [])
-        .map(item => ({ordinal: String(propertyValue(item, 'Ordinal') ?? ''), name: String(propertyValue(item, 'TagName') ?? '').trim()}))
-        .filter(tag => tag.name && tag.ordinal);
-    } catch (error) {
-      console.warn(error.message);
-      tagCache = [];
+      tagCache = await tagsFromFlow();
+    } catch (flowError) {
+      console.warn('[US-ATTACHMENTS] ' + flowError.message + ' Reading the tags IQA instead.');
+      try {
+        tagCache = await tagsFromQuery();
+      } catch (error) {
+        console.warn(error.message);
+        tagCache = [];
+      }
     }
     return tagCache;
   }
@@ -21254,19 +21316,25 @@ SOFTWARE.
     // The theme's button spinner while the save is in flight (owner,
     // 5 October 2026); cleared on either outcome.
     const busy = window.UnionSuiteBusy?.show(saveButton);
-    // The page's record, for its change history: a case's CaseID or an
-    // agreement's AgreementID, as their flows log them.
+    // The page's record, for its change history. A case page saves through
+    // the cases flow, which checks the case and logs against it (owner,
+    // 18 Nov 2026); an agreement's through the CA flow, by its AgreementID.
     const params = new URLSearchParams(location.search);
+    const caseKeys = params.get('CaseID') && params.get('CaseNum')
+      ? {CaseID: params.get('CaseID'), CaseNum: params.get('CaseNum')}
+      : null;
+    const change = {
+      FileOrdinal: row.dataset.ordinal,
+      FileName: name,
+      NewTagOrdinals: tagOrdinals.join(','),
+      RemovedTagOrdinals: removed.join(',')
+    };
     try {
-      await window.UnionSuiteAgreements.cloudToolz('/ca/update-attachment', {
+      await window.UnionSuiteAgreements.cloudToolz(caseKeys ? '/cases/quick-update/attachment' : '/ca/update-attachment', {
         method: 'POST',
-        body: JSON.stringify({
-          RecordID: params.get('CaseID') || params.get('AgreementID') || '',
-          FileOrdinal: row.dataset.ordinal,
-          FileName: name,
-          NewTagOrdinals: tagOrdinals.join(','),
-          RemovedTagOrdinals: removed.join(',')
-        })
+        body: JSON.stringify(caseKeys
+          ? {...caseKeys, ...change}
+          : {RecordID: params.get('AgreementID') || '', ...change})
       });
     } catch (error) {
       console.warn(error.message);
@@ -21335,11 +21403,14 @@ SOFTWARE.
       active = -1;
     }
 
+    // The list stays open on the tags still to choose (owner, 18 Nov 2026:
+    // it closed after a pick and only came back on typing, as the input
+    // never lost focus to fire focus again). It closes when none are left.
     function pick(tag) {
       box.insertBefore(chip(tag.name, tag.ordinal), input);
       input.value = '';
-      hide();
       input.focus();
+      show();
     }
 
     async function show() {
@@ -21388,7 +21459,9 @@ SOFTWARE.
           if (exact) pick(exact);
         }
       } else if (event.key === 'Backspace' && !input.value) {
+        // The removed tag is offered again.
         box.querySelector('.us-attachment__chip:last-of-type')?.remove();
+        show();
       }
     });
     box.addEventListener('click', event => { if (event.target === box) input.focus(); });
