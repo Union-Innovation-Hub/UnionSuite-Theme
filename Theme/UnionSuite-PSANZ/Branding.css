@@ -35,18 +35,18 @@
   --face-ui: "Averta", system-ui, sans-serif;
 }
 
-/* PSA: dark maroon banner, the dark end of the coral ramp and the same
-   family as the navigation. The full coral gradient was too strong behind a
-   whole record header (owner, 18 November 2026); coral now marks the top
-   edge, the current tab and the primary action. One stop darker than the
-   theme's default banner: on the lighter stop the red priority badge and
-   the coral accent lose contrast. */
+/* PSA: charcoal banner, a gradient from the dark end of the neutral ramp
+   to one stop lighter than PSA's own charcoal (the neutral seed), so the
+   gradient shows. The full coral gradient was
+   too strong behind a whole record header, and the dark maroon that
+   replaced it was dropped for charcoal (owner, 18 November 2026); coral
+   now marks the top edge, the current tab and the primary action. */
 :root .us-banner:not(:where(.us-report-no-styling, .us-report-no-styling *)) {
-  --banner-bg: var(--brand-900);
-  --banner-bg-end: var(--brand-800);
-  --banner-border: var(--brand-700);
-  --banner-soft-bg: var(--brand-900);
-  --banner-hover-bg: var(--brand-800);
+  --banner-bg: var(--neutral-800);
+  --banner-bg-end: var(--neutral-500);
+  --banner-border: var(--neutral-500);
+  --banner-soft-bg: var(--neutral-800);
+  --banner-hover-bg: var(--neutral-700);
   --banner-accent: var(--accent);
   --banner-on-accent: var(--text-on-accent);
   --banner-accent-hover: var(--accent-hover);
