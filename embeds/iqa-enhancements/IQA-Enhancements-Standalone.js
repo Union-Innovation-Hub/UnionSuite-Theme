@@ -68,7 +68,7 @@
   }
   if (window.UnionSuiteIqaStandalone) return;
   if (!/\/QueryBuilder\/Design\.aspx$|\/AsiCommon\/Controls\/IQA\/Default\.aspx$/i.test(location.pathname)) return;
-  window.UnionSuiteIqaStandalone = Object.freeze({ version: "f11ba05057" });
+  window.UnionSuiteIqaStandalone = Object.freeze({ version: "44dec2007d" });
 
   const style = document.createElement('style');
   style.id = 'iqa-standalone-css';
@@ -7020,6 +7020,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
    * Code WhereUsedIndex). Proven by configuration-payload-probe.js.
    * ======================================================================== */
   const STORE = { entity: 'i4u_UT_Configuration', module: 'System', category: 'IQA', code: 'WhereUsedIndex' };
+  const NO_PAYLOAD = 'This site’s i4u_UT_Configuration has no Payload property (varbinary(MAX)) to hold them, so they show here until the page reloads.';
   const property = (name, value) => ({ $type: 'Asi.Soa.Core.DataContracts.GenericPropertyData, Asi.Contracts', Name: name, Value: value });
   const scalar = value => value && typeof value === 'object' && '$value' in value ? value.$value : value;
 
@@ -7686,7 +7687,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = createSqlE
         if (PAGE.reads) index = mergeIndex(state.stored?.index, index);
         await save(index, ordinal);
         // Read back what everyone else will now see, including iMIS's UpdatedBy.
-        state.stored = await readStored().catch(() => ({ ordinal, index }));
+        const saved = await readStored().catch(() => null);
+        // A site whose i4u_UT_Configuration has no Payload property accepts
+        // the save and drops the results (PSANZ UAT, 18 November 2026): the
+        // row reads back without them. The results then stay on this page.
+        if (saved && !saved.index) state.saveError = NO_PAYLOAD;
+        state.stored = saved?.index ? saved : { ordinal: saved?.ordinal ?? ordinal, index };
       } catch (error) {
         state.saveError = error.message;
         state.stored = { ordinal: state.stored?.ordinal ?? null, index };

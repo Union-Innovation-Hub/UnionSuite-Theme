@@ -1652,6 +1652,26 @@
     return {total: rows.length, shown: shown.map(row => row.ordinal)};
   }
 
+  // A send control whose action leaves the page: the theme loops its paper
+  // plane taking off (data-us-sending; US-SENDING in zUnionSuite.css) until
+  // the browser leaves.
+  function markSending(control) {
+    const icon = control?.matches?.('.ti') ? control : control?.querySelector?.('.ti');
+    const button = icon?.parentElement;
+    if (!button) return;
+    button.dataset.usSending = '';
+    // The offline case page never leaves.
+    if (window.UnionSuiteCasePreview) setTimeout(clearSending, 3000);
+  }
+
+  function clearSending() {
+    document.querySelectorAll('[data-us-sending]').forEach(button => button.removeAttribute('data-us-sending'));
+  }
+
+  // Back restores the page as it was left, animation included. (The guide
+  // build reads this file with a window that has no events.)
+  window.addEventListener?.('pageshow', clearSending);
+
   define('cases.email-parties', {
     // An icon beside the search in the list's toolbar (owner, 8 October
     // 2026); a labelled item in the banner's Actions menu.
@@ -1660,7 +1680,7 @@
     action: {type: 'function', recordKey: ['caseId'],
       // Read the rows when pressed: the search changes without the action
       // being checked again.
-      run: ({context, wrapper}) => {
+      run: ({context, wrapper, trigger}) => {
         const fromList = !!wrapper?.closest('.us-parties') || !!wrapper?.matches?.('.us-parties');
         const {total, shown, selected} = fromList ? partyOrdinals() : {total: 0, shown: []};
         if (fromList && !total) throw new Error('This case has no parties to email.');
@@ -1682,6 +1702,9 @@
         // The case page prototype runs offline and answers the navigation
         // itself (UnionSuiteCasePreview); a live page navigates.
         (window.UnionSuiteCasePreview?.navigate || (href => location.assign(href)))(url.href);
+        // The send page is a full page load: the plane takes off, on a
+        // loop, until the browser leaves (owner, 18 November 2026).
+        markSending(trigger);
       }}
   });
 
