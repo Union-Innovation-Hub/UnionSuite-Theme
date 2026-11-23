@@ -158,7 +158,9 @@ Several fail loading the 190 MB guide into the browser.
   `THEME-ENHANCEMENTS-INTEGRATION-PLAN.md`, `THEME-BROWSER-COMPATIBILITY.md`,
   `UTSTAFF-CONSOLIDATION.md`, `MVP.md`, `design-qa.md`,
   `BEYONDFORMZ-DYNAMIC-FIELDS.md` (fields added by script reach the flow;
-  planned flow-driven fields), and
+  planned flow-driven fields), `STANDALONE-APPS.md` (the styling rule and
+  shared patterns for UHUB-managed apps embedded in client sites; a design
+  record, not shipped code), and
   `crm-member-profile/` (component and iPart mapping CSVs). The guide build
   reads four of these as sources; it is configured with their `docs/` paths.
 - **`docs/user-guide/`**: the staff help, in plain words for the people who

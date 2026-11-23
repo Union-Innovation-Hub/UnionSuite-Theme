@@ -22,6 +22,23 @@
   background only; do not reconcile this theme back to it or reintroduce its
   values where they conflict.
 
+## Standalone apps
+
+- **UHUB-managed apps embedded in a client site use standalone styling with
+  one consistent UHUB brand** (owner, 23 November 2026). They do not follow a
+  client's branding, and they must work with and without this theme: some
+  client sites run the theme, some rebrand it, and some use their own styling.
+- Take the look from this theme, but pin every value in the app. Declare all
+  tokens on the app root, scope every rule by the root's `id`, reset the
+  root's contents to browser defaults before styling, and ship fonts and icons
+  with the app. Read nothing from the page.
+- The isolation recipe and the shared interface patterns (wizard steps, action
+  menus, filter chips, copyable paths and others) are in
+  [`docs/STANDALONE-APPS.md`](docs/STANDALONE-APPS.md). That file is a design
+  record: none of it is shipped theme code yet.
+- This rule is for apps UHUB builds and maintains. CRM page layouts stay
+  re-themable per client, as the rest of this file describes.
+
 ## iMIS folder path spelling
 
 - Preserve literal underscores in iMIS folder identifiers, including `_i4u_`
